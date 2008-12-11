@@ -1,0 +1,33 @@
+Source: maven-debian-helper
+Section: libs
+Priority: optional
+Maintainer: Debian Java Maintainers <pkg-java-maintainers@lists.alioth.debian.org>
+Uploaders: Torsten Werner <twerner@debian.org>
+Build-Depends: cdbs, debhelper (>= 5), openjdk-6-jdk, maven-debian-helper
+Standards-Version: 3.8.0
+Vcs-Svn: svn://svn.debian.org/svn/pkg-java/trunk/maven-debian-helper
+Vcs-Browser: http://svn.debian.org/wsvn/pkg-java/trunk/maven-debian-helper/
+Homepage: http://wiki.debian.org/Java/MavenBuilder
+
+Package: maven-debian-helper
+Architecture: all
+Depends: ${misc:Depends}, openjdk-6-jre | java2-runtime,
+ libmaven-clean-plugin-java, libmaven-resources-plugin-java,
+ libmaven-compiler-plugin-java, libmaven-jar-plugin-java
+Description: Helper tools for building Debian packages with Maven
+ Maven is a software project management and comprehension tool. Based on the
+ concept of a project object model (POM), Maven can manage a project's build,
+ reporting and documentation from a central piece of information.
+ .
+ Maven's primary goal is to allow a developer to comprehend the complete
+ state of a development effort in the shortest period of time. In order to
+ attain this goal there are several areas of concern that Maven attempts
+ to deal with:
+ .
+    * Making the build process easy
+    * Providing a uniform build system
+    * Providing quality project information
+    * Providing guidelines for best practices development
+    * Allowing transparent migration to new features
+ .
+ This package makes it possible to use Maven for building Debian packages.

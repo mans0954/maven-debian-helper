@@ -1,0 +1,15 @@
+#!/usr/bin/make -f
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/maven.mk
+
+PACKAGE   := $(DEB_SOURCE_PACKAGE)
+VERSION   := $(DEB_UPSTREAM_VERSION)
+JAVA_HOME := /usr/lib/jvm/java-6-openjdk
+
+DEST := $(DEB_REPO)/org/debian/maven/$(PACKAGE)/$(VERSION)
+
+binary-post-install/$(PACKAGE)::
+	dh_install target/*.jar $(DEST)/
+	install -m644 pom.xml $(DEB_DESTDIR)$(DEST)/$(PACKAGE)-$(VERSION).pom
+	dh_link $(DEST)/$(PACKAGE)-$(VERSION).jar /usr/share/maven2/debian/$(PACKAGE).jar

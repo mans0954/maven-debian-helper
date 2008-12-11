@@ -1,0 +1,5 @@
+maven-debian-helper (0.1) unstable; urgency=low
+
+  * Initial release. (Closes: #xxxxxx)
+
+ -- Torsten Werner <twerner@debian.org>  Thu, 11 Dec 2008 20:06:35 +0100

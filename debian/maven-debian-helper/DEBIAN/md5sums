@@ -1,0 +1,6 @@
+803df133d18c612b1e2f655d585cb093  usr/share/doc/maven-debian-helper/copyright
+397eabfd33164dba866e1e922b46e870  usr/share/doc/maven-debian-helper/changelog.gz
+6ec78b30203af40b25afcc7653356a3e  usr/share/cdbs/1/class/maven-vars.mk
+4183a6a76a749a46a6c2faddfd1d50ed  usr/share/cdbs/1/class/maven.mk
+6d81b5cd0ab23e528499b24300f10ce8  usr/share/maven-repo/org/debian/maven/maven-debian-helper/0.1/maven-debian-helper-0.1.jar
+ad0b0f3b5215d0a9357e7b16dc1c0f0e  usr/share/maven-repo/org/debian/maven/maven-debian-helper/0.1/maven-debian-helper-0.1.pom

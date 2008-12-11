@@ -1,0 +1,9 @@
+<!--
+  This is a minimal settings.xml that switches maven to offline mode
+  and uses the Debian repo as the local repo.
+-->
+
+<settings>
+  <localRepository>/usr/share/maven-repo</localRepository>
+  <offline>true</offline>
+</settings>
