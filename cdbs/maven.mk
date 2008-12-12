@@ -1,5 +1,4 @@
 # This file is based on ant.mk
-# revision: 2
 
 # Copyright © 2003 Stefan Gybas <sgybas@debian.org>
 # Copyright © 2008 Torsten Werner <twerner@debian.org>
@@ -30,7 +29,11 @@ _cdbs_class_maven = 1
 include $(_cdbs_rules_path)/buildcore.mk$(_cdbs_makefile_suffix)
 include $(_cdbs_class_path)/maven-vars.mk$(_cdbs_makefile_suffix)
 
-DEB_REPO := /usr/share/maven-repo
+DEB_MAVEN_REPO := /usr/share/maven-repo
+
+MAVEN_EXTRA_OPTS = \
+  $(shell test -n "$(DEB_MAVEN_PROPERTYFILE)" && echo -Dproperties.file.manual=$(DEB_MAVEN_PROPERTYFILE)) \
+  -Dproperties.file.auto=$(CURDIR)/debian/auto.properties
 
 DEB_PHONY_RULES += maven-sanity-check
 
@@ -44,15 +47,20 @@ maven-sanity-check:
 		exit 1; \
 	fi
 
+debian/auto.properties:
+	find $(DEB_MAVEN_REPO) -name '*.pom' | \
+	  sed -e's,^$(DEB_MAVEN_REPO)/,,' \
+	      -e's,/\([0-9][^/]*\).*,.version = \1,' \
+	      -e's,/,.,g'                            > $@
 
 common-build-arch common-build-indep:: debian/stamp-maven-build maven-sanity-check
-debian/stamp-maven-build:
+debian/stamp-maven-build: debian/auto.properties
 	$(DEB_MAVEN_INVOKE) $(DEB_MAVEN_BUILD_TARGET)
 	touch $@
 
-cleanbuilddir:: maven-sanity-check apply-patches
+cleanbuilddir:: maven-sanity-check apply-patches debian/auto.properties
 	-$(DEB_MAVEN_INVOKE) $(DEB_MAVEN_CLEAN_TARGET)
-	$(RM) debian/stamp-maven-build
+	$(RM) debian/auto.properties debian/stamp-maven-build
 
 common-install-arch common-install-indep:: common-install-impl
 common-install-impl::

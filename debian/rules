@@ -7,7 +7,7 @@ PACKAGE   := $(DEB_SOURCE_PACKAGE)
 VERSION   := $(DEB_UPSTREAM_VERSION)
 JAVA_HOME := /usr/lib/jvm/java-6-openjdk
 
-DEST := $(DEB_REPO)/org/debian/maven/$(PACKAGE)/$(VERSION)
+DEST := $(DEB_MAVEN_REPO)/org/debian/maven/$(PACKAGE)/$(VERSION)
 
 binary-post-install/$(PACKAGE)::
 	dh_install target/*.jar $(DEST)/
