@@ -55,7 +55,6 @@ DEB_CLASSPATH = $(MAVEN_HOME)/boot/classworlds.jar:$(shell for jar in $(DEB_JARS
 		if [ -f "$(JAVA_HOME)/lib/tools.jar" ]; then echo -n "$(JAVA_HOME)/lib/tools.jar"; fi)
 
 # Extra arguments for the Maven command line.
-# TODO: DOES NOT WORK YET BECAUSE IT NEEDS PATCHING MAVEN!!!
 DEB_MAVEN_ARGS = 
 
 # Property file for Maven, defaults to debian/maven.properties if it exists.
@@ -68,14 +67,10 @@ DEB_MAVEN_PROPERTYFILE = $(shell test -f $(CURDIR)/debian/maven.properties && ec
 # command-line arguments in MAVEN_ARGS. You can additionally define
 # MAVEN_ARGS_<package> for each individual package.
 DEB_MAVEN_INVOKE = cd $(DEB_BUILDDIR) && $(JAVACMD) -classpath $(DEB_CLASSPATH) \
-		 $(MAVEN_EXTRA_OPTS) -Dclassworlds.conf=/etc/maven2/m2-debian.conf \
-		 -Dmaven.home=$(MAVEN_HOME) $(DEB_MAVEN_EXTRAPROPS) \
+		 $(JAVA_OPTS) -Dclassworlds.conf=/etc/maven2/m2-debian.conf \
 		 org.codehaus.classworlds.Launcher $(DEB_MAVEN_ARGS) \
 		 -s/etc/maven2/settings-debian.xml \
 		 $(if $(MAVEN_ARGS_$(cdbs_curpkg)),$(MAVEN_ARGS_$(cdbs_curpkg)),$(MAVEN_ARGS))
-
-# TODO: DOES NOT WORK YET
-#		 $(if $(DEB_MAVEN_PROPERTYFILE),-propertyfile $(DEB_MAVEN_PROPERTYFILE),)
 
 # Targets to invoke for building, installing, testing and cleaning up.
 # Building uses the default target from build.xml, installing and testing is

@@ -31,7 +31,7 @@ include $(_cdbs_class_path)/maven-vars.mk$(_cdbs_makefile_suffix)
 
 DEB_MAVEN_REPO := /usr/share/maven-repo
 
-MAVEN_EXTRA_OPTS = \
+JAVA_OPTS = \
   $(shell test -n "$(DEB_MAVEN_PROPERTYFILE)" && echo -Dproperties.file.manual=$(DEB_MAVEN_PROPERTYFILE)) \
   -Dproperties.file.auto=$(CURDIR)/debian/auto.properties
 

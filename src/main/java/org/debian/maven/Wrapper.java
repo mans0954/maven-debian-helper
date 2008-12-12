@@ -7,10 +7,14 @@ import java.util.Properties;
 import org.apache.maven.cli.MavenCli;
 import org.codehaus.classworlds.ClassWorld;
 
+/* This is a wrapper for Maven's main function that implements reading 2
+ * property files: debian/auto.properties and debian/manual.properties.
+ */
+
 public class Wrapper
 {
-  /* Opens the filename specified by property 'key' and adds its content to
-   * args as -Dkey=value.
+  /* Opens the filename specified by property 'key' and returns its content as
+   * a String array of items -Dkey=value.
    */
   public static String[] getProperties(String key) throws IOException
   {
@@ -35,7 +39,7 @@ public class Wrapper
   }
 
   /* Add more properties to the commandline. The files specified
-   * by 'properties.file.auto' and 'properties.file.manual' are read.
+   * by '-Dproperties.file.auto=' and '-Dproperties.file.manual=' are read.
    */
   public static String[] updateCommandLine(String[] args) throws IOException
   {
