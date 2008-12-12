@@ -64,12 +64,15 @@ DEB_MAVEN_ARGS =
 # the property file.
 DEB_MAVEN_PROPERTYFILE = $(shell test -f $(CURDIR)/debian/maven.properties && echo $(CURDIR)/debian/maven.properties)
 
+DEB_MAVEN_EXTRAPROPS = $(shell test -n "$(DEB_MAVEN_PROPERTYFILE)" && echo -Dproperties.file.manual=$(DEB_MAVEN_PROPERTYFILE))
+#DEB_MAVEN_EXTRAPROPS = -Dproperties.file.auto=$(CURDIR)/debian/auto.properties
+
 # You can specify additional JVM arguments in MAVEN_OPTS and Maven
 # command-line arguments in MAVEN_ARGS. You can additionally define
 # MAVEN_ARGS_<package> for each individual package.
 DEB_MAVEN_INVOKE = cd $(DEB_BUILDDIR) && $(JAVACMD) -classpath $(DEB_CLASSPATH) \
 		 $(MAVEN_OPTS) -Dclassworlds.conf=/etc/maven2/m2-debian.conf \
-		 -Dmaven.home=$(MAVEN_HOME) \
+		 -Dmaven.home=$(MAVEN_HOME) $(DEB_MAVEN_EXTRAPROPS) \
 		 org.codehaus.classworlds.Launcher $(DEB_MAVEN_ARGS) \
 		 -s/etc/maven2/settings-debian.xml \
 		 $(if $(MAVEN_ARGS_$(cdbs_curpkg)),$(MAVEN_ARGS_$(cdbs_curpkg)),$(MAVEN_ARGS))
