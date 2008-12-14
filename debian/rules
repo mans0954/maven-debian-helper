@@ -8,14 +8,10 @@ JAVA_HOME := /usr/lib/jvm/java-6-openjdk
 
 DEST := $(DEB_MAVEN_REPO)/org/debian/maven/
 
-binary-post-install/$(DEB_SOURCE_PACKAGE)::
-	# maven-debian
-	dh_installdirs $(DEST)/maven-debian/$(VERSION)
-	install -m644 pom.xml $(DEB_DESTDIR)$(DEST)/maven-debian/$(VERSION)/maven-debian-$(VERSION).pom
-	# maven-debian-helper
-	dh_install maven-debian-helper/target/*.jar $(DEST)/maven-debian-helper/$(VERSION)
-	install -m644 pom.xml $(DEB_DESTDIR)$(DEST)/maven-debian-helper/$(VERSION)/maven-debian-helper-$(VERSION).pom
-	dh_link $(DEST)/maven-debian-helper/$(VERSION)/maven-debian-helper-$(VERSION).jar /usr/share/maven2/debian/maven-debian-helper.jar
-	# maven-debian-helper
-	dh_install maven-debian-plugin/target/*.jar $(DEST)/maven-debian-plugin/$(VERSION)
-	install -m644 pom.xml $(DEB_DESTDIR)$(DEST)/maven-debian-plugin/$(VERSION)/maven-debian-plugin-$(VERSION).pom
+DEB_JAR_PACKAGE ?= $(firstword $(shell dh_listpackages))
+DEB_PLUGIN_VERSION = $(shell ls /usr/share/maven-repo/org/debian/maven/maven-debian-helper/)
+
+PLUGIN_GOAL = org.debian.maven:maven-debian-plugin:$(DEB_PLUGIN_VERSION):install
+PLUGIN_ARGS = -Ddebian.dir=$(CURDIR)/debian -Ddebian.package=$(DEB_JAR_PACKAGE)
+binary-post-install/$(DEB_JAR_PACKAGE)::
+	$(DEB_MAVEN_INVOKE) $(PLUGIN_GOAL) $(PLUGIN_ARGS)
