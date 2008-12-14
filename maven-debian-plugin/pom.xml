@@ -11,14 +11,4 @@
   <artifactId>maven-debian-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Maven Debian Plugin</name>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
-      <version>1.5.6</version>
-      <scope>system</scope>
-      <systemPath>/usr/share/java/plexus-utils.jar</systemPath>
-    </dependency>
-  </dependencies>
 </project>
