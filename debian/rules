@@ -3,15 +3,4 @@
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/maven.mk
 
-VERSION   := $(DEB_UPSTREAM_VERSION)
 JAVA_HOME := /usr/lib/jvm/java-6-openjdk
-
-DEST := $(DEB_MAVEN_REPO)/org/debian/maven/
-
-DEB_JAR_PACKAGE ?= $(firstword $(shell dh_listpackages))
-DEB_PLUGIN_VERSION = $(shell ls /usr/share/maven-repo/org/debian/maven/maven-debian-helper/)
-
-PLUGIN_GOAL = org.debian.maven:maven-debian-plugin:$(DEB_PLUGIN_VERSION):install
-PLUGIN_ARGS = -Ddebian.dir=$(CURDIR)/debian -Ddebian.package=$(DEB_JAR_PACKAGE)
-binary-post-install/$(DEB_JAR_PACKAGE)::
-	$(DEB_MAVEN_INVOKE) $(PLUGIN_GOAL) $(PLUGIN_ARGS)

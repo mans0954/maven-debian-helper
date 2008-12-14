@@ -72,12 +72,16 @@ DEB_MAVEN_INVOKE = cd $(DEB_BUILDDIR) && $(JAVACMD) -classpath $(DEB_CLASSPATH) 
 		 -s/etc/maven2/settings-debian.xml \
 		 $(if $(MAVEN_ARGS_$(cdbs_curpkg)),$(MAVEN_ARGS_$(cdbs_curpkg)),$(MAVEN_ARGS))
 
+# The name of the binary package that gets the jar files installed. The
+# first package by default.
+DEB_JAR_PACKAGE = $(firstword $(shell dh_listpackages))
+
 # Targets to invoke for building, installing, testing and cleaning up.
 # Building uses the default target from build.xml, installing and testing is
 # only called if the corresponding variable is set. You can also specify
 # multiple targets for each step.
 DEB_MAVEN_BUILD_TARGET = compile jar:jar   # TODO: should be 'package'
-DEB_MAVEN_INSTALL_TARGET =
+DEB_MAVEN_INSTALL_TARGET = debian:install
 DEB_MAVEN_CHECK_TARGET =
 DEB_MAVEN_CLEAN_TARGET = clean
 

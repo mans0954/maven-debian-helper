@@ -62,9 +62,12 @@ cleanbuilddir:: maven-sanity-check apply-patches debian/auto.properties
 	-$(DEB_MAVEN_INVOKE) $(DEB_MAVEN_CLEAN_TARGET)
 	$(RM) debian/auto.properties debian/stamp-maven-build
 
+# extra arguments for the installation step
+PLUGIN_ARGS = -Ddebian.dir=$(CURDIR)/debian -Ddebian.package=$(DEB_JAR_PACKAGE)
+
 common-install-arch common-install-indep:: common-install-impl
 common-install-impl::
-	$(if $(DEB_MAVEN_INSTALL_TARGET),$(DEB_MAVEN_INVOKE) $(DEB_MAVEN_INSTALL_TARGET),@echo "DEB_MAVEN_INSTALL_TARGET unset, skipping default maven.mk common-install target")
+	$(if $(DEB_MAVEN_INSTALL_TARGET),$(DEB_MAVEN_INVOKE) $(DEB_MAVEN_INSTALL_TARGET) $(PLUGIN_ARGS),@echo "DEB_MAVEN_INSTALL_TARGET unset, skipping default maven.mk common-install target")
 
 ifeq (,$(findstring nocheck,$(DEB_BUILD_OPTIONS)))
 common-build-arch common-build-indep:: debian/stamp-maven-check
