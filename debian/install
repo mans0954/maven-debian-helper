@@ -1,2 +1,3 @@
-cdbs/* /usr/share/cdbs/1/class/
-etc/*  /etc/maven2/
+cdbs/*     /usr/share/cdbs/1/class/
+etc/*      /etc/maven2/
+maven-repo /usr/share/
