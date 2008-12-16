@@ -66,7 +66,7 @@ DEB_MAVEN_PROPERTYFILE = $(shell test -f $(CURDIR)/debian/maven.properties && ec
 # You can specify additional JVM arguments in MAVEN_OPTS and Maven
 # command-line arguments in MAVEN_ARGS. You can additionally define
 # MAVEN_ARGS_<package> for each individual package.
-DEB_MAVEN_INVOKE = cd $(DEB_BUILDDIR) && $(JAVACMD) -classpath $(DEB_CLASSPATH) \
+DEB_MAVEN_INVOKE = cd $(DEB_BUILDDIR) && $(JAVACMD) -noverify -cp $(DEB_CLASSPATH) \
 		 $(JAVA_OPTS) -Dclassworlds.conf=/etc/maven2/m2-debian.conf \
 		 org.codehaus.classworlds.Launcher $(DEB_MAVEN_ARGS) \
 		 -s/etc/maven2/settings-debian.xml \
@@ -80,7 +80,7 @@ DEB_JAR_PACKAGE = $(firstword $(shell dh_listpackages))
 # Building uses the default target from build.xml, installing and testing is
 # only called if the corresponding variable is set. You can also specify
 # multiple targets for each step.
-DEB_MAVEN_BUILD_TARGET = compile jar:jar   # TODO: should be 'package'
+DEB_MAVEN_BUILD_TARGET = package
 DEB_MAVEN_INSTALL_TARGET = debian:install
 DEB_MAVEN_CHECK_TARGET =
 DEB_MAVEN_CLEAN_TARGET = clean
