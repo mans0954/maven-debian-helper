@@ -59,8 +59,8 @@ public class Wrapper
     return newArgs;
   }
 
-  public static void main(String[] args, ClassWorld classWorld) throws IOException
+  public static int main(String[] args, ClassWorld classWorld) throws IOException
   {
-    MavenCli.main(updateCommandLine(args), classWorld);
+    return MavenCli.main(updateCommandLine(args), classWorld);
   }
 }
