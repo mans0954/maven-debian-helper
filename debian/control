@@ -13,7 +13,8 @@ Package: maven-debian-helper
 Architecture: all
 Depends: ${misc:Depends}, openjdk-6-jre | java2-runtime,
  libmaven-clean-plugin-java, libmaven-resources-plugin-java,
- libmaven-compiler-plugin-java, libmaven-jar-plugin-java
+ libmaven-compiler-plugin-java, libmaven-jar-plugin-java, libmaven-site-plugin-java,
+ libsurefire-java
 Description: Helper tools for building Debian packages with Maven
  Maven is a software project management and comprehension tool. Based on the
  concept of a project object model (POM), Maven can manage a project's build,
