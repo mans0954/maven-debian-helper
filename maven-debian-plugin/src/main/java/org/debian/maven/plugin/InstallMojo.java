@@ -195,6 +195,16 @@ public class InstallMojo
     FileUtils.copyFile(new File(pomSrcPath()), new File(pomDestPath()));
   }
 
+  private void mkdir(String path) throws IOException
+  {
+    new File(path).mkdirs();
+  }
+
+  private void run(String[] command) throws IOException
+  {
+    Runtime.getRuntime().exec(command, null);
+  }
+
   /* if a jar exists: copy it and symlink it to the compat share dir
    */
 
@@ -204,8 +214,8 @@ public class InstallMojo
     if (jarFile.exists())
     {
       FileUtils.copyFile(jarFile, new File(jarDestPath()));
-      new File(compatSharePath()).mkdirs();
-      Runtime.getRuntime().exec(linkCommand(), null);
+      mkdir(compatSharePath());
+      run(linkCommand());
     }
   }
 }
