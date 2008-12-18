@@ -48,11 +48,11 @@ public class InstallMojo
   /**
    * directory where the current pom.xml can be found
    *
-   * @parameter expression="${project.build.directory}"
+   * @parameter expression="${project.basedir}"
    * @required
    * @readonly
    */
-  private String buildDir;
+  private File basedir;
 
   /**
    * directory of the jar file
@@ -130,14 +130,9 @@ public class InstallMojo
     return artifactId + "-" + version + ".pom";
   }
 
-  private String pomDir()
-  {
-    return buildDir.replaceFirst("[^/]*$", "");
-  }
-
   private String pomSrcPath()
   {
-    return pomDir() + "/pom.xml";
+    return basedir.getAbsolutePath() + "/pom.xml";
   }
 
   private String pomDestPath()
