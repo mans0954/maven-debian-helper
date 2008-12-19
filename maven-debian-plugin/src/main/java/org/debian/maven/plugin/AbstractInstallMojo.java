@@ -98,7 +98,7 @@ abstract public class AbstractInstallMojo extends AbstractMojo
   /* absolute path to destination dir
    */
 
-  private String fullRepoPath()
+  protected String fullRepoPath()
   {
     return packagePath() + "/usr/share/maven-repo" + repoPath();
   }
@@ -151,12 +151,17 @@ abstract public class AbstractInstallMojo extends AbstractMojo
     return "../maven-repo" + repoPath() + jarName();
   }
 
+  protected String fullCompatPath()
+  {
+    return compatSharePath() + compatName();
+  }
+
   /* command for creating the relative symlink
    */
 
   private String[] linkCommand()
   {
-    String[] command = {"ln", "-s", compatRelPath(), compatSharePath() + compatName()};
+    String[] command = {"ln", "-s", compatRelPath(), fullCompatPath()};
     return command;
   }
 
