@@ -7,60 +7,74 @@ import java.util.Properties;
 import org.apache.maven.cli.MavenCli;
 import org.codehaus.classworlds.ClassWorld;
 
-/* This is a wrapper for Maven's main function that implements reading 2
- * property files: debian/auto.properties and debian/manual.properties.
+/* This is a wrapper for Maven's main function that reads 2 property
+ * files: debian/auto.properties and debian/manual.properties and adds
+ * their content to maven's commandline.
  */
 
 public class Wrapper
 {
-  /* Opens the filename specified by property 'key' and returns its content as
-   * a String array of items -Dkey=value.
+  /* holds system properties
    */
-  public static String[] getProperties(String key) throws IOException
+
+  private static Properties systemProperties = System.getProperties();
+
+  /* holds extra properties that are read from property files
+   */
+
+  private static Properties extraProperties = new Properties();
+
+  /* the extended command line for maven's main function
+   */
+
+  private static String[] newArgs;
+
+  /* Opens the filename specified by property 'key' and loads its
+   * properties into extraProperties
+   */
+
+  public static void updateProperties(String key) throws IOException
   {
-    Properties systemproperties = System.getProperties();
-    String filename = systemproperties.getProperty(key);
+    String filename = systemProperties.getProperty(key);
     if (filename != null)
     {
-      Properties extraProperties = new Properties();
       extraProperties.load(new FileInputStream(filename));
-      String[] extraArgs = new String[extraProperties.size()];
-      int i = 0;
-      for(Enumeration e = extraProperties.propertyNames(); e.hasMoreElements(); )
-      {
-	String k = (String) e.nextElement();
-	String v = (String) extraProperties.get(k);
-	extraArgs[i] = "-D" + k + "=" + v;
-	i++;
-      }
-      return extraArgs;
     }
-    return new String[0];
   }
 
-  /* Add more properties to the commandline. The files specified
-   * by '-Dproperties.file.auto=' and '-Dproperties.file.manual=' are read.
+  /* Fill new commandline array 'newArgs' with properties from
+   * extraProperties and the current commandline array 'args.
    */
-  public static String[] updateCommandLine(String[] args) throws IOException
-  {
-    String[] autoArgs = getProperties("properties.file.auto");
-    String[] manualArgs = getProperties("properties.file.manual");
 
-    int argsSize = args.length;
-    int autoSize = autoArgs.length;
-    int manualSize = manualArgs.length;
+  public static void updateCommandLine(String[] args) throws IOException
+  {
+    int argsSize  = args.length;
+    int extraSize = extraProperties.size();
     
-    String[] newArgs = new String[argsSize + autoSize + manualSize];
+    newArgs = new String[argsSize + extraSize];
+
+    int i = 0;
+    for(Enumeration e = extraProperties.propertyNames(); e.hasMoreElements(); )
+    {
+      String key   = (String) e.nextElement();
+      String value = (String) extraProperties.get(key);
+      newArgs[i] = "-D" + key + "=" + value;
+      i++;
+    }
     
-    System.arraycopy(autoArgs, 0, newArgs, 0, autoSize);
-    System.arraycopy(manualArgs, 0, newArgs, autoSize, manualSize);
-    System.arraycopy(args, 0, newArgs, autoSize + manualSize, argsSize);
-    
-    return newArgs;
+    System.arraycopy(args, 0, newArgs, extraSize, argsSize);
   }
+
+  /* wraps maven's main function
+   */
 
   public static int main(String[] args, ClassWorld classWorld) throws IOException
   {
-    return MavenCli.main(updateCommandLine(args), classWorld);
+    updateProperties("properties.file.auto");
+    updateProperties("properties.file.manual");
+
+    updateCommandLine(args);
+
+    return MavenCli.main(newArgs, classWorld);
   }
 }
