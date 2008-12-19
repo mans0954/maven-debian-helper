@@ -2,7 +2,6 @@ package org.debian.maven.plugin;
 
 import java.io.IOException;
 import org.apache.maven.bootstrap.util.FileUtils;
-import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * Remove installed files and symlinks from the /usr/share hierarchy
@@ -19,22 +18,13 @@ public class SysUninstallMojo extends SysInstallMojo
   // Public methods
   // ----------------------------------------------------------------------
 
-  public void execute() throws MojoExecutionException
-  {
-    try
-    {
-      FileUtils.forceDelete(fullRepoPath());
-      FileUtils.fileDelete(fullCompatPath());
-    }
-    catch(IOException e)
-    {
-      getLog().error("uninstallation failed", e);
-      throw new MojoExecutionException("IOException catched");
-    }
-  }
-
   // ----------------------------------------------------------------------
   // Private methods
   // ----------------------------------------------------------------------
 
+  protected void runMojo() throws IOException
+  {
+    FileUtils.forceDelete(fullRepoPath());
+    FileUtils.fileDelete(fullCompatPath());
+  }
 }

@@ -5,7 +5,7 @@ package org.debian.maven.plugin;
  *
  * @goal install
  */
-public class InstallMojo extends AbstractInstallMojo
+public class InstallMojo extends SysInstallMojo
 {
   // ----------------------------------------------------------------------
   // Mojo parameters
