@@ -2,8 +2,9 @@ maven-debian-helper (0.2) unstable; urgency=low
 
   UNRELEASED
   * Refactoring.
+  * Add sysinstall goal.
 
- -- Torsten Werner <twerner@debian.org>  Wed, 17 Dec 2008 23:19:00 +0100
+ -- Torsten Werner <twerner@debian.org>  Fri, 19 Dec 2008 17:43:18 +0100
 
 maven-debian-helper (0.1) unstable; urgency=low
 

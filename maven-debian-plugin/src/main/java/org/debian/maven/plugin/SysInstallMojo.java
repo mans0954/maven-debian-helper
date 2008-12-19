@@ -1,31 +1,15 @@
 package org.debian.maven.plugin;
 
 /**
- * Install pom and jar files into the debian/ directory
+ * Install pom and jar files into the /usr/share hierarchy
  *
- * @goal install
+ * @goal sysinstall
  */
-public class InstallMojo extends AbstractInstallMojo
+public class SysInstallMojo extends AbstractInstallMojo
 {
   // ----------------------------------------------------------------------
   // Mojo parameters
   // ----------------------------------------------------------------------
-
-  /**
-   * $(CURDIR)/debian - must be supplied because $(CURDIR) is not known
-   *
-   * @parameter expression="${debian.dir}"
-   * @required
-   */
-  private String debianDir;
-
-  /**
-   * name of the debian binary package, e.g. libfoobar-java
-   *
-   * @parameter expression="${debian.package}"
-   * @required
-   */
-  private String debianPackage;
 
   // ----------------------------------------------------------------------
   // Public methods
@@ -35,11 +19,11 @@ public class InstallMojo extends AbstractInstallMojo
   // Private methods
   // ----------------------------------------------------------------------
 
-  /* returns e.g. $CURDIR/debian/libfoobar-java
+  /* returns empty prefix
    */
 
   protected String packagePath()
   {
-    return debianDir + "/" + debianPackage;
+    return "";
   }
 }
