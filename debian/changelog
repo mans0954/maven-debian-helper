@@ -2,9 +2,10 @@ maven-debian-helper (0.2) unstable; urgency=low
 
   UNRELEASED
   * Refactoring.
-  * Add sysinstall and sysuninstall goals.
+  * Add more goals: sysinstall, sysuninstall, resolve-none, resolve-compile,
+    resolve-test, resolve-runtime.
 
- -- Torsten Werner <twerner@debian.org>  Fri, 19 Dec 2008 18:04:30 +0100
+ -- Torsten Werner <twerner@debian.org>  Sat, 20 Dec 2008 13:55:31 +0100
 
 maven-debian-helper (0.1) unstable; urgency=low
 
