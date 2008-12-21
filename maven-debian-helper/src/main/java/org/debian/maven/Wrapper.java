@@ -57,7 +57,7 @@ public class Wrapper
     for(Enumeration e = extraProperties.propertyNames(); e.hasMoreElements(); )
     {
       String key   = (String) e.nextElement();
-      String value = (String) extraProperties.get(key);
+      String value = extraProperties.getProperty(key);
       newArgs[i] = "-D" + key + "=" + value;
       i++;
     }

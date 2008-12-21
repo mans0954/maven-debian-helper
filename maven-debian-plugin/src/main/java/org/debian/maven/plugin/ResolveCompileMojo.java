@@ -5,6 +5,7 @@ package org.debian.maven.plugin;
  *
  * @goal resolve-compile
  * @requiresDependencyResolution compile
+ * @aggregator true
  */
 public class ResolveCompileMojo extends ResolveNoneMojo
 {

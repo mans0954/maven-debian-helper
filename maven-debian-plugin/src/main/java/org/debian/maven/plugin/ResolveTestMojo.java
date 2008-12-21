@@ -5,6 +5,7 @@ package org.debian.maven.plugin;
  *
  * @goal resolve-test
  * @requiresDependencyResolution test
+ * @aggregator true
  */
 public class ResolveTestMojo extends ResolveNoneMojo
 {

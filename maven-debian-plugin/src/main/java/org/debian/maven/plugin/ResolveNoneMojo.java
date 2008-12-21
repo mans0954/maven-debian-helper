@@ -7,6 +7,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  * dummy goal that just reads the pom.xml files including parents
  *
  * @goal resolve-none
+ * @aggregator true
  */
 public class ResolveNoneMojo extends AbstractMojo
 {
