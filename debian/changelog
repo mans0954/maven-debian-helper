@@ -4,8 +4,9 @@ maven-debian-helper (0.2) unstable; urgency=low
   * Refactoring.
   * Add more goals: sysinstall, sysuninstall, resolve-none, resolve-compile,
     resolve-test, resolve-runtime.
+  * Support more core plugins.
 
- -- Torsten Werner <twerner@debian.org>  Sat, 20 Dec 2008 13:55:31 +0100
+ -- Torsten Werner <twerner@debian.org>  Thu, 25 Dec 2008 13:31:30 +0100
 
 maven-debian-helper (0.1) unstable; urgency=low
 
