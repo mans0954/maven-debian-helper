@@ -63,12 +63,18 @@ under the License.
 
   <properties>
     <!-- TODO: add properties for ALL core plugins -->
+    <org.apache.maven.plugins.maven-antrun-plugin.version>
+      1.1
+    </org.apache.maven.plugins.maven-antrun-plugin.version>
     <org.apache.maven.plugins.maven-clean-plugin.version>
       2.2
     </org.apache.maven.plugins.maven-clean-plugin.version>
     <org.apache.maven.plugins.maven-compiler-plugin.version>
       2.0.2
     </org.apache.maven.plugins.maven-compiler-plugin.version>
+    <org.apache.maven.plugins.maven-dependency-plugin.version>
+      2.0
+    </org.apache.maven.plugins.maven-dependency-plugin.version>
     <org.apache.maven.plugins.maven-jar-plugin.version>
       2.2
     </org.apache.maven.plugins.maven-jar-plugin.version>
@@ -84,10 +90,14 @@ under the License.
     <org.apache.maven.plugins.maven-surefire-plugin.version>
       2.4.3
     </org.apache.maven.plugins.maven-surefire-plugin.version>
+    <org.apache.maven.plugins.maven-war-plugin.version>
+      2.1-alpha-1
+    </org.apache.maven.plugins.maven-war-plugin.version>
   </properties>
 
   <build>
     <!-- load the correct version of maven-debian-plugin -->
+    <!-- startworkaround -->
     <plugins>
       <plugin>
 	<groupId>org.debian.maven</groupId>
@@ -95,6 +105,7 @@ under the License.
 	<version>${org.debian.maven.maven-debian-plugin.version}</version>
       </plugin>
     </plugins>
+    <!-- endworkaround -->
 
     <directory>target</directory>
     <outputDirectory>target/classes</outputDirectory>
@@ -117,7 +128,7 @@ under the License.
        <plugins>
          <plugin>
            <artifactId>maven-antrun-plugin</artifactId>
-           <version>1.1</version>
+           <version>${org.apache.maven.plugins.maven-antrun-plugin.version}</version>
          </plugin>       
          <plugin>
            <artifactId>maven-assembly-plugin</artifactId>
@@ -133,7 +144,7 @@ under the License.
          </plugin>
          <plugin>
            <artifactId>maven-dependency-plugin</artifactId>
-           <version>2.0</version>
+           <version>${org.apache.maven.plugins.maven-dependency-plugin.version}</version>
          </plugin>
          <plugin>
            <artifactId>maven-deploy-plugin</artifactId>
@@ -189,7 +200,7 @@ under the License.
          </plugin>
          <plugin>
            <artifactId>maven-war-plugin</artifactId>
-           <version>2.1-alpha-1</version>
+           <version>${org.apache.maven.plugins.maven-war-plugin.version}</version>
          </plugin>
        </plugins>
      </pluginManagement>

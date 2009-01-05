@@ -11,12 +11,12 @@ MAIN_CLASS=org.codehaus.classworlds.Launcher
 MAVEN_OPTS=-s/etc/maven2/settings-debian.xml
 MAVEN_REPO=/usr/share/maven-repo
 
-mkdir -p debian
+AUTO_PROPS=$(mktemp)
 find $MAVEN_REPO -name "*.pom" | \
   sed -e"s,^$MAVEN_REPO/,," \
       -e"s,/\([0-9][^/]*\).*,.version = \1," \
-      -e"s,/,.,g"                            > debian/auto.properties
-JAVA_OPTS="$JAVA_OPTS -Dproperties.file.auto=$PWD/debian/auto.properties"
+      -e"s,/,.,g"                            > $AUTO_PROPS
+JAVA_OPTS="$JAVA_OPTS -Dproperties.file.auto=$AUTO_PROPS"
 MAVEN_OPTS="$MAVEN_OPTS -Ddebian.dir=$PWD/debian"
 
 if [ -r debian/control ]; then
@@ -24,4 +24,7 @@ if [ -r debian/control ]; then
   MAVEN_OPTS="$MAVEN_OPTS -Ddebian.package=$JAR_PACKAGE"
 fi
 
-exec java -noverify -cp $DEB_CLASSPATH $JAVA_OPTS $MAIN_CLASS "$@" $MAVEN_OPTS
+java -noverify -cp $DEB_CLASSPATH $JAVA_OPTS $MAIN_CLASS "$@" $MAVEN_OPTS
+
+rm $AUTO_PROPS
+
