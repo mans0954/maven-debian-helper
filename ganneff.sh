@@ -14,7 +14,7 @@ boot() {
   PKG=org/apache/maven/project
   POM=$PKG/pom-4.0.0.xml
   DIR=maven-debian-helper/src/main/resources
-  mkdir -p org/apache/maven/project/
+  mkdir -p $PKG
   sed '/startworkaround/,/endworkaround/d' $DIR/$POM > $POM
   jar cf boot.jar org
   rm -rf org
@@ -33,7 +33,7 @@ scan() {
 maven() {
   $JAVA_HOME/bin/java -cp /usr/share/maven2/boot/classworlds.jar \
     -D"classworlds.conf=boot.conf" org.codehaus.classworlds.Launcher \
-    -s"etc/settings-debian.xml" package \
+    -s"etc/settings-debian.xml" \
     -D"org.codehaus.plexus.plexus-archiver.version=$P_ARCHIVER" \
     -D"org.codehaus.plexus.plexus-interpolation.version=$P_INTERPOLATION" \
     -D"org.apache.maven.plugins.maven-resources-plugin.version=$M_RESOURCES_P" \
