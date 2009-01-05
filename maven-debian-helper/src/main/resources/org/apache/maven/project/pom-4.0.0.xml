@@ -97,6 +97,7 @@ under the License.
 
   <build>
     <!-- load the correct version of maven-debian-plugin -->
+    <!-- startworkaround -->
     <plugins>
       <plugin>
 	<groupId>org.debian.maven</groupId>
@@ -104,6 +105,7 @@ under the License.
 	<version>${org.debian.maven.maven-debian-plugin.version}</version>
       </plugin>
     </plugins>
+    <!-- endworkaround -->
 
     <directory>target</directory>
     <outputDirectory>target/classes</outputDirectory>

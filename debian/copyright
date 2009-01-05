@@ -27,6 +27,10 @@ Copyright: 2001-2007 Apache Software Foundation.
 
 License: Apache-2.0 (see above)
 
+The file is a slightly modified version of Maven's super POM. It
+mentions a file called NOTICE which contains the thirdparty copyright
+information for Maven's binary distribution.
+
 ----------
 
 Files: maven-repo/org/codehaus/*
@@ -54,10 +58,9 @@ License:
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-  02111-1307 USA.
+  You should have received a copy of the GNU General Public License along
+  with this program; if not, write to the Free Software Foundation, Inc.,
+  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 The full text of the license can be found in
 `/usr/share/common-licenses/GPL-2'.

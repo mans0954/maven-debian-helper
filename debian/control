@@ -3,7 +3,9 @@ Section: libs
 Priority: optional
 Maintainer: Debian Java Maintainers <pkg-java-maintainers@lists.alioth.debian.org>
 Uploaders: Torsten Werner <twerner@debian.org>
-Build-Depends: cdbs, debhelper (>= 5), openjdk-6-jdk, maven-debian-helper
+Build-Depends: cdbs, debhelper (>= 5), openjdk-6-jdk, libmaven-clean-plugin-java,
+ libmaven-resources-plugin-java, libmaven-compiler-plugin-java,
+ libmaven-jar-plugin-java, libmaven-site-plugin-java, libsurefire-java
 Standards-Version: 3.8.0
 Vcs-Svn: svn://svn.debian.org/svn/pkg-java/trunk/maven-debian-helper
 Vcs-Browser: http://svn.debian.org/wsvn/pkg-java/trunk/maven-debian-helper/
