@@ -1,0 +1,24 @@
+=head1 NAME
+
+mvn-debian - debian helper for using Maven in offline mode
+
+=head1 SYNOPSIS
+
+B<mvn-debian> [S<I<maven-arguments>>]
+
+=head1 DESCRIPTION
+
+This script can be used to interactively build Maven packages compatible
+to Debian's Maven Repository Specification. Please do not use it for
+building real Debian packages because there are cdbs snippets available
+with more features and less bugs. The full documentation can be found at
+<http://wiki.debian.org/Java/MavenBuilder>.
+
+=head1 SEE ALSO
+
+L<mvn(1)>, <http://wiki.debian.org/Java/MavenRepoSpec>
+
+=head1 AUTHOR
+
+Torsten Werner <twerner@debian.org>
+

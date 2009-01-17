@@ -4,3 +4,9 @@ include /usr/share/cdbs/1/rules/debhelper.mk
 
 install/maven-debian-helper::
 	sh bootstrap.sh
+	pod2man -c 'Maven for Debian GNU/Linux' \
+	  -r maven-debian-helper-$(DEB_UPSTREAM_VERSION) \
+	  man/mvn-debian.pod > man/mvn-debian.1
+
+clean::
+	$(RM) man/mvn-debian.1
