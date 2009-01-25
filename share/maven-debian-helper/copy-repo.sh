@@ -14,16 +14,16 @@ find_all_meta() {
 }
 
 header() {
-  echo "<?xml version="1.0" encoding="UTF-8"?>"
-  echo "<metadata>"
-  echo "  <versioning>"
-  echo "    <versions>"
+  echo '<?xml version="1.0" encoding="UTF-8"?>'
+  echo '<metadata>'
+  echo '  <versioning>'
+  echo '    <versions>'
 }
 
 footer() {
-  echo "    </versions>"
-  echo "  </versioning>"
-  echo "</metadata>"
+  echo '    </versions>'
+  echo '  </versioning>'
+  echo '</metadata>'
 }
 
 echo_meta() {
