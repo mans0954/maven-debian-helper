@@ -179,7 +179,15 @@ public class SysInstallMojo extends AbstractMojo
 
   private void mkdir(String path) throws IOException
   {
-    new File(path).mkdirs();
+    File destinationDirectory = new File(path);
+    if (destinationDirectory.isDirectory())
+    {
+      return;
+    }
+    if (!destinationDirectory.mkdirs())
+    {
+      throw new IOException("cannot create destination directory " + path);
+    }
   }
 
   private void run(String[] command) throws IOException

@@ -4,7 +4,7 @@
 
   <groupId>org.debian.maven</groupId>
   <artifactId>maven-debian</artifactId>
-  <version>0.2</version>
+  <version>0.3</version>
   <packaging>pom</packaging>
   <name>helper tools for using Maven to build Debian packages</name>
 

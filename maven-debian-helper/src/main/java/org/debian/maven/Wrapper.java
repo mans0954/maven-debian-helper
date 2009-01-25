@@ -36,9 +36,22 @@ public class Wrapper
   public static void updateProperties(String key) throws IOException
   {
     String filename = systemProperties.getProperty(key);
-    if (filename != null)
+    if (filename == null)
     {
-      extraProperties.load(new FileInputStream(filename));
+      return;
+    }
+    FileInputStream stream = null;
+    try
+    {
+      stream = new FileInputStream(filename);
+      extraProperties.load(stream);
+    }
+    finally
+    {
+      if (stream != null)
+      {
+	stream.close();
+      }
     }
   }
 
