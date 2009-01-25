@@ -70,6 +70,7 @@ DEB_MAVEN_INVOKE = cd $(DEB_BUILDDIR) && $(JAVACMD) -noverify -cp $(DEB_CLASSPAT
 		 $(JAVA_OPTS) -Dclassworlds.conf=/etc/maven2/m2-debian.conf \
 		 org.codehaus.classworlds.Launcher $(DEB_MAVEN_ARGS) \
 		 -s/etc/maven2/settings-debian.xml \
+		 -Dmaven.repo.local=$(DEB_MAVEN_REPO) \
 		 $(if $(MAVEN_ARGS_$(cdbs_curpkg)),$(MAVEN_ARGS_$(cdbs_curpkg)),$(MAVEN_ARGS))
 
 # The name of the binary package that gets the jar files installed. The

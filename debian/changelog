@@ -2,8 +2,9 @@ maven-debian-helper (0.3) unstable; urgency=low
 
   UNRELEASED
   * Implement better exception handling.
+  * Create our own maven repository during build time.
 
- -- Torsten Werner <twerner@debian.org>  Sun, 25 Jan 2009 12:27:03 +0100
+ -- Torsten Werner <twerner@debian.org>  Sun, 25 Jan 2009 20:33:10 +0100
 
 maven-debian-helper (0.2) unstable; urgency=low
 

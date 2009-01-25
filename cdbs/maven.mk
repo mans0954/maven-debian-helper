@@ -29,7 +29,7 @@ _cdbs_class_maven = 1
 include $(_cdbs_rules_path)/buildcore.mk$(_cdbs_makefile_suffix)
 include $(_cdbs_class_path)/maven-vars.mk$(_cdbs_makefile_suffix)
 
-DEB_MAVEN_REPO := /usr/share/maven-repo
+DEB_MAVEN_REPO := $(CURDIR)/debian/maven-repo
 
 JAVA_OPTS = \
   $(shell test -n "$(DEB_MAVEN_PROPERTYFILE)" && echo -Dproperties.file.manual=$(DEB_MAVEN_PROPERTYFILE)) \
@@ -48,10 +48,7 @@ maven-sanity-check:
 	fi
 
 debian/auto.properties:
-	find $(DEB_MAVEN_REPO) -name '*.pom' | \
-	  sed -e's,^$(DEB_MAVEN_REPO)/,,' \
-	      -e's,/\([0-9][^/]*\).*,.version = \1,' \
-	      -e's,/,.,g'                            > $@
+	/usr/share/maven-debian-helper/copy-repo.sh $(CURDIR)/debian
 
 common-build-arch common-build-indep:: debian/stamp-maven-build maven-sanity-check
 debian/stamp-maven-build: debian/auto.properties
@@ -60,7 +57,7 @@ debian/stamp-maven-build: debian/auto.properties
 
 cleanbuilddir:: maven-sanity-check apply-patches debian/auto.properties
 	-$(DEB_MAVEN_INVOKE) $(DEB_MAVEN_CLEAN_TARGET)
-	$(RM) debian/auto.properties debian/stamp-maven-build
+	$(RM) -r debian/auto.properties $(DEB_MAVEN_REPO) debian/stamp-maven-build
 
 # extra arguments for the installation step
 PLUGIN_ARGS = -Ddebian.dir=$(CURDIR)/debian -Ddebian.package=$(DEB_JAR_PACKAGE)

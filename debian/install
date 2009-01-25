@@ -2,3 +2,4 @@ bin        /usr/
 cdbs/*     /usr/share/cdbs/1/class/
 etc/*      /etc/maven2/
 maven-repo /usr/share/
+share      /usr/

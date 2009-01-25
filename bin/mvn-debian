@@ -1,21 +1,20 @@
 #!/bin/sh
 
 # This is an example script that allows running maven on the command
-# line in a similar way as our cdbs snippets work. Copy this script to
-# /usr/local/bin if you want to have it in the $PATH. Production use is
+# line in a similar way as our cdbs snippets work. Production use is
 # not supported by the maintainer of maven-debian-helper.
 
 DEB_CLASSPATH=/usr/share/java/classworlds.jar
 JAVA_OPTS=-Dclassworlds.conf=/etc/maven2/m2-debian.conf
 MAIN_CLASS=org.codehaus.classworlds.Launcher
 MAVEN_OPTS=-s/etc/maven2/settings-debian.xml
-MAVEN_REPO=/usr/share/maven-repo
 
-AUTO_PROPS=$(mktemp)
-find $MAVEN_REPO -name "*.pom" | \
-  sed -e"s,^$MAVEN_REPO/,," \
-      -e"s,/\([0-9][^/]*\).*,.version = \1," \
-      -e"s,/,.,g"                            > $AUTO_PROPS
+TMP_DIR=$(mktemp -d ${TMP:-/tmp}/mvn-deb.XXXXXXXXXX)
+/usr/share/maven-debian-helper/copy-repo.sh $TMP_DIR
+MAVEN_REPO=$TMP_DIR/maven-repo
+MAVEN_OPTS="$MAVEN_OPTS -Dmaven.repo.local=$MAVEN_REPO"
+
+AUTO_PROPS=$TMP_DIR/auto.properties
 JAVA_OPTS="$JAVA_OPTS -Dproperties.file.auto=$AUTO_PROPS"
 MAVEN_OPTS="$MAVEN_OPTS -Ddebian.dir=$PWD/debian"
 
@@ -26,5 +25,5 @@ fi
 
 java -noverify -cp $DEB_CLASSPATH $JAVA_OPTS $MAIN_CLASS "$@" $MAVEN_OPTS
 
-rm $AUTO_PROPS
+rm -rf $TMP_DIR
 
