@@ -39,12 +39,18 @@ fi
 
 find_all_poms | while read POM; do
   VER_DIR=$(dirname $POM)
-  VER_TAG="      <version>$(basename $VER_DIR)</version>"
+  VERSION=$(basename $VER_DIR)
   BASE_DIR=$(dirname $VER_DIR)
+
   mkdir -p $DEST_REPO/$BASE_DIR
   ln -s $SRC_REPO/$VER_DIR $DEST_REPO/$BASE_DIR/
+  
+  VER_TAG="      <version>$VERSION</version>"
   echo "$VER_TAG" >> $DEST_REPO/$BASE_DIR/maven-metadata-tmp.xml
-done
+  
+  KEY=$(echo $BASE_DIR | tr / .)
+  echo "$KEY.version = $VERSION"
+done > $1/auto.properties
 
 find_all_meta | while read META; do
   DIR=$(dirname $META)
@@ -52,7 +58,3 @@ find_all_meta | while read META; do
   rm -f $META
 done
 
-find -L $DEST_REPO -name "*.pom" | \
-  sed -e"s,^$DEST_REPO/,," \
-      -e"s,/\([0-9][^/]*\).*,.version = \1," \
-      -e"s,/,.,g"                            > $1/auto.properties
