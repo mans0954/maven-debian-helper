@@ -1,6 +1,5 @@
 maven-debian-helper (0.3) unstable; urgency=low
 
-  UNRELEASED
   * Implement better exception handling.
   * Create our own maven repository during build time.
   * Set version for non plugins to '[$version]' instead of '$version' only.
