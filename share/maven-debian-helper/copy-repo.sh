@@ -9,6 +9,20 @@ find_all_poms() {
   find $SRC_REPO -name '*.pom' -printf '%P\n'
 }
 
+echo_property() {
+  KEY=$(echo $BASE_DIR | tr / .)
+  case "$KEY" in
+    *.maven-*-plugin|*-maven-plugin)
+      echo "$KEY.version = $VERSION"
+      return
+      ;;
+    *)
+      echo "$KEY.version = [$VERSION]"
+      return
+      ;;
+  esac
+}
+
 find_all_meta() {
   find $DEST_REPO -name 'maven-metadata-tmp.xml'
 }
@@ -48,13 +62,12 @@ find_all_poms | while read POM; do
   VER_TAG="      <version>$VERSION</version>"
   echo "$VER_TAG" >> $DEST_REPO/$BASE_DIR/maven-metadata-tmp.xml
   
-  KEY=$(echo $BASE_DIR | tr / .)
-  echo "$KEY.version = $VERSION"
+  echo_property
 done > $1/auto.properties
 
 find_all_meta | while read META; do
   DIR=$(dirname $META)
-  echo_meta > $DIR/maven-metadata.xml
+  echo_meta > $DIR/maven-metadata-local.xml
   rm -f $META
 done
 
