@@ -1,3 +1,10 @@
+maven-debian-helper (0.4) unstable; urgency=low
+
+  UNRELEASED
+  * Implement pom faking.
+
+ -- Torsten Werner <twerner@debian.org>  Thu, 29 Jan 2009 20:23:33 +0100
+
 maven-debian-helper (0.3) unstable; urgency=low
 
   * Implement better exception handling.
