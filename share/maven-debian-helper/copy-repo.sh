@@ -27,20 +27,6 @@ find_all_meta() {
   find $DEST_REPO -name 'maven-metadata-tmp.xml'
 }
 
-echo_property() {
-  KEY=$(echo $BASEDIR | tr / .)
-  case "$KEY" in
-    *.maven-*-plugin|*-maven-plugin)
-      echo "$KEY.version = $VERSION"
-      return
-      ;;
-    *)
-      echo "$KEY.version = [$VERSION]"
-      return
-      ;;
-  esac
-}
-
 header() {
   echo '<?xml version="1.0" encoding="UTF-8"?>'
   echo '<metadata>'
@@ -109,7 +95,8 @@ find_dest_poms | while read POM; do
   BASEDIR=$(dirname $VER_DIR)
   VER_TAG="      <version>$VERSION</version>"
   echo "$VER_TAG" >> $DEST_REPO/$BASEDIR/maven-metadata-tmp.xml
-  echo_property
+  KEY=$(echo $BASEDIR | tr / .)
+  echo "$KEY.version = $VERSION"
 done > $1/auto.properties
 
 find_all_meta | while read META; do
