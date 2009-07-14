@@ -1,9 +1,18 @@
-maven-debian-helper (0.4) unstable; urgency=low
+maven-debian-helper (0.4) experimental; urgency=low
 
-  UNRELEASED
+  [Ludovic Claude]
+  * Use maven-ant-helper for the build instead of recursively building
+    this package with itself (which required an ugly bootstrap script)
+  * Integrate the cdbs helper with maven-repo-helper, this unifies the
+    way the Maven repository is used, and simplifies the job of the
+    packager as maven-repo-helper takes care of most POM patching work.
+  * Use default-jdk for the build
+  * Change section to java, update Standards-Version to 3.8.1
+    
+  [Torsten Werner]
   * Implement pom faking.
 
- -- Torsten Werner <twerner@debian.org>  Thu, 29 Jan 2009 20:23:33 +0100
+ -- Ludovic Claude <ludovic.claude@laposte.net>  Tue, 14 Jul 2009 20:17:16 +0100
 
 maven-debian-helper (0.3) unstable; urgency=low
 

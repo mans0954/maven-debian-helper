@@ -1,6 +1,7 @@
 This package was created by Torsten Werner<twerner@debian.org>.
 
 Copyright: 2008 Torsten Werner <twerner@debian.org>
+Copyright: 2009 Ludovic Claude <ludovic.claude@laposte.net>
 
 License:
 
@@ -21,30 +22,11 @@ The full text of the license can be found in
 
 ----------
 
-File: src/main/resources/org/apache/maven/project/pom-4.0.0.xml
-
-Copyright: 2001-2007 Apache Software Foundation.
-
-License: Apache-2.0 (see above)
-
-The file is a slightly modified version of Maven's super POM. It
-mentions a file called NOTICE which contains the thirdparty copyright
-information for Maven's binary distribution.
-
-----------
-
-Files: maven-repo/org/codehaus/*
-
-Copyright: 2001-2008 Codehaus Foundation.
-
-License: Apache-2.0 (see above)
-
-----------
-
 Files: cdbs/maven*.mk
 
 Copyright: 2003 Stefan Gybas <sgybas@debian.org>
 Copyright: 2008 Torsten Werner <twerner@debian.org>
+Copyright: 2009 Ludovic Claude <ludovic.claude@laposte.net>
 
 License:
 

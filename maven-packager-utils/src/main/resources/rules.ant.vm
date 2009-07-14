@@ -1,0 +1,36 @@
+#!/usr/bin/make -f
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/ant.mk
+#macro(printJars $jars)
+#set ($lineLength=0)
+#foreach ($jar in $jars)
+#if($lineLength==0)${space}#end${jar}#if($velocityHasNext), #end
+#set ($lineLength = $lineLength + $jar.length() + 2)
+#if ($lineLength > 70)
+$space
+#set ($lineLength=0)
+#end
+#end
+#end
+
+PACKAGE              := $(DEB_SOURCE_PACKAGE)
+VERSION              := $(DEB_UPSTREAM_VERSION)
+JAVA_HOME            := /usr/lib/jvm/default-java
+DEB_JARS             := ant-nodeps#if (!$buildJars.isEmpty()),#end
+#printJars($buildJars)
+DEB_ANT_BUILDFILE    := /usr/share/maven-ant-helper/maven-build.xml
+DEB_ANT_ARGS         := -Dbasedir=$(realpath .) -Dpackage=$(PACKAGE) -Dversion=$(VERSION)
+
+get-orig-source:
+	uscan --download-version $(DEB_UPSTREAM_VERSION) --force-download --rename
+
+binary-post-install/lib$(PACKAGE)-java::
+	mh_installpoms -plib$(PACKAGE)-java
+#foreach ( $dir in $pomDirs )
+#if ($dir != '') #set ($dir = '$dir/') #end
+	mh_installjar -plib$(PACKAGE)-java -l ${dir}pom.xml ${dir}target/$(PACKAGE)-$(VERSION).jar
+#end
+
+clean::
+	-rm -rf debian/tmp

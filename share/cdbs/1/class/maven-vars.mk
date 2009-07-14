@@ -26,9 +26,15 @@ _cdbs_class_path ?= /usr/share/cdbs/1/class
 ifndef _cdbs_class_maven_vars
 _cdbs_class_maven_vars = 1
 
+# Declare Build-Deps for packages using this file
+CDBS_BUILD_DEPENDS := $(CDBS_BUILD_DEPENDS), cdbs (>= 0.4.43)
+CDBS_BUILD_DEPENDS := $(CDBS_BUILD_DEPENDS), maven-debian-helper (>> 0.3)
+
 # Maven home directory.  Doesn't need to be changed except when using
 # nonstandard Maven installations.
 MAVEN_HOME = /usr/share/maven2
+
+MAVEN_DEBIAN_VERSION = 0.4
 
 # The home directory of the Java Runtime Environment (JRE) or Java Development
 # Kit (JDK). You can either directly set JAVA_HOME in debian/rules or set
@@ -77,13 +83,19 @@ DEB_MAVEN_INVOKE = cd $(DEB_BUILDDIR) && $(JAVACMD) -noverify -cp $(DEB_CLASSPAT
 # first package by default.
 DEB_JAR_PACKAGE = $(firstword $(shell dh_listpackages))
 
+# The name of the package containing the documentation. The second package
+# by default. Leave empty to skip generating documentation.
+DEB_DOC_PACKAGE = $(word 2, $(shell dh_listpackages))
+
 # Targets to invoke for building, installing, testing and cleaning up.
 # Building uses the default target from build.xml, installing and testing is
 # only called if the corresponding variable is set. You can also specify
 # multiple targets for each step.
 DEB_MAVEN_BUILD_TARGET = package
-DEB_MAVEN_INSTALL_TARGET = debian:install
+DEB_MAVEN_INSTALL_TARGET = org.debian.maven:maven-debian-plugin:$(MAVEN_DEBIAN_VERSION):install
 DEB_MAVEN_CHECK_TARGET =
 DEB_MAVEN_CLEAN_TARGET = clean
+DEB_MAVEN_DOC_TARGET = javadoc:jar
+DEB_MAVEN_INSTALL_DOC_TARGET = org.debian.maven:maven-debian-plugin:$(MAVEN_DEBIAN_VERSION):install-doc
 
 endif

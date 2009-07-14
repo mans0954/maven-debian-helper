@@ -1,0 +1,65 @@
+#!/bin/bash
+
+MH_VERSION=0.4
+. /usr/share/maven-repo-helper/mh_lib.sh
+
+syntax()
+{
+   echo -e "Usage: mh_revolve_dependencies [option]... <package>"
+   echo -e "Resolve the dependencies and generates the substvars"
+   echo -e "file containing the list of dependent packages."
+   echo -e ""
+   echo -e "Where"
+   echo -e "\t<package> is the name of the binary package,"
+   echo -e "\t  e.g. libcommons-lang-java. Default to the first binary"
+   echo -e "\t  found in the debian/control file"
+   echo -e "Options:"
+   echo -e "\t-h --help: show this text"
+   echo -e "\t-V --version: show the version"
+   echo -e "\t-p<package> --package=<package>: name of the package"
+   echo -e "\t-a --ant: use Ant for the packaging instead of Maven"
+   echo -e "\t-v --verbose: show more information while running"
+   echo -e ""
+   echo -e "Description:"
+   echo -e "This tool reads the POM files defined in debian/$package.poms"
+   echo -e "and scans the Maven repository in /usr/share/maven-repo."
+   echo -e "It then extracts the dependencies required for the current"
+   echo -e "package and store them in the file debian/$package.substvars"
+   echo -e "where they can be read by debhelper."
+   echo -e "The variables defined are:"
+   echo -e "  maven:Depends - the list of runtime dependencies"
+   echo -e "  maven:OptionalDepends - the list of optional runtime dependencies"
+   echo -e "  maven:CompileDepends - the list of compile-time dependencies"
+   echo -e "  maven:TestDepends - the list of test dependencies"
+   exit 1
+}
+
+ARGS="p package a ant v verbose" parseargs "$@"
+
+PACKAGE=$(getarg p package)
+ANT=$(getarg a ant)
+
+if [ -z "$PACKAGE" ]; then
+    if [ "$ARGC" -gt "0" ]; then
+        PACKAGE="${ARGV[0]}"
+    else
+        PACKAGE=$(dh_listpackages | head -1)
+    fi
+fi
+
+if [ ! -e .debianVersion -a ! -e debian/stamp-poms-patched ]; then
+    touch .debianVersion
+    CREATED_POMS=false
+    if [ ! -e debian/${PACKAGE}.poms ]; then
+        CREATED_POMS=true
+        mh_lspoms $PACKAGE
+    fi
+    mh_patchpoms -p$PACKAGE --keep-pom-version
+    if [ $CREATED_POMS ]; then
+        rm debian/${PACKAGE}.poms
+    fi
+fi
+
+mvn org.debian.maven:maven-packager-utils:$MH_VERSION:dependencies -Dpackage="$PACKAGE" ${ANT:+-DpackageType=ant} -Dmaven.repo.local=/usr/share/maven-repo --offline
+
+perl -p -i -e 's/maven\./maven:/' debian/${PACKAGE}.substvars

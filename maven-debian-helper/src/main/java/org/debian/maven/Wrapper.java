@@ -4,7 +4,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Properties;
-import org.apache.maven.cli.MavenCli;
+import org.apache.maven.cli.compat.CompatibleMain;
 import org.codehaus.classworlds.ClassWorld;
 
 /* This is a wrapper for Maven's main function that reads 2 property
@@ -83,11 +83,10 @@ public class Wrapper
 
   public static int main(String[] args, ClassWorld classWorld) throws IOException
   {
-    updateProperties("properties.file.auto");
     updateProperties("properties.file.manual");
 
     updateCommandLine(args);
 
-    return MavenCli.main(newArgs, classWorld);
+    return CompatibleMain.main(newArgs, classWorld);
   }
 }

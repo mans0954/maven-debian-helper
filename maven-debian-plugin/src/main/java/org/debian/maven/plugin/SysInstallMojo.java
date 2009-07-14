@@ -1,10 +1,17 @@
 package org.debian.maven.plugin;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import org.apache.maven.bootstrap.util.FileUtils;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import org.codehaus.plexus.util.FileUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.debian.maven.repo.POMCleaner;
+import org.debian.maven.repo.POMTransformer;
 
 /**
  * Install pom and jar files into the /usr/share/hierarchy
@@ -45,6 +52,13 @@ public class SysInstallMojo extends AbstractMojo
   private String version;
 
   /**
+   * debianVersion
+   *
+   * @parameter
+   */
+  private String debianVersion;
+
+  /**
    * directory where the current pom.xml can be found
    *
    * @parameter expression="${basedir}"
@@ -61,6 +75,26 @@ public class SysInstallMojo extends AbstractMojo
    * @readonly
    */
   private String jarDir;
+
+  /**
+   * Debian directory
+   *
+   * @parameter expression="${debian.dir}"
+   */
+  private File debianDir;
+
+  /**
+   * Debian package
+   *
+   * @parameter expression="${debian.package}"
+   */
+  private String debianPackage;
+
+  /**
+   * @parameter expression="${maven.rules}" default-value="maven.rules"
+   * @required
+   */
+  private String mavenRules;
 
   // ----------------------------------------------------------------------
   // Public methods
@@ -83,33 +117,79 @@ public class SysInstallMojo extends AbstractMojo
   // Private methods
   // ----------------------------------------------------------------------
 
-  /* optional destination prefix, empty by default
-   */
+  protected String getArtifactId()
+  {
+      return artifactId;
+  }
 
+  protected String getVersion()
+  {
+      return version;
+  }
+
+  protected String getDebianVersion()
+  {
+      return debianVersion;
+  }
+
+  protected File getDebianDir()
+  {
+      return debianDir;
+  }
+
+  protected String getDebianPackage()
+  {
+      return debianPackage;
+  }
+
+  /**
+   * optional destination prefix, empty by default
+   */
   protected String packagePath()
   {
     return "";
   }
 
-  /* returns e.g. /org/debian/maven/maven-debian-plugin/0.1/
+  /**
+   * returns e.g. /org/debian/maven/maven-debian-plugin/0.1/
    */
-
   private String repoPath()
   {
     return "/" + groupId.replace( '.', '/' ) + "/" + artifactId + "/" + version + "/";
   }
 
-  /* absolute path to destination dir
+  /**
+   * returns e.g. /org/debian/maven/maven-debian-plugin/debian/
    */
+  private String debianRepoPath()
+  {
+    return "/" + groupId.replace( '.', '/' ) + "/" + artifactId + "/" + debianVersion + "/";
+  }
 
+  /**
+   * absolute path to destination dir
+   */
   protected String fullRepoPath()
   {
     return packagePath() + "/usr/share/maven-repo" + repoPath();
   }
 
-  private String pomName()
+  /**
+   * absolute path to destination dir
+   */
+  protected String debianFullRepoPath()
+  {
+    return packagePath() + "/usr/share/maven-repo" + debianRepoPath();
+  }
+
+  protected String pomName()
   {
     return artifactId + "-" + version + ".pom";
+  }
+
+  protected String debianPomName()
+  {
+    return artifactId + "-" + debianVersion + ".pom";
   }
 
   private String pomSrcPath()
@@ -117,14 +197,44 @@ public class SysInstallMojo extends AbstractMojo
     return basedir.getAbsolutePath() + "/pom.xml";
   }
 
+  private String cleanedPomSrcPath()
+  {
+    return basedir.getAbsolutePath() + "/target/pom.xml";
+  }
+
+  private String cleanedPomPropertiesSrcPath()
+  {
+    return basedir.getAbsolutePath() + "/target/pom.properties";
+  }
+
+  private String debianPomSrcPath()
+  {
+    return basedir.getAbsolutePath() + "/target/pom.debian.xml";
+  }
+
+  private String debianPomPropertiesSrcPath()
+  {
+    return basedir.getAbsolutePath() + "/target/pom.debian.properties";
+  }
+
   private String pomDestPath()
   {
     return fullRepoPath() + pomName();
   }
 
-  private String jarName()
+  private String debianPomDestPath()
+  {
+    return debianFullRepoPath() + debianPomName();
+  }
+
+  protected String jarName()
   {
     return artifactId + "-" + version + ".jar";
+  }
+
+  protected String debianJarName()
+  {
+    return artifactId + "-" + debianVersion + ".jar";
   }
 
   private String fullJarName()
@@ -137,9 +247,19 @@ public class SysInstallMojo extends AbstractMojo
     return fullRepoPath() + jarName();
   }
 
-  /* jar file name without version number
-   */
+  private String jarDestRelPath()
+  {
+    return "../" + version + "/" + jarName();
+  }
 
+  private String debianJarDestPath()
+  {
+    return debianFullRepoPath() + debianJarName();
+  }
+
+  /** 
+   * jar file name without version number
+   */
   private String compatName()
   {
     return artifactId + ".jar";
@@ -160,21 +280,18 @@ public class SysInstallMojo extends AbstractMojo
     return compatSharePath() + compatName();
   }
 
-  /* command for creating the relative symlink
-   */
-
-  private String[] linkCommand()
+  protected String versionedFullCompatPath()
   {
-    String[] command = {"ln", "-s", compatRelPath(), fullCompatPath()};
-    return command;
+    return compatSharePath() + jarName();
   }
 
-  /* copy the pom.xml
+  /**
+   * command for creating the relative symlink
    */
-
-  private void copyPom() throws IOException
+  private String[] linkCommand(String source, String dest)
   {
-    FileUtils.copyFile(new File(pomSrcPath()), new File(pomDestPath()));
+    String[] command = {"ln", "-s", source, dest};
+    return command;
   }
 
   private void mkdir(String path) throws IOException
@@ -195,26 +312,140 @@ public class SysInstallMojo extends AbstractMojo
     Runtime.getRuntime().exec(command, null);
   }
 
-  /* if a jar exists: copy it and symlink it to the compat share dir
+  /**
+   * if a jar exists: copy it to the Maven repository
    */
-
-  private void copyAndSymlinkJar() throws IOException
+  protected void copyJar() throws IOException
   {
-    FileUtils.copyFile(new File(pomSrcPath()), new File(pomDestPath()));
     File jarFile = new File(fullJarName());
     if (jarFile.exists())
     {
       FileUtils.copyFile(jarFile, new File(jarDestPath()));
+      if (debianVersion != null && !debianVersion.equals(version))
+      {
+        mkdir(debianFullRepoPath());
+        run(linkCommand(jarDestRelPath(), debianJarDestPath()));
+      }
       mkdir(compatSharePath());
-      run(linkCommand());
+      run(linkCommand(compatRelPath(), fullCompatPath()));
+      run(linkCommand(compatRelPath(), versionedFullCompatPath()));
     }
   }
 
-  /* do the actual work
+  /**
+   * if a jar exists: symlink it to the compat share dir
+   */
+  private void symlinkJar() throws IOException
+  {
+    File jarFile = new File(fullJarName());
+    if (jarFile.exists())
+    {
+      mkdir(compatSharePath());
+      run(linkCommand(compatRelPath(), fullCompatPath()));
+      run(linkCommand(compatRelPath(), versionedFullCompatPath()));
+    }
+  }
+
+  /**
+   * clean the pom.xml
+   */
+  private void cleanPom()
+  {
+    File pomOptionsFile = new File(debianDir, debianPackage + ".poms");
+    Map pomOptions = POMTransformer.getPomOptions(pomOptionsFile);
+    // Use the saved pom before cleaning as it was untouched by the transform operation
+    File pom = new File(pomSrcPath() + ".save");
+    File originalPom = new File(pomSrcPath()).getAbsoluteFile();
+    if (! pom.exists())
+    {
+        pom = originalPom;
+    }
+
+    String pomOption = (String) pomOptions.get(originalPom);
+
+    List params = new ArrayList();
+    params.add("--keep-pom-version");
+    params.add("--package=" + debianPackage);
+    String mavenRulesPath = new File(debianDir, mavenRules).getAbsolutePath();
+    params.add("--rules=" + mavenRulesPath);
+
+    System.out.println("Cleaning pom file: " + pom + " with options:");
+    System.out.println("\t--keep-pom-version --package=" + debianPackage);
+    System.out.println("\t--rules=" + mavenRulesPath);
+
+    // add optional --no-parent option
+    if (pomOption != null && !pomOption.isEmpty()) {
+        params.add(pomOption);
+        System.out.println("\t" + pomOption);
+    }
+    
+    params.add(pom.getAbsolutePath());
+    params.add(cleanedPomSrcPath());
+    params.add(cleanedPomPropertiesSrcPath());
+
+    POMCleaner.main((String[]) params.toArray(new String[params.size()]));
+
+    // read debian version
+    if (debianVersion == null)
+    {
+      Properties pomProperties = new Properties();
+      try {
+        pomProperties.load(new FileReader(cleanedPomPropertiesSrcPath()));
+      } catch (IOException ex) {
+        ex.printStackTrace();
+      }
+      debianVersion = pomProperties.getProperty("debianVersion");
+    }
+
+    if (debianVersion != null && !debianVersion.equals(version))
+    {
+      params.remove(0);
+      params.remove(params.size() -1);
+      params.remove(params.size() -1);
+      params.add(debianPomSrcPath());
+      params.add(debianPomPropertiesSrcPath());
+
+      POMCleaner.main((String[]) params.toArray(new String[params.size()]));
+    }
+  }
+ 
+  /**
+   * copy the pom.xml
+   */
+  protected void copyPom() throws IOException
+  {
+    FileUtils.copyFile(new File(cleanedPomSrcPath()), new File(pomDestPath()));
+    if (debianVersion != null && !debianVersion.equals(version))
+    {
+      FileUtils.copyFile(new File(debianPomSrcPath()), new File(debianPomDestPath()));
+    }
+  }
+
+  /**
+   * Initialize some properties which don't seem to be set automatically
+   * by Maven Mojo mechanism.
+   */
+  protected void initProperties()
+  {
+    if (debianDir == null)
+    {
+      debianDir = new File(System.getProperty("debian.dir"));
+    }
+    if (debianPackage == null)
+    {
+      debianPackage = System.getProperty("debian.package");
+    }
+  }
+
+  /**
+   * do the actual work
    */
   protected void runMojo() throws IOException
   {
+    //initProperties();
+    cleanPom();
     copyPom();
-    copyAndSymlinkJar();
+    copyJar();
+    symlinkJar();
   }
 }

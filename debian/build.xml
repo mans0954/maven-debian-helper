@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+
+<project name="pkg-java" default="package" basedir="..">
+
+    <property file="debian/build.properties"/>
+    <property name="maven.build" value="/usr/share/maven-ant-helper/maven-build.xml"/>
+    <property file="/usr/share/maven-ant-helper/maven-defaults.properties"/>
+
+    <macrodef name="cleanmodule">
+	    <attribute name="dir"/>
+	    <sequential>
+		  <ant target="clean" antfile="${maven.build}" dir="@{dir}">
+            <property name="debian.dir" location="debian" />
+            <property name="project.dir" value="@{dir}" />
+          </ant> 
+	    </sequential>
+    </macrodef>
+
+    <macrodef name="packagemodule">
+	    <attribute name="dir"/>
+	    <sequential>
+		<ant target="package" antfile="${maven.build}" dir="@{dir}">
+          <property name="debian.dir" location="debian" />
+          <property name="project.dir" value="@{dir}" />
+          <property name="keep-cleaned-pom" value="true" />
+		</ant>
+	    </sequential>
+    </macrodef>
+
+    <macrodef name="package-plugin-module">
+	    <attribute name="dir"/>
+	    <sequential>
+		<ant target="package" antfile="${maven.build}" dir="@{dir}">
+          <property name="debian.dir" location="debian" />
+          <property name="project.dir" value="@{dir}" />
+          <property name="maven.generate.target" value="plugin:descriptor" />
+          <property name="keep-cleaned-pom" value="true" />
+          <property name="use-local-repo" value="true" />
+		</ant>
+	    </sequential>
+    </macrodef>
+
+    <target name="clean">
+        <cleanmodule dir=""/>
+        <cleanmodule dir="maven-debian-helper"/>
+        <cleanmodule dir="maven-debian-plugin"/>
+        <cleanmodule dir="maven-packager-utils"/>
+    </target>
+
+    <target name="package">
+        <packagemodule dir=""/>
+        <packagemodule dir="maven-debian-helper"/>
+        <package-plugin-module dir="maven-debian-plugin"/>
+        <package-plugin-module dir="maven-packager-utils"/>
+    </target>
+
+    <target name="javadoc">
+        <javadoc destdir="${javadoc.dir}">
+            <packageset dir="maven-debian-helper/src/main/java/"/>
+            <packageset dir="maven-debian-plugin/src/main/java/"/>
+            <packageset dir="maven-packager-utils/src/main/java/"/>
+        </javadoc>
+    </target>
+
+</project>

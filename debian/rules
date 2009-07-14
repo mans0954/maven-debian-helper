@@ -1,12 +1,45 @@
 #!/usr/bin/make -f
 
 include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/ant.mk
 
-install/maven-debian-helper::
-	sh bootstrap.sh
+PACKAGE              := $(DEB_SOURCE_PACKAGE)
+VERSION              := $(DEB_UPSTREAM_VERSION)
+JAVA_HOME            := /usr/lib/jvm/default-java
+DEB_JARS             := ant-nodeps classworlds maven-core maven-artifact maven-artifact-manager maven-model \
+ maven-compat maven-plugin-api maven-project maven-scm-api velocity file-management plexus-utils \
+ plexus-container-default-alpha maven-repo-helper
+DEB_ANT_BUILD_TARGET := package #javadoc
+DEB_ANT_BUILDFILE    := debian/build.xml
+DEB_ANT_ARGS         := -Dpackage=$(PACKAGE) -Dbin.package=$(PACKAGE) -Dversion=$(VERSION)
+API_DOCS             := target/api
+
+debian/tmp:
+	mkdir -p debian/tmp
+
+debian/tmp/bin: debian/tmp
+	cp -R bin debian/tmp/
+
+debian/tmp/etc: debian/tmp
+	cp -R etc debian/tmp/
+
+debian/tmp/share: debian/tmp
+	cp -R share debian/tmp/
+
+makebuilddir/$(PACKAGE):: debian/tmp/bin debian/tmp/etc debian/tmp/share
+
+install/$(PACKAGE)::
+	mh_installpoms -p$(PACKAGE)
+	mh_installjar -p$(PACKAGE) -l maven-debian-helper/pom.xml maven-debian-helper/target/maven-debian-helper-$(VERSION).jar
+	mh_installjar -p$(PACKAGE) -l maven-debian-plugin/pom.xml maven-debian-plugin/target/maven-debian-plugin-$(VERSION).jar
+	mh_installjar -p$(PACKAGE) -l maven-packager-utils/pom.xml maven-packager-utils/target/maven-packager-utils-$(VERSION).jar
 	pod2man -c 'Maven for Debian GNU/Linux' \
 	  -r maven-debian-helper-$(DEB_UPSTREAM_VERSION) \
 	  man/mvn-debian.pod > man/mvn-debian.1
+
+clean::
+	-rm -rf debian/tmp
+	$(RM) man/mvn-debian.1
 
 clean::
 	$(RM) man/mvn-debian.1

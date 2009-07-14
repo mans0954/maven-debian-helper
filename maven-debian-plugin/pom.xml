@@ -11,4 +11,12 @@
   <artifactId>maven-debian-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Maven Debian Plugin</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.debian.maven</groupId>
+      <artifactId>maven-repo-helper</artifactId>
+      <version>0.5</version>
+    </dependency>
+  </dependencies>
 </project>

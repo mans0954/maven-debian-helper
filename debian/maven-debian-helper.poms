@@ -1,0 +1,4 @@
+pom.xml --no-parent
+maven-debian-helper/pom.xml
+maven-debian-plugin/pom.xml
+maven-packager-utils/pom.xml

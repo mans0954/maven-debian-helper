@@ -1,0 +1,106 @@
+#!/bin/bash
+
+MH_VERSION=0.4
+. /usr/share/maven-repo-helper/mh_lib.sh
+
+syntax()
+{
+   echo -e "Usage: mh_make [option]..."
+   echo -e "Generate the Debian packaging by reading the information"
+   echo -e "from the Maven POM."
+   echo -e ""
+   echo -e "Options:"
+   echo -e "\t-h --help: show this text"
+   echo -e "\t-V --version: show the version"
+   echo -e "\t-p<package> --package=<package>: name of the source package"
+   echo -e "\t-b<package> --bin-package=<package>: name of the binary package"
+   echo -e "\t-t<true|false> --run-tests=<true|false>: include or not the tests"
+   echo -e "\t-d<true|false> --javadoc=<true|false>: include or not the javadoc"
+   echo -e "\t  during the build"
+   echo -e "\t-a --ant: use Ant for the packaging instead of Maven"
+   echo -e "\t-v --verbose: show more information while running"
+   exit 1
+}
+
+ARGS="p package b bin-package t run-tests d javadoc a ant v verbose" parseargs "$@"
+
+if [ -z "$DEBFULLNAME" ]; then
+  echo "Please define the environment variable DEBFULLNAME, e.g."
+  echo "export DEBFULLNAME=\"Ludovic Claude\""
+  return;
+fi
+
+if [ -z "$DEBEMAIL" ]; then
+  echo "Please define the environment variable DEBEMAIL, e.g."
+  echo "export DEBEMAIL=\"ludovic.claude@laposte.net\""
+  return;
+fi
+
+PACKAGE=$(getarg p package)
+BIN_PACKAGE=$(getarg b bin-package)
+RUN_TESTS=$(getarg t run-tests)
+GEN_JAVADOC=$(getarg d javadoc)
+ANT=$(getarg a ant)
+
+if [ -z "$DEBLICENSE" ]; then
+    DEBLICENSE="GPL-3"
+fi
+
+if [ -z "$PACKAGE" ]; then
+    PACKAGE="$(basename $(pwd))"
+    echo "Enter the name of the new Debian source package. If empty, it will defaults to $PACKAGE"
+    read -p ">" USER_PACKAGE
+    if [ -n "$USER_PACKAGE" ]; then
+        PACKAGE=$USER_PACKAGE
+    fi
+fi
+
+if [ -z "$BIN_PACKAGE" ]; then
+    BIN_PACKAGE="lib${PACKAGE}-java"
+    echo "Enter the name of the binary package. If empty, it will defaults to $BIN_PACKAGE"
+    read -p ">" USER_PACKAGE
+    if [ -n "$USER_PACKAGE" ]; then
+        BIN_PACKAGE=$USER_PACKAGE
+    fi
+fi
+
+if [ -z "$RUN_TESTS" ]; then
+    RUN_TESTS="false"
+    echo "Enter y (yes) or n (no) to run tests while building the package. Defaults to no"
+    read -p ">" RUN
+    if [ "$RUN" == "y" ]; then
+        RUN_TESTS="true"
+    fi
+fi
+
+if [ -z "$GEN_JAVADOC" ]; then
+    GEN_JAVADOC="false"
+    echo "Enter y (yes) or n (no) to generate the Javadoc while building the package. Defaults to no"
+    read -p ">" GEN
+    if [ "$GEN" == "y" ]; then
+        GEN_JAVADOC="true"
+    fi
+fi
+
+if [ ! -e debian/${BIN_PACKAGE}.substvars ]; then
+    java -cp /usr/share/java/maven-project.jar:/usr/share/java/maven-repo-helper.jar:/usr/share/java/maven-packager-utils.jar org.debian.maven.packager.DependenciesSolver --package="$BIN_PACKAGE" ${ANT:--ant} --maven-repo=/usr/share/maven-repo
+fi
+
+if [ ! -e .debianVersion ]; then
+    touch .debianVersion
+    mh_patchpoms -p$BIN_PACKAGE --keep-pom-version
+fi
+
+mvn org.debian.maven:maven-packager-utils:$MH_VERSION:generate -Demail="$DEBEMAIL" -Dpackager="$DEBFULLNAME" -DpackagerLicense="$DEBLICENSE" -Dpackage="$PACKAGE" -Dbin.package="$BIN_PACKAGE" -DrunTests="$RUN_TESTS" -DgenerateJavadoc="$GEN_JAVADOC" -Dmaven.repo.local=/usr/share/maven-repo ${ANT:+-DpackageType=ant} --offline
+
+rm -f debian/*.substvars
+
+if [ ! -f debian/changelog ]; then
+    mkdir -p debian/tmp
+    mh_cleanpom -p$PACKAGE pom.xml debian/tmp/pom.xml debian/tmp/pom.properties
+    source debian/tmp/pom.properties
+    rm -R debian/tmp
+    version=$(echo $version | sed -re's/-(alpha|beta)-?/~\1/')
+    dch --create --newversion=${version}-1 --package=$PACKAGE "Initial release (Closes: #XXXXX)"
+fi
+

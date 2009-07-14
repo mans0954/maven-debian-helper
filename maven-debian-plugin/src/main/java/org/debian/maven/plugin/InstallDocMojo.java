@@ -1,12 +1,15 @@
 package org.debian.maven.plugin;
 
 /**
- * Install pom and jar files into the debian/ directory
+ * Install the javadoc jar files into the debian/ directory
  *
- * @goal install
+ * @goal install-doc
+ *
+ * @author Ludovic Claude
  */
-public class InstallMojo extends SysInstallMojo
+public class InstallDocMojo extends SysInstallDocMojo
 {
+
   // ----------------------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------------------
@@ -22,4 +25,5 @@ public class InstallMojo extends SysInstallMojo
   {
     return getDebianDir() + "/" + getDebianPackage();
   }
+
 }

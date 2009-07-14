@@ -1,0 +1,68 @@
+#set ($dollar = "$")
+#set ($space = " ")
+#macro(printDependencies $dependencies)
+#set ($lineLength=0)
+#foreach ($dependency in $dependencies)
+#if($lineLength==0)${space}#end${dependency}#if($velocityHasNext), #end
+#set ($lineLength = $lineLength + $dependency.length() + 2)
+#if ($lineLength > 70)
+$space
+#set ($lineLength=0)
+#end
+#end
+#end
+Source: ${package}
+Section: java
+Priority: optional
+Maintainer: Debian Java Maintainers <pkg-java-maintainers@lists.alioth.debian.org>
+Uploaders: ${packager} <${packagerEmail}>
+Build-Depends: debhelper (>= 7), cdbs, default-jdk, ant-optional, maven-ant-helper (>> 4)
+Build-Depends-Indep: maven-repo-helper,
+#printDependencies($compileDependencies)
+Standards-Version: 3.8.2
+Vcs-Svn: svn://svn.debian.org/svn/pkg-java/trunk/${package}
+Vcs-Browser: http://svn.debian.org/wsvn/pkg-java/trunk/${package}/
+Homepage:#if(${project.Url}) ${project.Url} #else TODO #end
+
+
+Package: ${binPackage}
+Architecture: all
+## libraries should not depend on runtime - default-jre-headless | java2-runtime-headless,
+Depends: ${dollar}{misc:Depends}, 
+#printDependencies($runtimeDependencies)
+#if(!$optionalDependencies.isEmpty())
+Recommends: #printDependencies($optionalDependencies)
+#fi
+Description:#if ($description.isEmpty()) TODO - fill the description #else $description.get(0) #end
+#foreach ($line in $description)
+#if ($velocityCount > 1)
+ #if ($line == "")
+ .
+ #else
+ $line
+ #end
+#end
+#end
+
+
+#if ($generateJavadoc)
+Package: ${binPackage}-doc
+Architecture: all
+Section: doc
+Depends: ${dollar}{misc:Depends}
+Suggests: ${binPackage}
+Description: Documentation for ${project.Name}
+#if ($description.isEmpty()) TODO - fill the description #else $description.get(0) #end
+#foreach ($line in $description)
+#if ($velocityCount > 1)
+ #if ($line == "")
+ .
+ #else
+ $line
+ #end
+#end
+#end
+
+ .
+ This package provides the API documentation for ${binPackage}.
+#end

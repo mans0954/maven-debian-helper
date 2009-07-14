@@ -19,10 +19,6 @@ list_fakes()
   sed -e's,#.*,,' $CONFFILES
 }
 
-find_dest_poms() {
-  find -L $DEST_REPO -name '*.pom' -printf '%P\n'
-}
-
 find_all_meta() {
   find $DEST_REPO -name 'maven-metadata-tmp.xml'
 }
@@ -88,16 +84,6 @@ do
 </project>
 .EOF
 done
-
-find_dest_poms | while read POM; do
-  VER_DIR=$(dirname $POM)
-  VERSION=$(basename $VER_DIR)
-  BASEDIR=$(dirname $VER_DIR)
-  VER_TAG="      <version>$VERSION</version>"
-  echo "$VER_TAG" >> $DEST_REPO/$BASEDIR/maven-metadata-tmp.xml
-  KEY=$(echo $BASEDIR | tr / .)
-  echo "$KEY.version = $VERSION"
-done > $1/auto.properties
 
 find_all_meta | while read META; do
   DIR=$(dirname $META)

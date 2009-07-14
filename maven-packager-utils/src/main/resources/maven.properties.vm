@@ -1,0 +1,3 @@
+#if(!$runTests)
+maven.test.skip=true
+#end

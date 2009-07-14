@@ -1,0 +1,56 @@
+#!/bin/bash --
+
+. /usr/share/maven-repo-helper/mh_lib.sh
+
+syntax()
+{
+   echo -e "Usage: mh_lspoms [option]... <package>"
+   echo -e "Looks for all POM files defined in the source of the project."
+   echo -e ""
+   echo -e "Where"
+   echo -e "\t<package> is the name of the binary package,"
+   echo -e "\t  e.g. libcommons-lang-java. Default to the first binary"
+   echo -e "\t  found in the debian/control file"
+   echo -e "Options:"
+   echo -e "\t-h --help: show this text"
+   echo -e "\t-V --version: show the version"
+   echo -e "\t-p<package> --package=<package>: package to act on "
+   echo -e "\t-f --force: force run even if the .poms files exist."
+   echo -e "\t  Only maven.rules will be created, assuming that it"
+   echo -e "\t  did not exist before."
+   echo -e ""
+   echo -e "You need to execute it on the unpacked origial source tree, merged with the"
+   echo -e "debian/ folder. It will create the file debian/<binary package>.poms which"
+   echo -e "contains all the POMs to deploy to the Maven repository and is used by"
+   echo -e "mh_installpoms."
+   echo -e ""
+   echo -e "The contents of debian/<binary package>.poms should be:"
+   echo -e "\t* one POM file location per line,"
+   echo -e "\t* optionaly, the location is followed by the option --no-parent"
+   echo -e "\t  to indicate that if this POM inherits from a parent, the parent"
+   echo -e "\t  element will be removed."
+   exit 1
+}
+
+ARGS="p package f force" parseargs "$@"
+
+PACKAGE=$(getarg p package)
+FORCE=$(getarg f force)
+
+if [ -z "$PACKAGE" ]; then
+	if [ "$ARGC" -gt "0" ]; then
+		PACKAGE="${ARGV[0]}"
+	else
+		PACKAGE=$(dh_listpackages | head -1)
+	fi
+fi
+
+if [ -e debian/$PACKAGE.poms -a -z "$FORCE" ]; then
+  echo "debian/$PACKAGE.poms already exist. Please delete it if you want to regenerate it."
+else
+  mkdir -p debian
+  java -cp /usr/share/java/maven-project.jar:/usr/share/java/maven-repo-helper.jar:/usr/share/java/maven-packager-utils.jar org.debian.maven.packager.DependenciesSolver --package=$PACKAGE --maven-repo=/usr/share/maven-repo
+  rm debian/$PACKAGE.substvars
+  echo "The list of POM files is now in debian/$PACKAGE.poms"
+fi
+

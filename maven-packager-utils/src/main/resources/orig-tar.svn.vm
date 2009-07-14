@@ -1,0 +1,17 @@
+#!/bin/sh -e
+
+VERSION=$2
+TAR=../${package}_$VERSION.orig.tar.gz
+DIR=${package}-$VERSION
+TAG=$(echo "${tagMarker}$VERSION" | sed -re's/~(alpha|beta)/-\1-/')
+
+svn export ${baseUrl}/${TAG}${suffixUrl} $DIR
+tar -c -z -f $TAR $DIR
+rm -rf $DIR ../$TAG
+
+# move to directory 'tarballs'
+if [ -r .svn/deb-layout ]; then
+  . .svn/deb-layout
+  mv $TAR $origDir
+  echo "moved $TAR to $origDir"
+fi

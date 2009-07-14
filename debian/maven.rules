@@ -1,0 +1,3 @@
+junit junit jar s/3\..*/3.x/
+org.codehaus.plexus plexus-container-default jar s/1\.0-alpha-.*/1.0-alpha/
+

@@ -1,7 +1,7 @@
 package org.debian.maven.plugin;
 
 import java.io.IOException;
-import org.apache.maven.bootstrap.util.FileUtils;
+import org.codehaus.plexus.util.FileUtils;
 
 /**
  * Remove installed files and symlinks from the /usr/share hierarchy

@@ -1,22 +1,25 @@
 Source: maven-debian-helper
-Section: libs
+Section: java
 Priority: optional
 Maintainer: Debian Java Maintainers <pkg-java-maintainers@lists.alioth.debian.org>
 Uploaders: Torsten Werner <twerner@debian.org>
-Build-Depends: cdbs, debhelper (>= 5), openjdk-6-jdk, libmaven-clean-plugin-java,
- libmaven-resources-plugin-java, libmaven-compiler-plugin-java,
- libmaven-jar-plugin-java, libmaven-site-plugin-java, libsurefire-java
-Standards-Version: 3.8.0
+Build-Depends: cdbs, debhelper (>= 6), default-jdk, maven-ant-helper (>> 4), ant-optional
+Build-Depends-Indep: maven-repo-helper (>> 0.5),
+ junit, testng, libmaven-plugin-tools-java, libplexus-velocity-java, velocity,
+ libmaven2-core-java
+Standards-Version: 3.8.1
 Vcs-Svn: svn://svn.debian.org/svn/pkg-java/trunk/maven-debian-helper
 Vcs-Browser: http://svn.debian.org/wsvn/pkg-java/trunk/maven-debian-helper/
 Homepage: http://wiki.debian.org/Java/MavenBuilder
 
 Package: maven-debian-helper
 Architecture: all
-Depends: ${misc:Depends}, openjdk-6-jre | java2-runtime,
+Depends: ${misc:Depends}, openjdk-6-jre | java2-runtime, maven-repo-helper (>> 0.5), maven2,
  libmaven-clean-plugin-java, libmaven-resources-plugin-java,
  libmaven-compiler-plugin-java, libmaven-jar-plugin-java, libmaven-site-plugin-java,
- libsurefire-java
+ libsurefire-java, velocity, libplexus-velocity-java
+Suggests: libmaven-javadoc-plugin-java
+Conflicts: maven-repo-helper (<= 0.5)
 Description: Helper tools for building Debian packages with Maven
  Maven is a software project management and comprehension tool. Based on the
  concept of a project object model (POM), Maven can manage a project's build,

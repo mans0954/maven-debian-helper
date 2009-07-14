@@ -1,0 +1,4 @@
+version=3
+opts="uversionmangle=s/-(alpha|beta)-/~$1/" \
+  ${baseUrl}/ \
+  ${tagMarker}(\d.*)/ debian debian/orig-tar.sh
