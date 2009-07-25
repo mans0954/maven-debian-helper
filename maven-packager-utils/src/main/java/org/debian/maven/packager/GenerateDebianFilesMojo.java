@@ -106,7 +106,7 @@ public class GenerateDebianFilesMojo
     protected String binPackageName;
     /**
      * Type of the package (e.g. 'maven' or 'ant')
-     * @parameter expression="${packageType}" default="maven"
+     * @parameter expression="${packageType}" default-value="maven"
      */
     protected String packageType;
     /**
@@ -118,12 +118,12 @@ public class GenerateDebianFilesMojo
     protected String downloadUrl;
     /**
      * If true, include running the tests during the build.
-     * @parameter expression="${runTests}" default="true"
+     * @parameter expression="${runTests}" default-value="false"
      */
     protected boolean runTests;
     /**
      * If true, generate the Javadoc packaged in a separate package.
-     * @parameter expression="${generateJavadoc}" default="true"
+     * @parameter expression="${generateJavadoc}" default-value="false"
      */
     protected boolean generateJavadoc;
 
@@ -150,6 +150,7 @@ public class GenerateDebianFilesMojo
             Velocity.init(velocityProperties);
             VelocityContext context = new VelocityContext();
             context.put("package", packageName);
+            context.put("packageType", packageType);
             context.put("binPackage", binPackageName);
             context.put("packager", packager);
             context.put("packagerEmail", email);
@@ -173,63 +174,22 @@ public class GenerateDebianFilesMojo
             context.put("licenses", new TreeSet());
             List description = new ArrayList();
             if (project.getDescription() != null) {
-                StringTokenizer st = new StringTokenizer(project.getDescription().trim(), "\n");
+                StringTokenizer st = new StringTokenizer(project.getDescription().trim(), "\n\t ");
+                StringBuffer descLine = new StringBuffer();
                 while (st.hasMoreTokens()) {
-                    description.add(st.nextToken().trim());
+                    descLine.append(st.nextToken());
+                    descLine.append(" ");
+                    if (descLine.length() > 70 || !st.hasMoreTokens()) {
+                        String line = descLine.toString().trim();
+                        if (line.isEmpty()) {
+                            line = ".";
+                        }
+                        description.add(line);
+                        descLine = new StringBuffer();
+                    }
                 }
             }
             context.put("description", description);
-
-            String projectVersion = project.getVersion();
-
-            int downloadType = DownloadType.UNKNOWN;
-            if (downloadUrl == null) {
-                if (project.getScm() != null) {
-                    downloadUrl = project.getScm().getConnection();
-                }
-            }
-            if (downloadUrl != null && downloadUrl.startsWith("scm:svn:")) {
-                downloadType = DownloadType.SVN;
-                downloadUrl = downloadUrl.substring("scm:svn:".length());
-                final int versionPos = downloadUrl.indexOf(projectVersion);
-                if (versionPos > 0) {
-                    String baseUrl = downloadUrl.substring(0, versionPos);
-                    String suffixUrl = downloadUrl.substring(versionPos + projectVersion.length());
-                    if (!suffixUrl.endsWith("/")) {
-                        suffixUrl += "/";
-                    }
-                    int slashPos = baseUrl.lastIndexOf("/");
-                    String tagMarker = baseUrl.substring(slashPos + 1);
-                    baseUrl = baseUrl.substring(0, slashPos);
-
-                    context.put("baseUrl", baseUrl);
-                    context.put("tagMarker", tagMarker);
-                    context.put("suffixUrl", suffixUrl);
-
-                    FileWriter out = new FileWriter(new File(outputDirectory, "watch"));
-                    Velocity.mergeTemplate("watch.svn.vm", "UTF8", context, out);
-                    out.flush();
-                    out.close();
-
-                    out = new FileWriter(new File(outputDirectory, "orig-tar.sh"));
-                    Velocity.mergeTemplate("orig-tar.svn.vm", "UTF8", context, out);
-                    out.flush();
-                    out.close();
-
-                    makeExecutable("debian/orig-tar.sh");
-
-                } else {
-                    System.err.println("Cannot locate the version in the download url (" +
-                            downloadUrl + ").");
-                    System.err.println("Please run again and provide the download location with an explicit version tag, e.g.");
-                    System.err.println("-DdownloadUrl=scm:svn:http://svn.codehaus.org/modello/tags/modello-1.0-alpha-21/");
-                }
-            }
-
-            if (downloadType == DownloadType.UNKNOWN) {
-                System.err.println("Cannot recognize the download url (" +
-                        downloadUrl + ").");
-            }
 
             File substvarsFile = new File(outputDirectory, binPackageName + ".substvars");
             if (substvarsFile.exists()) {
@@ -241,8 +201,23 @@ public class GenerateDebianFilesMojo
                 if (runTests) {
                     depends.addAll(split(substvars.getProperty("maven.TestDepends")));
                 }
-                if ("maven".equals(packageType) && generateJavadoc) {
-                    depends.add("libmaven-javadoc-plugin-java");
+                if ("maven".equals(packageType)) {
+                    // Remove dependencies that are implied by maven-debian-helper
+                    depends.remove("libmaven-clean-plugin-java");
+                    depends.remove("libmaven-resources-plugin-java");
+                    depends.remove("libmaven-compiler-plugin-java");
+                    depends.remove("libmaven-jar-plugin-java");
+                    depends.remove("libmaven-site-plugin-java");
+                    depends.remove("libsurefire-java");
+                    depends.remove("velocity");
+                    depends.remove("libplexus-velocity-java");
+                    if (generateJavadoc) {
+                        depends.add("libmaven-javadoc-plugin-java");
+                    }
+                } else if ("ant".equals(packageType)) {
+                    // Remove dependencies that are implied by ant packaging
+                    depends.remove("ant");
+                    depends.remove("ant-optional");
                 }
                 context.put("compileDependencies", depends);
                 context.put("runtimeDependencies", split(substvars.getProperty("maven.Depends")));
@@ -272,6 +247,72 @@ public class GenerateDebianFilesMojo
                     pomDirs.add(dirRelPath);
                 }
                 context.put("pomDirs", pomDirs);
+            }
+
+            String projectVersion = project.getVersion();
+            int downloadType = DownloadType.UNKNOWN;
+
+            if (downloadUrl == null) {
+                if (project.getScm() != null) {
+                    downloadUrl = project.getScm().getConnection();
+                }
+            }
+            if (downloadUrl != null && downloadUrl.startsWith("scm:svn:")) {
+                downloadType = DownloadType.SVN;
+                downloadUrl = downloadUrl.substring("scm:svn:".length());
+                String tag = projectVersion;
+                int tagPos = downloadUrl.indexOf(tag);
+                String baseUrl = null;
+                String suffixUrl = null;
+                String tagMarker = null;
+                if (tagPos >= 0) {
+                    baseUrl = downloadUrl.substring(0, tagPos);
+                    suffixUrl = downloadUrl.substring(tagPos + tag.length());
+                    if (!suffixUrl.endsWith("/")) {
+                        suffixUrl += "/";
+                    }
+                    int slashPos = baseUrl.lastIndexOf("/");
+                    tagMarker = baseUrl.substring(slashPos + 1);
+                    baseUrl = baseUrl.substring(0, slashPos);
+                }
+                if (tagPos < 0 && downloadUrl.indexOf("/trunk") >= 0) {
+                    System.out.println("Download URL does not include a tagged revision but /trunk found,");
+                    System.out.println("Trying to guess the address of the tagged revision.");
+                    tag = "trunk";
+                    tagPos = downloadUrl.indexOf(tag);
+                    baseUrl = downloadUrl.substring(0, tagPos);
+                    baseUrl += "tags";
+                    tagMarker = packageName  + "-";
+                    suffixUrl = "";
+                }
+                if (tagPos >= 0) {
+                    context.put("baseUrl", baseUrl);
+                    context.put("tagMarker", tagMarker);
+                    context.put("suffixUrl", suffixUrl);
+
+                    FileWriter out = new FileWriter(new File(outputDirectory, "watch"));
+                    Velocity.mergeTemplate("watch.svn.vm", "UTF8", context, out);
+                    out.flush();
+                    out.close();
+
+                    out = new FileWriter(new File(outputDirectory, "orig-tar.sh"));
+                    Velocity.mergeTemplate("orig-tar.svn.vm", "UTF8", context, out);
+                    out.flush();
+                    out.close();
+
+                    makeExecutable("debian/orig-tar.sh");
+
+                } else {
+                    System.err.println("Cannot locate the version in the download url (" +
+                            downloadUrl + ").");
+                    System.err.println("Please run again and provide the download location with an explicit version tag, e.g.");
+                    System.err.println("-DdownloadUrl=scm:svn:http://svn.codehaus.org/modello/tags/modello-1.0-alpha-21/");
+                }
+            }
+
+            if (downloadType == DownloadType.UNKNOWN) {
+                System.err.println("Cannot recognize the download url (" +
+                        downloadUrl + ").");
             }
 
             FileWriter out = new FileWriter(new File(outputDirectory, "README.source"));

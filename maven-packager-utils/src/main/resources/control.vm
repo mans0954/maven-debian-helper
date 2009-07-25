@@ -31,14 +31,15 @@ Architecture: all
 ## libraries should not depend on runtime - default-jre-headless | java2-runtime-headless,
 Depends: ${dollar}{misc:Depends}, ${dollar}{maven:Depends}
 Recommends: ${dollar}{maven:OptionalDepends}
-Description:#if ($description.isEmpty()) TODO - fill the description #else $description.get(0) #end
+Description: ${project.Name}
+#if ($description.isEmpty()) TODO - fill the description
+#else
 #foreach ($line in $description)
-#if ($velocityCount > 1)
- #if ($line == "")
+#if ($line == "")
  .
- #else
+#else
  $line
- #end
+#end
 #end
 #end
 
@@ -50,14 +51,14 @@ Section: doc
 Depends: ${dollar}{misc:Depends}
 Suggests: ${binPackage}
 Description: Documentation for ${project.Name}
-#if ($description.isEmpty()) TODO - fill the description #else $description.get(0) #end
+#if ($description.isEmpty()) TODO - fill the description
+#else
 #foreach ($line in $description)
-#if ($velocityCount > 1)
- #if ($line == "")
+#if ($line == "")
  .
- #else
+#else
  $line
- #end
+#end
 #end
 #end
 

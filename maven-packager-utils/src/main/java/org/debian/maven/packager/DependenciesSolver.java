@@ -198,9 +198,9 @@ public class DependenciesSolver {
             if (pom.exists()) {
                 projects.add(pom);
             } else {
-                File debianPom = new File(baseDir, "debian/pom.xml");
-                if (debianPom.exists()) {
-                    projects.add(debianPom);
+                pom = new File(baseDir, "debian/pom.xml");
+                if (pom.exists()) {
+                    projects.add(pom);
                 } else {
                     System.err.println("Cannot find the POM file");
                     return;

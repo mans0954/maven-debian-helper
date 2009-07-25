@@ -12,6 +12,5 @@ rm -rf $DIR ../$TAG
 # move to directory 'tarballs'
 if [ -r .svn/deb-layout ]; then
   . .svn/deb-layout
-  mv $TAR $origDir
-  echo "moved $TAR to $origDir"
+  mv $TAR $origDir && echo "moved $TAR to $origDir"
 fi
