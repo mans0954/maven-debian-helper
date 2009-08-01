@@ -1,6 +1,7 @@
 maven-debian-helper (0.4) experimental; urgency=low
 
   [Ludovic Claude]
+  * Add myself to Uploaders
   * Use maven-ant-helper for the build instead of recursively building
     this package with itself (which required an ugly bootstrap script)
   * Integrate the cdbs helper with maven-repo-helper, this unifies the
