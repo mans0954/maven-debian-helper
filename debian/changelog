@@ -8,6 +8,9 @@ maven-debian-helper (0.4) experimental; urgency=low
     packager as maven-repo-helper takes care of most POM patching work.
   * Use default-jdk for the build
   * Change section to java, update Standards-Version to 3.8.1
+  * Generate Javadoc API automatically.
+  * Add mh_make tool to generate Debian packaging automatically from
+    a Maven project.
     
   [Torsten Werner]
   * Implement pom faking.

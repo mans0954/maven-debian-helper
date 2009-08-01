@@ -201,6 +201,10 @@ public class GenerateDebianFilesMojo
                 if (runTests) {
                     depends.addAll(split(substvars.getProperty("maven.TestDepends")));
                 }
+                if (generateJavadoc) {
+                    depends.addAll(split(substvars.getProperty("maven.DocDepends")));
+                    depends.addAll(split(substvars.getProperty("maven.DocOptionalDepends")));
+                }
                 if ("maven".equals(packageType)) {
                     // Remove dependencies that are implied by maven-debian-helper
                     depends.remove("libmaven-clean-plugin-java");

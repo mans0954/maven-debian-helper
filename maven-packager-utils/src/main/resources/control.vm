@@ -3,11 +3,11 @@
 #macro(printDependencies $dependencies)
 #set ($lineLength=0)
 #foreach ($dependency in $dependencies)
-#if($lineLength==0)${space}#end${dependency}#if($velocityCount<$dependencies.size()), #else
+#if($lineLength==0)${space}#end${dependency}#if($velocityCount<$dependencies.size()), #elseif ($velocityHasNext)
 $space
 #end
 #set ($lineLength = $lineLength + $dependency.length() + 2)
-#if ($lineLength > 70)
+#if ($lineLength > 70 && $velocityHasNext)
 $space
 #set ($lineLength=0)
 #end
@@ -19,7 +19,7 @@ Priority: optional
 Maintainer: Debian Java Maintainers <pkg-java-maintainers@lists.alioth.debian.org>
 Uploaders: ${packager} <${packagerEmail}>
 Build-Depends: debhelper (>= 7), cdbs, default-jdk, maven-debian-helper
-Build-Depends-Indep: #printDependencies($compileDependencies)
+Build-Depends-Indep:#printDependencies($compileDependencies)$space
 Standards-Version: 3.8.2
 Vcs-Svn: svn://svn.debian.org/svn/pkg-java/trunk/${package}
 Vcs-Browser: http://svn.debian.org/wsvn/pkg-java/trunk/${package}/
@@ -48,7 +48,8 @@ Description: ${project.Name}
 Package: ${binPackage}-doc
 Architecture: all
 Section: doc
-Depends: ${dollar}{misc:Depends}
+Depends: ${dollar}{misc:Depends}, ${dollar}{maven:DocDepends}
+Recommends: ${dollar}{maven:DocOptionalDepends}
 Suggests: ${binPackage}
 Description: Documentation for ${project.Name}
 #if ($description.isEmpty()) TODO - fill the description

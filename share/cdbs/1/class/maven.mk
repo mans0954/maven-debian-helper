@@ -57,7 +57,7 @@ debian/maven.rules:
 	mh_lspoms -p$(DEB_JAR_PACKAGE) --force
 
 debian/stamp-poms-patched:
-	mh_patchpoms -p$(DEB_JAR_PACKAGE) --keep-pom-version
+	mh_patchpoms -p$(DEB_JAR_PACKAGE) --keep-pom-version $(DEB_PATCHPOMS_ARGS)
 	touch debian/stamp-poms-patched
 
 patch-poms: debian/$(DEB_JAR_PACKAGE).poms debian/maven.rules debian/stamp-poms-patched
@@ -107,9 +107,13 @@ common-build-arch common-build-indep:: debian/stamp-maven-doc
 debian/stamp-maven-doc: debian/stamp-maven-build
 	$(if $(DEB_MAVEN_DOC_TARGET),$(DEB_MAVEN_INVOKE) $(PLUGIN_ARGS) $(DEB_MAVEN_DOC_TARGET),@echo "DEB_MAVEN_DOC_TARGET unset, not generating documentation")
 	$(if $(DEB_MAVEN_DOC_TARGET),touch $@)
+	cd target && mkdir docs && mv apidocs docs/api
+
+# extra arguments for the installation step
+PLUGIN_DOC_ARGS = -Ddebian.dir=$(CURDIR)/debian -Ddebian.package=$(DEB_DOC_PACKAGE)
 
 common-install-impl:: 
-	$(if $(DEB_MAVEN_INSTALL_DOC_TARGET),$(DEB_MAVEN_INVOKE) $(PLUGIN_ARGS) $(DEB_MAVEN_INSTALL_DOC_TARGET),@echo "DEB_MAVEN_INSTALL_DOC_TARGET unset, skipping documentation maven.mk common-install target")
+	$(if $(DEB_MAVEN_INSTALL_DOC_TARGET),$(DEB_MAVEN_INVOKE) $(PLUGIN_DOC_ARGS) $(DEB_MAVEN_INSTALL_DOC_TARGET),@echo "DEB_MAVEN_INSTALL_DOC_TARGET unset, skipping documentation maven.mk common-install target")
 
 clean:: 
 	$(if $(DEB_MAVEN_DOC_TARGET),$(RM) debian/stamp-maven-doc)

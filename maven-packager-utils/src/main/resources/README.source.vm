@@ -5,7 +5,7 @@ This package was debianized using the mh_make command
 from the maven-debian-helper package.
 
 #if(${packageType} == 'maven')
-The build system uses Maven but prevent it from downloading
+The build system uses Maven but prevents it from downloading
 anything from the Internet, making the build compliant with
 the Debian policy.
 #end

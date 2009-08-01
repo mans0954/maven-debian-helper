@@ -14,12 +14,12 @@ public class SysInstallDocMojo extends SysInstallMojo
 
   protected String jarName()
   {
-    return getArtifactId() + "-javadoc-" + getVersion() + ".jar";
+    return getArtifactId() + "-" + getVersion() + "-javadoc.jar";
   }
 
   protected String debianJarName()
   {
-    return getArtifactId() + "-javadoc-" + getDebianVersion() + ".jar";
+    return getArtifactId() + "-" + getDebianVersion() + "-javadoc.jar";
   }
 
   /**

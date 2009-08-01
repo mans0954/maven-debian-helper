@@ -326,9 +326,6 @@ public class SysInstallMojo extends AbstractMojo
         mkdir(debianFullRepoPath());
         run(linkCommand(jarDestRelPath(), debianJarDestPath()));
       }
-      mkdir(compatSharePath());
-      run(linkCommand(compatRelPath(), fullCompatPath()));
-      run(linkCommand(compatRelPath(), versionedFullCompatPath()));
     }
   }
 

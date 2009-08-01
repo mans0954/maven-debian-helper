@@ -121,6 +121,17 @@ public class DependenciesSolver {
         depVars.put("maven.TestDepends", toString(testDepends));
         depVars.put("maven.Depends", toString(runtimeDepends));
         depVars.put("maven.OptionalDepends", toString(optionalDepends));
+        Set docRuntimeDepends = new TreeSet();
+        docRuntimeDepends.add("openjdk-6-doc | classpath-doc");
+        for (Iterator i = runtimeDepends.iterator(); i.hasNext();) {
+            docRuntimeDepends.add(i.next() + "-doc");
+        }
+        Set docOptionalDepends = new TreeSet();
+        for (Iterator i = optionalDepends.iterator(); i.hasNext();) {
+            docOptionalDepends.add(i.next() + "-doc");
+        }
+        depVars.put("maven.DocDepends", toString(docRuntimeDepends));
+        depVars.put("maven.DocOptionalDepends", toString(docOptionalDepends));
         try {
             depVars.store(new FileWriter(dependencies), "List of dependencies for " + packageName + ", generated for use by debian/control");
         } catch (IOException ex) {

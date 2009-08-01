@@ -3,7 +3,7 @@ Section: java
 Priority: optional
 Maintainer: Debian Java Maintainers <pkg-java-maintainers@lists.alioth.debian.org>
 Uploaders: Torsten Werner <twerner@debian.org>
-Build-Depends: cdbs, debhelper (>= 6), default-jdk, maven-ant-helper (>> 4), ant-optional
+Build-Depends: cdbs, debhelper (>= 6), default-jdk, maven-ant-helper (>> 4), ant-optional, help2man
 Build-Depends-Indep: maven-repo-helper (>> 0.5),
  junit, testng, libmaven-plugin-tools-java, libplexus-velocity-java, velocity,
  libmaven2-core-java

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 MH_VERSION=0.4
 . /usr/share/maven-repo-helper/mh_lib.sh
@@ -26,14 +26,19 @@ ARGS="p package b bin-package t run-tests d javadoc a ant v verbose" parseargs "
 
 if [ -z "$DEBFULLNAME" ]; then
   echo "Please define the environment variable DEBFULLNAME, e.g."
-  echo "export DEBFULLNAME=\"Ludovic Claude\""
+  echo "export DEBFULLNAME=\"John Doe\""
   return;
 fi
 
 if [ -z "$DEBEMAIL" ]; then
   echo "Please define the environment variable DEBEMAIL, e.g."
-  echo "export DEBEMAIL=\"ludovic.claude@laposte.net\""
+  echo "export DEBEMAIL=\"john.doe@where.no\""
   return;
+fi
+
+if [ -z "$DEBLICENSE" ]; then
+    echo "Environment variable DEBLICENSE not set, use GPL-3+ by default"
+    DEBLICENSE="GPL-3+"
 fi
 
 PACKAGE=$(getarg p package)
@@ -41,10 +46,6 @@ BIN_PACKAGE=$(getarg b bin-package)
 RUN_TESTS=$(getarg t run-tests)
 GEN_JAVADOC=$(getarg d javadoc)
 ANT=$(getarg a ant)
-
-if [ -z "$DEBLICENSE" ]; then
-    DEBLICENSE="GPL-3"
-fi
 
 if [ -z "$PACKAGE" ]; then
     PACKAGE="$(basename $(pwd))"
@@ -86,10 +87,11 @@ if [ ! -e debian/${BIN_PACKAGE}.substvars ]; then
     java -cp /usr/share/java/maven-project.jar:/usr/share/java/maven-repo-helper.jar:/usr/share/java/maven-packager-utils.jar org.debian.maven.packager.DependenciesSolver --package="$BIN_PACKAGE" ${ANT:--ant} --maven-repo=/usr/share/maven-repo
 fi
 
-if [ ! -e .debianVersion ]; then
-    touch .debianVersion
-    mh_patchpoms -p$BIN_PACKAGE --keep-pom-version
+if [ -e pom.xml.save ]; then
+	mh_unpatchpoms -p$BIN_PACKAGE
 fi
+ 
+mh_patchpoms -p$BIN_PACKAGE --keep-pom-version
 
 mvn org.debian.maven:maven-packager-utils:$MH_VERSION:generate -Demail="$DEBEMAIL" -Dpackager="$DEBFULLNAME" -DpackagerLicense="$DEBLICENSE" -Dpackage="$PACKAGE" -Dbin.package="$BIN_PACKAGE" -DrunTests="$RUN_TESTS" -DgenerateJavadoc="$GEN_JAVADOC" -Dmaven.repo.local=/usr/share/maven-repo ${ANT:+-DpackageType=ant} --offline
 
@@ -101,6 +103,6 @@ if [ ! -f debian/changelog ]; then
     source debian/tmp/pom.properties
     rm -R debian/tmp
     version=$(echo $version | sed -re's/-(alpha|beta)-?/~\1/')
-    dch --create --newversion=${version}-1 --package=$PACKAGE "Initial release (Closes: #XXXXX)"
+    dch --create --newversion=${version}-1 --package=$PACKAGE "Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>"
 fi
 

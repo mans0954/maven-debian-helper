@@ -64,7 +64,9 @@ License: #foreach($license in $licenses)${license}#if($velocityHasNext) or #end#
 Files: debian/*
 Copyright: Copyright ${currentYear}, ${packager} <${packagerEmail}>
 License: ${packagerLicense}
-#set ($x = $licenses.add("${packagerLicense}"))
+#set ($license = "${packagerLicense}")
+#set ($license = $license.replace("+",""))
+#set ($x = $licenses.add("${license}"))
 
 #foreach ($license in $licenses)
 License: $license

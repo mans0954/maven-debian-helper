@@ -63,6 +63,9 @@ DEB_CLASSPATH = $(MAVEN_HOME)/boot/classworlds.jar:$(shell for jar in $(DEB_JARS
 # Extra arguments for the Maven command line.
 DEB_MAVEN_ARGS = 
 
+# Extra arguments for the mh_patchpoms command line
+DEB_PATCHPOMS_ARGS=
+
 # Property file for Maven, defaults to debian/maven.properties if it exists.
 # You may define additional properties. Please note that command-line
 # arguments in MAVEN_ARGS (see below) override the settings in pom.xml and
