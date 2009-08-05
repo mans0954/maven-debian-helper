@@ -1,3 +1,11 @@
+maven-debian-helper (0.5) experimental; urgency=low
+
+  * Update Standards-Version to 3.8.2
+  * Follow the new convention for Javadoc:
+    javadoc in /usr/share/doc/package/api even if it's in package-doc
+
+ -- Ludovic Claude <ludovic.claude@laposte.net>  Sun, 02 Aug 2009 11:42:31 +0100
+
 maven-debian-helper (0.4) experimental; urgency=low
 
   [Ludovic Claude]

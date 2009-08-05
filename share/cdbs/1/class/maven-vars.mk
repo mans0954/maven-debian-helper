@@ -34,7 +34,7 @@ CDBS_BUILD_DEPENDS := $(CDBS_BUILD_DEPENDS), maven-debian-helper (>> 0.3)
 # nonstandard Maven installations.
 MAVEN_HOME = /usr/share/maven2
 
-MAVEN_DEBIAN_VERSION = 0.4
+MAVEN_DEBIAN_VERSION = 0.5
 
 # The home directory of the Java Runtime Environment (JRE) or Java Development
 # Kit (JDK). You can either directly set JAVA_HOME in debian/rules or set

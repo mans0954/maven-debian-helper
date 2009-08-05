@@ -64,7 +64,7 @@ patch-poms: debian/$(DEB_JAR_PACKAGE).poms debian/maven.rules debian/stamp-poms-
 
 unpatch-poms: debian/$(DEB_JAR_PACKAGE).poms
 	mh_unpatchpoms -p$(DEB_JAR_PACKAGE)
-	rm -f debian/stamp-poms-patched
+	$(RM) -f debian/stamp-poms-patched
 
 debian/maven-repo:
 	/usr/share/maven-debian-helper/copy-repo.sh $(CURDIR)/debian
@@ -83,6 +83,7 @@ cleanbuilddir:: maven-sanity-check post-patches debian/maven-repo
 	$(RM) -r $(DEB_MAVEN_REPO) debian/stamp-maven-build
 	$(if $(cdbs_new_poms_file), $(RM) debian/$(DEB_JAR_PACKAGE).poms)
 	$(if $(cdbs_new_maven_rules_file), $(RM) debian/maven.rules)
+	$(if $(cdbs_use_maven_substvars), $(RM) debian/*.substvars)
 
 # extra arguments for the installation step
 PLUGIN_ARGS = -Ddebian.dir=$(CURDIR)/debian -Ddebian.package=$(DEB_JAR_PACKAGE)
@@ -107,13 +108,15 @@ common-build-arch common-build-indep:: debian/stamp-maven-doc
 debian/stamp-maven-doc: debian/stamp-maven-build
 	$(if $(DEB_MAVEN_DOC_TARGET),$(DEB_MAVEN_INVOKE) $(PLUGIN_ARGS) $(DEB_MAVEN_DOC_TARGET),@echo "DEB_MAVEN_DOC_TARGET unset, not generating documentation")
 	$(if $(DEB_MAVEN_DOC_TARGET),touch $@)
-	cd target && mkdir docs && mv apidocs docs/api
 
 # extra arguments for the installation step
 PLUGIN_DOC_ARGS = -Ddebian.dir=$(CURDIR)/debian -Ddebian.package=$(DEB_DOC_PACKAGE)
 
 common-install-impl:: 
 	$(if $(DEB_MAVEN_INSTALL_DOC_TARGET),$(DEB_MAVEN_INVOKE) $(PLUGIN_DOC_ARGS) $(DEB_MAVEN_INSTALL_DOC_TARGET),@echo "DEB_MAVEN_INSTALL_DOC_TARGET unset, skipping documentation maven.mk common-install target")
+	$(if $(cdbs_use_maven_substvars), cp debian/$(DEB_JAR_PACKAGE).substvars debian/$(DEB_DOC_PACKAGE).substvars)
+	# cleanup generated docs
+	$(RM) -f target/apidocs/*.sh target/apidocs/options 
 
 clean:: 
 	$(if $(DEB_MAVEN_DOC_TARGET),$(RM) debian/stamp-maven-doc)

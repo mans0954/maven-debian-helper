@@ -1,5 +1,5 @@
 build.directory=target
-javadoc.dir=target/docs/api
+javadoc.dir=target/apidocs
 #if(!$runTests)
 maven.test.skip=true
 #end

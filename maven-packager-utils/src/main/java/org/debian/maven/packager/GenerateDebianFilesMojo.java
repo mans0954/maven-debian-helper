@@ -136,7 +136,6 @@ public class GenerateDebianFilesMojo
 
         String controlTemplate = "control.vm";
         String rulesTemplate = "rules.vm";
-        String javadocsTemplate = "java-doc.docs.vm";
         if ("ant".equals(packageType)) {
             controlTemplate = "control.ant.vm";
             rulesTemplate = "rules.ant.vm";
@@ -351,13 +350,13 @@ public class GenerateDebianFilesMojo
             out.close();
 
             if (generateJavadoc) {
-                out = new FileWriter(new File(outputDirectory, binPackageName + "-doc.doc-base"));
-                Velocity.mergeTemplate("java-doc.doc-base.vm", "UTF8", context, out);
+                out = new FileWriter(new File(outputDirectory, binPackageName + "-doc.doc-base.api"));
+                Velocity.mergeTemplate("java-doc.doc-base.api.vm", "UTF8", context, out);
                 out.flush();
                 out.close();
 
-                out = new FileWriter(new File(outputDirectory, binPackageName + "-doc.docs"));
-                Velocity.mergeTemplate(javadocsTemplate, "UTF8", context, out);
+                out = new FileWriter(new File(outputDirectory, binPackageName + "-doc.install"));
+                Velocity.mergeTemplate("java-doc.install.vm", "UTF8", context, out);
                 out.flush();
                 out.close();
             }

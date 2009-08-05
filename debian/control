@@ -7,7 +7,7 @@ Build-Depends: cdbs, debhelper (>= 6), default-jdk, maven-ant-helper (>> 4), ant
 Build-Depends-Indep: maven-repo-helper (>> 0.5),
  junit, testng, libmaven-plugin-tools-java, libplexus-velocity-java, velocity,
  libmaven2-core-java
-Standards-Version: 3.8.1
+Standards-Version: 3.8.2
 Vcs-Svn: svn://svn.debian.org/svn/pkg-java/trunk/maven-debian-helper
 Vcs-Browser: http://svn.debian.org/wsvn/pkg-java/trunk/maven-debian-helper/
 Homepage: http://wiki.debian.org/Java/MavenBuilder
