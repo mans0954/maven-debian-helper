@@ -1,3 +1,10 @@
+maven-debian-helper (0.6) unstable; urgency=low
+
+  * Update everything to version 0.6 because 2 scripts have still been at
+    version 0.4. We should make the package more version agnostic.
+
+ -- Torsten Werner <twerner@debian.org>  Sun, 16 Aug 2009 15:18:57 +0200
+
 maven-debian-helper (0.5) unstable; urgency=low
 
   * Update Standards-Version to 3.8.2
