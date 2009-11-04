@@ -1,3 +1,12 @@
+maven-debian-helper (0.7) UNRELEASED; urgency=low
+
+  * Add Recommends: apt-file to maven-debian-helper (Closes: #542511).
+  * Build-Depends on debhelper (>= 7).
+  * Added myself to Uploaders.
+  * Updated Standards-Version to 3.8.3.
+
+ -- Michael Koch <konqueror@gmx.de>  Wed, 04 Nov 2009 17:19:08 +0100
+
 maven-debian-helper (0.6) unstable; urgency=low
 
   * Update everything to version 0.6 because 2 scripts have still been at
