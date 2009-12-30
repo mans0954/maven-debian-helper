@@ -1,11 +1,21 @@
-maven-debian-helper (0.7) UNRELEASED; urgency=low
+maven-debian-helper (0.7) unstable; urgency=low
 
+  [Ludovic Claude]
+  * Make the package more version agnostic. Versions are discovered
+    at runtime
+  * mh_make has a new option, --from-svn, to download automatically
+    the sources from a SVN repository and generate the Debian packaging
+    for the project.
+  * Add apt-file to Recommends: as it's used by mh_lspoms
+    (Closes: #542511)
+
+  [Michael Koch]
   * Add Recommends: apt-file to maven-debian-helper (Closes: #542511).
   * Build-Depends on debhelper (>= 7).
   * Added myself to Uploaders.
   * Updated Standards-Version to 3.8.3.
 
- -- Michael Koch <konqueror@gmx.de>  Wed, 04 Nov 2009 17:19:08 +0100
+ -- Ludovic Claude <ludovic.claude@laposte.net>  Thu, 17 Dec 2009 20:09:00 +0100
 
 maven-debian-helper (0.6) unstable; urgency=low
 

@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-MH_VERSION=0.6
+MH_VERSION=$(ls /usr/share/maven-repo/org/debian/maven/maven-packager-utils/ | sed 's|/||')
 . /usr/share/maven-repo-helper/mh_lib.sh
 
 syntax()
@@ -12,6 +12,10 @@ syntax()
    echo -e "Options:"
    echo -e "\t-h --help: show this text"
    echo -e "\t-V --version: show the version"
+   echo -e "\t--from-svn=<svn url>: download the source code from the SVN"
+   echo -e "\t repository before building the Debian packaging. Use a tagged"
+   echo -e "\t branch of the source code, for example"
+   echo -e "\t http://svn.apache.org/repos/asf/felix/releases/org.osgi.core-1.2.0/"
    echo -e "\t-p<package> --package=<package>: name of the source package"
    echo -e "\t-b<package> --bin-package=<package>: name of the binary package"
    echo -e "\t-t<true|false> --run-tests=<true|false>: include or not the tests"
@@ -22,7 +26,7 @@ syntax()
    exit 1
 }
 
-ARGS="p package b bin-package t run-tests d javadoc a ant v verbose" parseargs "$@"
+ARGS="p package b bin-package t run-tests d javadoc a ant v verbose from-svn" parseargs "$@"
 
 if [ -z "$DEBFULLNAME" ]; then
   echo "Please define the environment variable DEBFULLNAME, e.g."
@@ -46,9 +50,13 @@ BIN_PACKAGE=$(getarg b bin-package)
 RUN_TESTS=$(getarg t run-tests)
 GEN_JAVADOC=$(getarg d javadoc)
 ANT=$(getarg a ant)
+FROM_SVN=$(getarg from-svn)
 
 if [ -z "$PACKAGE" ]; then
     PACKAGE="$(basename $(pwd))"
+	if [ -n "$FROM_SVN" ]; then
+		PACKAGE=$(basename $FROM_SVN | sed 's/-[0-9].*//' )
+	fi
     echo "Enter the name of the new Debian source package. If empty, it will defaults to $PACKAGE"
     read -p ">" USER_PACKAGE
     if [ -n "$USER_PACKAGE" ]; then
@@ -83,6 +91,11 @@ if [ -z "$GEN_JAVADOC" ]; then
     fi
 fi
 
+if [ -n "$FROM_SVN" ]; then
+	svn export $FROM_SVN $PACKAGE
+	cd $PACKAGE
+fi
+
 if [ ! -e debian/${BIN_PACKAGE}.substvars ]; then
     java -cp /usr/share/java/maven-project.jar:/usr/share/java/maven-repo-helper.jar:/usr/share/java/maven-packager-utils.jar org.debian.maven.packager.DependenciesSolver --package="$BIN_PACKAGE" ${ANT:--ant} --maven-repo=/usr/share/maven-repo
 fi
@@ -93,7 +106,7 @@ fi
  
 mh_patchpoms -p$BIN_PACKAGE --keep-pom-version
 
-mvn org.debian.maven:maven-packager-utils:$MH_VERSION:generate -Demail="$DEBEMAIL" -Dpackager="$DEBFULLNAME" -DpackagerLicense="$DEBLICENSE" -Dpackage="$PACKAGE" -Dbin.package="$BIN_PACKAGE" -DrunTests="$RUN_TESTS" -DgenerateJavadoc="$GEN_JAVADOC" -Dmaven.repo.local=/usr/share/maven-repo ${ANT:+-DpackageType=ant} --offline
+mvn org.debian.maven:maven-packager-utils:$MH_VERSION:generate -Demail="$DEBEMAIL" -Dpackager="$DEBFULLNAME" -DpackagerLicense="$DEBLICENSE" -Dpackage="$PACKAGE" -Dbin.package="$BIN_PACKAGE" -DrunTests="$RUN_TESTS" -DgenerateJavadoc="$GEN_JAVADOC" -Dmaven.repo.local=/usr/share/maven-repo ${ANT:+-DpackageType=ant} ${FROM_SVN:+-DdownloadUrl=scm:svn:$FROM_SVN} --offline
 
 rm -f debian/*.substvars
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MH_VERSION=0.6
+MH_VERSION=$(ls /usr/share/maven-repo/org/debian/maven/maven-packager-utils/ | sed 's|/||')
 . /usr/share/maven-repo-helper/mh_lib.sh
 
 syntax()
