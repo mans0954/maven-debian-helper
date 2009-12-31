@@ -12,8 +12,8 @@ syntax()
    echo -e "Options:"
    echo -e "\t-h --help: show this text"
    echo -e "\t-V --version: show the version"
-   echo -e "\t--from-svn=<svn url>: download the source code from the SVN"
-   echo -e "\t repository before building the Debian packaging. Use a tagged"
+   echo -e "\t-s<svn url> --from-svn=<svn url>: download the source code from"
+   echo -e "\t the SVN repository before building the Debian packaging. Use a tagged"
    echo -e "\t branch of the source code, for example"
    echo -e "\t http://svn.apache.org/repos/asf/felix/releases/org.osgi.core-1.2.0/"
    echo -e "\t-p<package> --package=<package>: name of the source package"
@@ -26,7 +26,7 @@ syntax()
    exit 1
 }
 
-ARGS="p package b bin-package t run-tests d javadoc a ant v verbose from-svn" parseargs "$@"
+ARGS="p package b bin-package t run-tests d javadoc a ant v verbose s from-svn" parseargs "$@"
 
 if [ -z "$DEBFULLNAME" ]; then
   echo "Please define the environment variable DEBFULLNAME, e.g."
@@ -41,7 +41,7 @@ if [ -z "$DEBEMAIL" ]; then
 fi
 
 if [ -z "$DEBLICENSE" ]; then
-    echo "Environment variable DEBLICENSE not set, use GPL-3+ by default"
+    echo "Environment variable DEBLICENSE not set, using GPL-3+ by default"
     DEBLICENSE="GPL-3+"
 fi
 
@@ -50,7 +50,7 @@ BIN_PACKAGE=$(getarg b bin-package)
 RUN_TESTS=$(getarg t run-tests)
 GEN_JAVADOC=$(getarg d javadoc)
 ANT=$(getarg a ant)
-FROM_SVN=$(getarg from-svn)
+FROM_SVN=$(getarg s from-svn)
 
 if [ -z "$PACKAGE" ]; then
     PACKAGE="$(basename $(pwd))"
