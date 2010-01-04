@@ -1,3 +1,9 @@
+maven-debian-helper (0.8) UNRELEASED; urgency=low
+
+  * mh_make falls back on EMAIL when DEBEMAIL is not set
+
+ -- Ludovic Claude <ludovic.claude@laposte.net>  Mon, 04 Jan 2010 23:13:29 +0100
+
 maven-debian-helper (0.7) unstable; urgency=low
 
   [Ludovic Claude]

@@ -35,6 +35,11 @@ if [ -z "$DEBFULLNAME" ]; then
 fi
 
 if [ -z "$DEBEMAIL" ]; then
+  # Fall back on EMAIL when DEBEMAIL is not defined
+  DEBEMAIL=$EMAIL
+fi
+
+if [ -z "$DEBEMAIL" ]; then
   echo "Please define the environment variable DEBEMAIL, e.g."
   echo "export DEBEMAIL=\"john.doe@where.no\""
   return;
