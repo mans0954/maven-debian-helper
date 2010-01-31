@@ -28,13 +28,14 @@ _cdbs_class_maven_vars = 1
 
 # Declare Build-Deps for packages using this file
 CDBS_BUILD_DEPENDS := $(CDBS_BUILD_DEPENDS), cdbs (>= 0.4.43)
-CDBS_BUILD_DEPENDS := $(CDBS_BUILD_DEPENDS), maven-debian-helper (>> 0.3)
+CDBS_BUILD_DEPENDS := $(CDBS_BUILD_DEPENDS), maven-debian-helper (>> 0.7)
 
 # Maven home directory.  Doesn't need to be changed except when using
 # nonstandard Maven installations.
 MAVEN_HOME = /usr/share/maven2
 
 MAVEN_DEBIAN_VERSION = $(shell ls /usr/share/maven-repo/org/debian/maven/maven-packager-utils/ | sed 's|/||')
+MAVEN_CLASSCONF = /etc/maven2/m2-debian.conf
 
 # The home directory of the Java Runtime Environment (JRE) or Java Development
 # Kit (JDK). You can either directly set JAVA_HOME in debian/rules or set
@@ -66,6 +67,14 @@ DEB_MAVEN_ARGS =
 # Extra arguments for the mh_patchpoms command line
 DEB_PATCHPOMS_ARGS=
 
+# The name of the binary package that gets the jar files installed. The
+# first package by default.
+DEB_JAR_PACKAGE = $(firstword $(shell dh_listpackages))
+
+# The name of the package containing the documentation. The second package
+# by default. Leave empty to skip generating documentation.
+DEB_DOC_PACKAGE = $(firstword $(shell dh_listpackages | grep -v $(DEB_JAR_PACKAGE) | grep "-doc"))
+
 # Property file for Maven, defaults to debian/maven.properties if it exists.
 # You may define additional properties. Please note that command-line
 # arguments in MAVEN_ARGS (see below) override the settings in pom.xml and
@@ -76,19 +85,11 @@ DEB_MAVEN_PROPERTYFILE = $(shell test -f $(CURDIR)/debian/maven.properties && ec
 # command-line arguments in MAVEN_ARGS. You can additionally define
 # MAVEN_ARGS_<package> for each individual package.
 DEB_MAVEN_INVOKE = cd $(DEB_BUILDDIR) && $(JAVACMD) -noverify -cp $(DEB_CLASSPATH) \
-		 $(JAVA_OPTS) -Dclassworlds.conf=/etc/maven2/m2-debian.conf \
+		 $(JAVA_OPTS) -Dclassworlds.conf=$(MAVEN_CLASSCONF) \
 		 org.codehaus.classworlds.Launcher $(DEB_MAVEN_ARGS) \
 		 -s/etc/maven2/settings-debian.xml \
 		 -Dmaven.repo.local=$(DEB_MAVEN_REPO) \
 		 $(if $(MAVEN_ARGS_$(cdbs_curpkg)),$(MAVEN_ARGS_$(cdbs_curpkg)),$(MAVEN_ARGS))
-
-# The name of the binary package that gets the jar files installed. The
-# first package by default.
-DEB_JAR_PACKAGE = $(firstword $(shell dh_listpackages))
-
-# The name of the package containing the documentation. The second package
-# by default. Leave empty to skip generating documentation.
-DEB_DOC_PACKAGE = $(word 2, $(shell dh_listpackages))
 
 # Targets to invoke for building, installing, testing and cleaning up.
 # Building uses the default target from build.xml, installing and testing is

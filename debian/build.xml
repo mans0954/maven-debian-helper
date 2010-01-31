@@ -44,12 +44,14 @@
         <cleanmodule dir=""/>
         <cleanmodule dir="maven-debian-helper"/>
         <cleanmodule dir="maven-debian-plugin"/>
+        <cleanmodule dir="maven-build-nodocs"/>
         <cleanmodule dir="maven-packager-utils"/>
     </target>
 
     <target name="package">
         <packagemodule dir=""/>
         <packagemodule dir="maven-debian-helper"/>
+        <packagemodule dir="maven-build-nodocs"/>
         <package-plugin-module dir="maven-debian-plugin"/>
         <package-plugin-module dir="maven-packager-utils"/>
     </target>

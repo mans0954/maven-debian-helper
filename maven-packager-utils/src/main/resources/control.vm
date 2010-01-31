@@ -20,9 +20,9 @@ Maintainer: Debian Java Maintainers <pkg-java-maintainers@lists.alioth.debian.or
 Uploaders: ${packager} <${packagerEmail}>
 Build-Depends: debhelper (>= 7), cdbs, default-jdk, maven-debian-helper
 Build-Depends-Indep:#printDependencies($compileDependencies)$space
-Standards-Version: 3.8.2
+Standards-Version: 3.8.3
 Vcs-Svn: svn://svn.debian.org/svn/pkg-java/trunk/${package}
-Vcs-Browser: http://svn.debian.org/wsvn/pkg-java/trunk/${package}/
+Vcs-Browser: http://svn.debian.org/wsvn/pkg-java/trunk/${package}
 Homepage:#if(${project.Url}) ${project.Url} #else TODO #end
 
 

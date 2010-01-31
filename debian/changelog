@@ -1,6 +1,26 @@
-maven-debian-helper (0.8) UNRELEASED; urgency=low
+maven-debian-helper (0.8) unstable; urgency=low
 
   * mh_make falls back on EMAIL when DEBEMAIL is not set
+  * mh_make handles better multi projects
+  * mh_make generates projects following the Debian 3.8.3 policy
+  * Documentation improvements
+  * maven.mk: unpatch the poms in cleanbuilddir, to have a good
+    clean sequence when maven.mk is used with a patch system -
+    clean target -> mvn clean -> rm tmp files -> unpatch pom files
+     -> unpatch files with patch system
+  * Read rules from the Maven repository to force the version of
+    Maven plugins to be the same as in the repository
+  * maven.mk removes some elements from the POM files when their
+    use is against the Debian policy (<repositories> as they
+    imply downloading artifacts from the Internet, 
+    <distributionManagement> as it implies publishing on the net
+    or in a location not controlled by Debian) or when they are
+    not needed and risk pulling out unwanted dependencies
+    (<reports> which is not used if a documentation package is
+    not generated)
+  * maven.mk adds a patch to Maven to disable using the
+    maven-site-plugin when no documentation package is generated.
+    This helps to reduce the amount of build dependencies
 
  -- Ludovic Claude <ludovic.claude@laposte.net>  Mon, 04 Jan 2010 23:13:29 +0100
 

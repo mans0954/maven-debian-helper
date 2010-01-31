@@ -57,8 +57,13 @@ debian/$(DEB_JAR_PACKAGE).poms:
 debian/maven.rules:
 	mh_lspoms -p$(DEB_JAR_PACKAGE) --force
 
-debian/stamp-poms-patched:
-	mh_patchpoms -p$(DEB_JAR_PACKAGE) --keep-pom-version $(DEB_PATCHPOMS_ARGS)
+ifeq (, $(DEB_DOC_PACKAGE))
+DEB_PATCHPOMS_ARGS += --build-no-docs
+debian/stamp-maven-build: override MAVEN_CLASSCONF = /etc/maven2/m2-debian-nodocs.conf
+endif
+
+debian/stamp-poms-patched: debian/maven-repo
+	mh_patchpoms -p$(DEB_JAR_PACKAGE) --debian-build --keep-pom-version --maven-repo=$(DEB_MAVEN_REPO) $(DEB_PATCHPOMS_ARGS)
 	touch debian/stamp-poms-patched
 
 patch-poms: debian/$(DEB_JAR_PACKAGE).poms debian/maven.rules debian/stamp-poms-patched
@@ -79,20 +84,22 @@ debian/stamp-maven-build: debian/maven-repo
 	$(DEB_MAVEN_INVOKE) $(DEB_MAVEN_BUILD_TARGET)
 	touch $@
 
+cleanbuilddir:: DEB_PATCHPOMS_ARGS += --clean-ignore-rules=debian/maven.cleanIgnoreRules
 cleanbuilddir:: maven-sanity-check post-patches debian/maven-repo
 	-$(DEB_MAVEN_INVOKE) $(DEB_MAVEN_CLEAN_TARGET)
 	$(RM) -r $(DEB_MAVEN_REPO) debian/stamp-maven-build
 	$(if $(cdbs_new_poms_file), $(RM) debian/$(DEB_JAR_PACKAGE).poms)
 	$(if $(cdbs_new_maven_rules_file), $(RM) debian/maven.rules)
 	$(if $(cdbs_use_maven_substvars), $(RM) debian/*.substvars)
+	$(MAKE) -f debian/rules unpatch-poms
 
 # extra arguments for the installation step
-PLUGIN_ARGS = -Ddebian.dir=$(CURDIR)/debian -Ddebian.package=$(DEB_JAR_PACKAGE)
+PLUGIN_ARGS = -Ddebian.dir=$(CURDIR)/debian -Ddebian.package=$(DEB_JAR_PACKAGE) -Dmaven.repo.local=$(DEB_MAVEN_REPO)
 
 common-install-arch common-install-indep:: common-install-impl
 common-install-impl::
 	$(if $(DEB_MAVEN_INSTALL_TARGET),$(DEB_MAVEN_INVOKE) $(PLUGIN_ARGS) $(DEB_MAVEN_INSTALL_TARGET),@echo "DEB_MAVEN_INSTALL_TARGET unset, skipping default maven.mk common-install target")
-	$(if $(cdbs_use_maven_substvars), mh_resolve_dependencies -p$(DEB_JAR_PACKAGE))
+	$(if $(cdbs_use_maven_substvars), mh_resolve_dependencies --non-interactive -p$(DEB_JAR_PACKAGE))
 
 ifeq (,$(findstring nocheck,$(DEB_BUILD_OPTIONS)))
 common-build-arch common-build-indep:: debian/stamp-maven-check

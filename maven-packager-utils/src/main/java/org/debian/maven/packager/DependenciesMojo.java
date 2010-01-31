@@ -70,11 +70,22 @@ public class DependenciesMojo
      */
     protected String packageType;
     /**
+     * Location for the list of POMs file.
+     * @required
+     * @parameter expression="debian/${package}.poms"
+     */
+    protected File listOfPoms;
+    /**
      * Location of the Maven repository
      *
-     * @parameter default-value="/usr/share/maven-repo"
+     * @parameter expression="${maven.repo.local}" default-value="/usr/share/maven-repo"
      */
     protected File mavenRepo;
+    /**
+     * Type of the package (e.g. 'maven' or 'ant')
+     * @parameter expression="${nonInteractive}" default-value="false"
+     */
+    protected boolean nonInteractive;
 
     public void execute()
             throws MojoExecutionException {
@@ -101,6 +112,10 @@ public class DependenciesMojo
         solver.setOutputDirectory(outputDirectory);
         solver.setPackageName(packageName);
         solver.setPackageType(packageType);
+        solver.setNonInteractive(nonInteractive);
+        if (listOfPoms != null) {
+            solver.setListOfPoms(listOfPoms);
+        }
 
         solver.solveDependencies();
 

@@ -11,6 +11,7 @@
   <modules>
     <module>maven-debian-helper</module>
     <module>maven-debian-plugin</module>
+    <module>maven-build-no-docs</module>
     <module>maven-packager-utils</module>
   </modules>
   

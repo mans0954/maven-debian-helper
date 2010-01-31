@@ -1,3 +1,8 @@
+#set( $H = '#' )
+$H Include here properties to pass to Maven during the build.
+$H For example:
+$H maven.test.skip=true
+
 #if(!$runTests)
 maven.test.skip=true
 #end

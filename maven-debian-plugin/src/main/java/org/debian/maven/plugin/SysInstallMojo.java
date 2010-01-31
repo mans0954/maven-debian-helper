@@ -96,6 +96,14 @@ public class SysInstallMojo extends AbstractMojo
    */
   private String mavenRules;
 
+  /**
+   * root directory of the Maven repository
+   *
+   * @parameter expression="${basedir}"
+   * @readonly
+   */
+  private File repoDir;
+
   // ----------------------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------------------
@@ -431,6 +439,10 @@ public class SysInstallMojo extends AbstractMojo
     if (debianPackage == null)
     {
       debianPackage = System.getProperty("debian.package");
+    }
+    if (repoDir == null)
+    {
+      repoDir = new File(System.getProperty("maven.repo.local"));
     }
   }
 
