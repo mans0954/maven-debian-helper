@@ -717,8 +717,6 @@ public class DependenciesSolver {
                         optionalDepends.add(library);
                     } else if ("test".equals(dependency.getScope())) {
                         testDepends.add(library);
-                    } else if ("compile".equals(dependency.getScope())) {
-                        compileDepends.add(library);
                     } else {
                         runtimeDepends.add(library);
                     }
