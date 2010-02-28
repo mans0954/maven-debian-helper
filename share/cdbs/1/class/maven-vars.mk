@@ -73,7 +73,7 @@ DEB_JAR_PACKAGE = $(firstword $(shell dh_listpackages))
 
 # The name of the package containing the documentation. The second package
 # by default. Leave empty to skip generating documentation.
-DEB_DOC_PACKAGE = $(firstword $(shell dh_listpackages | grep -v $(DEB_JAR_PACKAGE) | grep "-doc"))
+DEB_DOC_PACKAGE = $(firstword $(shell dh_listpackages | grep -v $(DEB_JAR_PACKAGE) | grep "\-doc$"))
 
 # Property file for Maven, defaults to debian/maven.properties if it exists.
 # You may define additional properties. Please note that command-line
