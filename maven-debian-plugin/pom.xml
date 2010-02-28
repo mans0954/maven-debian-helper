@@ -5,7 +5,7 @@
   <parent>
     <artifactId>maven-debian</artifactId>
     <groupId>org.debian.maven</groupId>
-    <version>0.6</version>
+    <version>0.8</version>
   </parent>
   
   <artifactId>maven-debian-plugin</artifactId>
