@@ -1,3 +1,12 @@
+maven-debian-helper (0.9) unstable; urgency=low
+
+  * maven-vars.mk: Fix detection of DEB_DOC_PACKAGE
+    Only exclude first exact match from dh_listpackages result
+    instead of all packages which contains main package name.
+  * maven.mk: Pass DEB_DOC_PACKAGE when invoke DEB_MAVEN_DOC_TARGET.
+
+ -- Damien Raude-Morvan <drazzib@debian.org>  Mon, 01 Mar 2010 21:22:34 +0100
+
 maven-debian-helper (0.8) unstable; urgency=low
 
   * mh_make falls back on EMAIL when DEBEMAIL is not set
