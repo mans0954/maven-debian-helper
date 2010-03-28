@@ -879,6 +879,7 @@ public class DependenciesSolver {
             System.out.println("  --ant: use ant for the packaging");
             System.out.println("  --run-tests: run the unit tests");
             System.out.println("  --generate-javadoc: generate Javadoc");
+            System.out.println("  --non-interactive: non interactive session");
             return;
         }
         DependenciesSolver solver = new DependenciesSolver();
@@ -905,6 +906,8 @@ public class DependenciesSolver {
                 solver.setRunTests(true);
             } else if (arg.equals("--generate-javadoc")) {
                 solver.setGenerateJavadoc(true);
+            } else if (arg.equals("--non-interactive")) {
+                solver.setNonInteractive(true);
             }
             i = inc(i, args);
         }

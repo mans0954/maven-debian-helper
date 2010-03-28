@@ -1,3 +1,11 @@
+maven-debian-helper (0.10) unstable; urgency=low
+
+  * Add --non-interactive option to mh_lspoms and use it
+    in maven.mk to avoid asking questions during a build
+    (Closes: #574399)
+
+ -- Ludovic Claude <ludovic.claude@laposte.net>  Wed, 24 Mar 2010 23:48:29 +0100
+
 maven-debian-helper (0.9) unstable; urgency=low
 
   * maven-vars.mk: Fix detection of DEB_DOC_PACKAGE

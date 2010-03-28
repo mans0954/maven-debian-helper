@@ -14,10 +14,11 @@ syntax()
    echo -e "Options:"
    echo -e "\t-h --help: show this text"
    echo -e "\t-V --version: show the version"
-   echo -e "\t-p<package> --package=<package>: package to act on "
+   echo -e "\t-p<package> --package=<package>: package to act on"
    echo -e "\t-f --force: force run even if the .poms files exist."
    echo -e "\t  Only maven.rules will be created, assuming that it"
    echo -e "\t  did not exist before."
+   echo -e "\t-n --non-interactive: non interactive session, don't ask questions."
    echo -e ""
    echo -e "You need to execute it on the unpacked origial source tree, merged with the"
    echo -e "debian/ folder. It will create the file debian/<binary package>.poms which"
@@ -32,10 +33,11 @@ syntax()
    exit 1
 }
 
-ARGS="p package f force" parseargs "$@"
+ARGS="p package f force n non-interactive" parseargs "$@"
 
 PACKAGE=$(getarg p package)
 FORCE=$(getarg f force)
+NON_INTERACTIVE=$(getarg n non-interactive)
 
 if [ -z "$PACKAGE" ]; then
 	if [ "$ARGC" -gt "0" ]; then
@@ -49,7 +51,7 @@ if [ -e debian/$PACKAGE.poms -a -z "$FORCE" ]; then
   echo "debian/$PACKAGE.poms already exist. Please delete it if you want to regenerate it."
 else
   mkdir -p debian
-  java -cp /usr/share/java/maven-project.jar:/usr/share/java/maven-repo-helper.jar:/usr/share/java/maven-packager-utils.jar org.debian.maven.packager.DependenciesSolver --package=$PACKAGE --maven-repo=/usr/share/maven-repo
+  java -cp /usr/share/java/maven-project.jar:/usr/share/java/maven-repo-helper.jar:/usr/share/java/maven-packager-utils.jar org.debian.maven.packager.DependenciesSolver ${NON_INTERACTIVE:+--non-interactive} --package=$PACKAGE --maven-repo=/usr/share/maven-repo
   rm debian/$PACKAGE.substvars
   echo "The list of POM files is now in debian/$PACKAGE.poms"
 fi

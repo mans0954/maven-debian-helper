@@ -52,10 +52,10 @@ maven-sanity-check:
 	fi
 
 debian/$(DEB_JAR_PACKAGE).poms:
-	mh_lspoms -p$(DEB_JAR_PACKAGE)
+	mh_lspoms --non-interactive -p$(DEB_JAR_PACKAGE)
 
 debian/maven.rules:
-	mh_lspoms -p$(DEB_JAR_PACKAGE) --force
+	mh_lspoms --non-interactive -p$(DEB_JAR_PACKAGE) --force
 
 ifeq (, $(DEB_DOC_PACKAGE))
 DEB_PATCHPOMS_ARGS += --build-no-docs
