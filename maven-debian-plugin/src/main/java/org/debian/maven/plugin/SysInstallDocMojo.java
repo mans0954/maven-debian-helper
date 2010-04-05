@@ -12,14 +12,14 @@ import java.io.IOException;
 public class SysInstallDocMojo extends SysInstallMojo
 {
 
-  protected String jarName()
+  protected String destJarName()
   {
-    return getArtifactId() + "-" + getVersion() + "-javadoc.jar";
+    return getDestArtifactId() + "-" + getVersion() + "-javadoc.jar";
   }
 
   protected String debianJarName()
   {
-    return getArtifactId() + "-" + getDebianVersion() + "-javadoc.jar";
+    return getDestArtifactId() + "-" + getDebianVersion() + "-javadoc.jar";
   }
 
   /**

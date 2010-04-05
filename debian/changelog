@@ -1,3 +1,9 @@
+maven-debian-helper (0.12) unstable; urgency=low
+
+  * SysInstallDocMojo: Fix methods override to install -javadoc JAR flavors.
+
+ -- Damien Raude-Morvan <drazzib@debian.org>  Mon, 05 Apr 2010 23:46:22 +0200
+
 maven-debian-helper (0.11) unstable; urgency=low
 
   * SysInstallMojo: Read generated pom.properties after POMCleaner

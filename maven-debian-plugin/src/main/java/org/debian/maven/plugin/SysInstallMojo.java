@@ -145,6 +145,11 @@ public class SysInstallMojo extends AbstractMojo
   {
       return artifactId;
   }
+  
+  protected String getDestArtifactId()
+  {
+      return destArtifactId;
+  }
 
   protected String getVersion()
   {
