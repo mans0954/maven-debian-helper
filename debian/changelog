@@ -1,3 +1,12 @@
+maven-debian-helper (0.11) unstable; urgency=low
+
+  * SysInstallMojo: Read generated pom.properties after POMCleaner
+    calls to allow changing groupId and artifactId inside maven.rules
+    (trying to mimic mh_installpom/mh_installjar behavior)
+  * Switch to 3.0 (native) source format
+
+ -- Damien Raude-Morvan <drazzib@debian.org>  Mon, 05 Apr 2010 21:48:23 +0200
+
 maven-debian-helper (0.10) unstable; urgency=low
 
   * Add --non-interactive option to mh_lspoms and use it

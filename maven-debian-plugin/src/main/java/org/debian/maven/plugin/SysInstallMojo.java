@@ -41,6 +41,22 @@ public class SysInstallMojo extends AbstractMojo
    * @readonly
    */
   private String artifactId;
+  
+  /**
+   * destGroupId
+   * 
+   * @parameter expression="${project.groupId}"
+   * @required
+   */
+  private String destGroupId;
+
+  /**
+   * destArtifactId
+   * 
+   * @parameter expression="${project.artifactId}"
+   * @required
+   */
+  private String destArtifactId;
 
   /**
    * version
@@ -165,13 +181,21 @@ public class SysInstallMojo extends AbstractMojo
   {
     return "/" + groupId.replace( '.', '/' ) + "/" + artifactId + "/" + version + "/";
   }
+  
+  /**
+   * returns e.g. /org/debian/maven/maven-debian-plugin/0.1/
+   */
+  private String destRepoPath()
+  {
+    return "/" + destGroupId.replace( '.', '/' ) + "/" + destArtifactId + "/" + version + "/";
+  }
 
   /**
    * returns e.g. /org/debian/maven/maven-debian-plugin/debian/
    */
   private String debianRepoPath()
   {
-    return "/" + groupId.replace( '.', '/' ) + "/" + artifactId + "/" + debianVersion + "/";
+    return "/" + destGroupId.replace( '.', '/' ) + "/" + destArtifactId + "/" + debianVersion + "/";
   }
 
   /**
@@ -179,7 +203,7 @@ public class SysInstallMojo extends AbstractMojo
    */
   protected String fullRepoPath()
   {
-    return packagePath() + "/usr/share/maven-repo" + repoPath();
+    return packagePath() + "/usr/share/maven-repo" + destRepoPath();
   }
 
   /**
@@ -194,10 +218,15 @@ public class SysInstallMojo extends AbstractMojo
   {
     return artifactId + "-" + version + ".pom";
   }
+  
+  protected String destPomName()
+  {
+    return destArtifactId + "-" + version + ".pom";
+  }
 
   protected String debianPomName()
   {
-    return artifactId + "-" + debianVersion + ".pom";
+    return destArtifactId + "-" + debianVersion + ".pom";
   }
 
   private String pomSrcPath()
@@ -227,7 +256,7 @@ public class SysInstallMojo extends AbstractMojo
 
   private String pomDestPath()
   {
-    return fullRepoPath() + pomName();
+    return fullRepoPath() + destPomName();
   }
 
   private String debianPomDestPath()
@@ -239,10 +268,15 @@ public class SysInstallMojo extends AbstractMojo
   {
     return artifactId + "-" + version + ".jar";
   }
+  
+  protected String destJarName()
+  {
+    return destArtifactId + "-" + version + ".jar";
+  }
 
   protected String debianJarName()
   {
-    return artifactId + "-" + debianVersion + ".jar";
+    return destArtifactId + "-" + debianVersion + ".jar";
   }
 
   private String fullJarName()
@@ -252,12 +286,12 @@ public class SysInstallMojo extends AbstractMojo
 
   private String jarDestPath()
   {
-    return fullRepoPath() + jarName();
+    return fullRepoPath() + destJarName();
   }
 
   private String jarDestRelPath()
   {
-    return "../" + version + "/" + jarName();
+    return "../" + version + "/" + destJarName();
   }
 
   private String debianJarDestPath()
@@ -270,7 +304,7 @@ public class SysInstallMojo extends AbstractMojo
    */
   private String compatName()
   {
-    return artifactId + ".jar";
+    return destArtifactId + ".jar";
   }
 
   private String compatSharePath()
@@ -280,7 +314,7 @@ public class SysInstallMojo extends AbstractMojo
 
   private String compatRelPath()
   {
-    return "../maven-repo" + repoPath() + jarName();
+    return "../maven-repo" + destRepoPath() + destJarName();
   }
 
   protected String fullCompatPath()
@@ -290,7 +324,7 @@ public class SysInstallMojo extends AbstractMojo
 
   protected String versionedFullCompatPath()
   {
-    return compatSharePath() + jarName();
+    return compatSharePath() + destJarName();
   }
 
   /**
@@ -390,17 +424,15 @@ public class SysInstallMojo extends AbstractMojo
 
     POMCleaner.main((String[]) params.toArray(new String[params.size()]));
 
-    // read debian version
-    if (debianVersion == null)
-    {
-      Properties pomProperties = new Properties();
-      try {
-        pomProperties.load(new FileReader(cleanedPomPropertiesSrcPath()));
-      } catch (IOException ex) {
-        ex.printStackTrace();
-      }
-      debianVersion = pomProperties.getProperty("debianVersion");
+    Properties pomProperties = new Properties();
+    try {
+      pomProperties.load(new FileReader(cleanedPomPropertiesSrcPath()));
+    } catch (IOException ex) {
+      ex.printStackTrace();
     }
+    destGroupId = pomProperties.getProperty("groupId");
+    destArtifactId = pomProperties.getProperty("artifactId");
+    debianVersion = pomProperties.getProperty("debianVersion");
 
     if (debianVersion != null && !debianVersion.equals(version))
     {
