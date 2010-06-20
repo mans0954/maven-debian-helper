@@ -78,11 +78,16 @@ debian/maven-repo:
 post-patches:: patch-poms
 
 clean:: unpatch-poms
+	mh_clean
 
 common-build-arch common-build-indep:: debian/stamp-maven-build maven-sanity-check
-debian/stamp-maven-build: debian/maven-repo
+debian/stamp-maven-build: debian/maven-repo before-mvn-build mvn-build after-mvn-build
+mvn-build:
 	$(DEB_MAVEN_INVOKE) $(DEB_MAVEN_BUILD_TARGET)
 	touch $@
+# Placeholders to insert custom processing before and after a Maven build
+before-mvn-build::
+after-mvn-build::
 
 cleanbuilddir:: DEB_PATCHPOMS_ARGS += --clean-ignore-rules=debian/maven.cleanIgnoreRules
 cleanbuilddir:: maven-sanity-check post-patches debian/maven-repo
@@ -94,7 +99,7 @@ cleanbuilddir:: maven-sanity-check post-patches debian/maven-repo
 	$(MAKE) -f debian/rules unpatch-poms
 
 # extra arguments for the installation step
-PLUGIN_ARGS = -Ddebian.dir=$(CURDIR)/debian -Ddebian.package=$(DEB_JAR_PACKAGE) -Dmaven.repo.local=$(DEB_MAVEN_REPO)
+PLUGIN_ARGS = -Ddebian.dir=$(CURDIR)/debian -Ddebian.package=$(DEB_JAR_PACKAGE) -Dmaven.repo.local=$(DEB_MAVEN_REPO) -Dinstall.to.usj=$(DEB_MAVEN_INSTALL_TO_USJ)
 
 common-install-arch common-install-indep:: common-install-impl
 common-install-impl::

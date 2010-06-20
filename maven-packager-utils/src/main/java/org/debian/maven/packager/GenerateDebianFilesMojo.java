@@ -318,69 +318,45 @@ public class GenerateDebianFilesMojo
                         downloadUrl + ").");
             }
 
-            FileWriter out = new FileWriter(new File(outputDirectory, "README.source"));
-            Velocity.mergeTemplate("README.source.vm", "UTF8", context, out);
-            out.flush();
-            out.close();
-
-            out = new FileWriter(new File(outputDirectory, "copyright"));
-            Velocity.mergeTemplate("copyright.vm", "UTF8", context, out);
-            out.flush();
-            out.close();
-
-            out = new FileWriter(new File(outputDirectory, "compat"));
-            Velocity.mergeTemplate("compat.vm", "UTF8", context, out);
-            out.flush();
-            out.close();
-
-            out = new FileWriter(new File(outputDirectory, "rules"));
-            Velocity.mergeTemplate(rulesTemplate, "UTF8", context, out);
-            out.flush();
-            out.close();
+            generateFile(context, "README.source.vm", outputDirectory, "README.source");
+            generateFile(context, "copyright.vm", outputDirectory, "copyright");
+            generateFile(context, "compat.vm", outputDirectory, "compat");
+            generateFile(context, rulesTemplate, outputDirectory, "rules");
 
             makeExecutable("debian/rules");
 
             String debianVersion = projectVersion.replace("-alpha-", "~alpha");
             debianVersion = debianVersion.replace("-beta-", "~beta");
             debianVersion += "-1";
-            context.put("debianVersion", debianVersion);
-            out = new FileWriter(".debianVersion");
-            Velocity.mergeTemplate("version.vm", "UTF8", context, out);
-            out.flush();
-            out.close();
+            context.put("version.vm", debianVersion);
+
+            generateFile(context, rulesTemplate, new File("."), ".debianVersion");
 
             if (generateJavadoc) {
-                out = new FileWriter(new File(outputDirectory, binPackageName + "-doc.doc-base.api"));
-                Velocity.mergeTemplate("java-doc.doc-base.api.vm", "UTF8", context, out);
-                out.flush();
-                out.close();
-
-                out = new FileWriter(new File(outputDirectory, binPackageName + "-doc.install"));
-                Velocity.mergeTemplate("java-doc.install.vm", "UTF8", context, out);
-                out.flush();
-                out.close();
+                generateFile(context, "java-doc.doc-base.api.vm", outputDirectory, binPackageName + "-doc.doc-base.api");
+                generateFile(context, "java-doc.install.vm", outputDirectory, binPackageName + "-doc.install");
             }
 
             if ("ant".equals(packageType)) {
-                out = new FileWriter(new File(outputDirectory, "build.properties"));
-                Velocity.mergeTemplate("build.properties.ant.vm", "UTF8", context, out);
-                out.flush();
-                out.close();
+                generateFile(context, "build.properties.ant.vm", outputDirectory, "build.properties");
             } else {
-                out = new FileWriter(new File(outputDirectory, "maven.properties"));
-                Velocity.mergeTemplate("maven.properties.vm", "UTF8", context, out);
-                out.flush();
-                out.close();
+                generateFile(context, "maven.properties.vm", outputDirectory, "maven.properties");
             }
 
-            out = new FileWriter(new File(outputDirectory, "control"));
-            Velocity.mergeTemplate(controlTemplate, "UTF8", context, out);
-            out.flush();
-            out.close();
+            generateFile(context, controlTemplate, outputDirectory, "control");
+            generateFile(context, "format.vm", new File(outputDirectory, "source"), "format");
 
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    private void generateFile(VelocityContext context, String templateName, File destDir, String fileName) throws Exception {
+        destDir.mkdirs();
+        FileWriter out = new FileWriter(new File(destDir, fileName));
+        Velocity.mergeTemplate(templateName, "UTF8", context, out);
+        out.flush();
+        out.close();
     }
 
     private List listSharedJars(String library) {

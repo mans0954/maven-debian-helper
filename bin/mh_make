@@ -72,7 +72,7 @@ FROM_SVN=$(getarg s from-svn)
 if [ -z "$PACKAGE" ]; then
     PACKAGE="$(basename $(pwd) | sed 's/-[0-9\.].*//')"
 	if [ -n "$FROM_SVN" ]; then
-		PACKAGE=$(basename $FROM_SVN | sed 's/-[0-9\.].*//' )
+		PACKAGE=$(basename ${FROM_SVN%%/tags/*} | sed 's/-[0-9\.].*//' )
 	fi
     echo "Enter the name of the new Debian source package. If empty, it will defaults to $PACKAGE"
     read -p ">" USER_PACKAGE
@@ -107,7 +107,12 @@ if [ -z "$GEN_JAVADOC" ]; then
 fi
 
 if [ -n "$FROM_SVN" ]; then
-	svn export $FROM_SVN $PACKAGE
+	SVN_OPTIONS=
+	if [[ "$FROM_SVN" =~ https://.*\.dev\.java\.net/.* ]]; then
+		echo "Press enter if a password is asked"
+		SVN_OPTIONS="--username guest"
+	fi
+	svn export $FROM_SVN $PACKAGE $SVN_OPTIONS
 	cd $PACKAGE
 fi
 

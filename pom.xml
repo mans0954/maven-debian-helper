@@ -4,14 +4,14 @@
 
   <groupId>org.debian.maven</groupId>
   <artifactId>maven-debian</artifactId>
-  <version>0.8</version>
+  <version>1.0</version>
   <packaging>pom</packaging>
   <name>helper tools for using Maven to build Debian packages</name>
 
   <modules>
     <module>maven-debian-helper</module>
     <module>maven-debian-plugin</module>
-    <module>maven-build-no-docs</module>
+    <module>maven-build-nodocs</module>
     <module>maven-packager-utils</module>
   </modules>
   

@@ -28,7 +28,7 @@ _cdbs_class_maven_vars = 1
 
 # Declare Build-Deps for packages using this file
 CDBS_BUILD_DEPENDS := $(CDBS_BUILD_DEPENDS), cdbs (>= 0.4.43)
-CDBS_BUILD_DEPENDS := $(CDBS_BUILD_DEPENDS), maven-debian-helper (>> 0.7)
+CDBS_BUILD_DEPENDS := $(CDBS_BUILD_DEPENDS), maven-debian-helper (>= 1.1)
 
 # Maven home directory.  Doesn't need to be changed except when using
 # nonstandard Maven installations.
@@ -65,7 +65,10 @@ DEB_CLASSPATH = $(MAVEN_HOME)/boot/classworlds.jar:$(shell for jar in $(DEB_JARS
 DEB_MAVEN_ARGS = 
 
 # Extra arguments for the mh_patchpoms command line
-DEB_PATCHPOMS_ARGS=
+DEB_PATCHPOMS_ARGS =
+
+# If true, install the Maven jars to /usr/share/java automatically
+DEB_MAVEN_INSTALL_TO_USJ = true
 
 # The name of the binary package that gets the jar files installed. The
 # first package by default.
@@ -86,10 +89,10 @@ DEB_MAVEN_PROPERTYFILE = $(shell test -f $(CURDIR)/debian/maven.properties && ec
 # MAVEN_ARGS_<package> for each individual package.
 DEB_MAVEN_INVOKE = cd $(DEB_BUILDDIR) && $(JAVACMD) -noverify -cp $(DEB_CLASSPATH) \
 		 $(JAVA_OPTS) -Dclassworlds.conf=$(MAVEN_CLASSCONF) \
-		 org.codehaus.classworlds.Launcher $(DEB_MAVEN_ARGS) \
+		 org.codehaus.classworlds.Launcher \
 		 -s/etc/maven2/settings-debian.xml \
 		 -Dmaven.repo.local=$(DEB_MAVEN_REPO) \
-		 $(if $(MAVEN_ARGS_$(cdbs_curpkg)),$(MAVEN_ARGS_$(cdbs_curpkg)),$(MAVEN_ARGS))
+		 $(if $(DEB_MAVEN_ARGS_$(cdbs_curpkg)),$(DEB_MAVEN_ARGS_$(cdbs_curpkg)),$(DEB_MAVEN_ARGS))
 
 # Targets to invoke for building, installing, testing and cleaning up.
 # Building uses the default target from build.xml, installing and testing is

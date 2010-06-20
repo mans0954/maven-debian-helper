@@ -48,7 +48,7 @@ ${copyrightHeader} ${copyrightYear}, ${contributor.Name} #if (${contributor.Emai
 #elseif ($licenseName.indexOf("3") >= 0 || $licenseUrl.indexOf("3") >= 0)
 #set ($x = $licenses.add("GPL-3"))
 #else
-#if ($licenseName)#set ($x = $licenses.add("$licenseName"))
+#if ($licenseName)#set ($x = $licenses.add("$licenseName"))#set ($packagerLicense="$licenseName")
 #elseif($licenseUrl)#set ($x = $licenses.add("$licenseUrl"))
 #else#set ($x = $licenses.add("UNKNOWN-LICENSE"))
 #end

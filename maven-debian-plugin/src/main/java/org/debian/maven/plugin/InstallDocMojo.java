@@ -1,5 +1,7 @@
 package org.debian.maven.plugin;
 
+import java.io.File;
+
 /**
  * Install the javadoc jar files into the debian/ directory
  *
@@ -9,6 +11,20 @@ package org.debian.maven.plugin;
  */
 public class InstallDocMojo extends SysInstallDocMojo
 {
+
+    /**
+      * Maven repository root
+      *
+      * @parameter expression="${maven.repo.local}"
+      */
+    private File mavenRepoLocal;
+
+      /**
+        * If true, use local Maven repository for installation
+        *
+        * @parameter expression="${use.maven.repo.local}"
+        */
+      private boolean useMavenRepoLocal;
 
   // ----------------------------------------------------------------------
   // Public methods
@@ -23,7 +39,11 @@ public class InstallDocMojo extends SysInstallDocMojo
 
   protected String packagePath()
   {
-    return getDebianDir() + "/" + getDebianPackage();
+      if (useMavenRepoLocal) {
+          return mavenRepoLocal.getAbsolutePath();
+      } else {
+          return getDebianDir() + "/" + getDebianPackage();
+      }
   }
 
 }

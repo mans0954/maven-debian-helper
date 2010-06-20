@@ -1,3 +1,36 @@
+maven-debian-helper (1.0) unstable; urgency=low
+
+  * debian/control:
+     - replace Depends: on openjdk-6-jre | java2-runtime by default-jdk
+     - remove Conflits: on old maven-debian-helper as there is already
+       a version constraint for a new version of this package.
+  * mh_make:
+      - supports checking out code from the svn of dev.java.net
+      - use upstream copyright when available for debian/* files
+      - update Standards version, generate with source 3.0 (quilt) package
+        format
+      - mh_make --from-svn: improve package name proposal for URLs
+        containing /tags/
+      - ask to ignore missing dependencies
+  * maven.mk: 
+      - add before-mvn-build:: and after-mvn-build:: targets
+        to be able to insert custom actions before and after running the Maven
+        build
+      - add DEB_MAVEN_INSTALL_TO_USJ variable. Set this variable to false to
+        prevent maven.mk to install the jars in /usr/share/java. This
+        variable defaults to true.
+      - add call to mh_clean to remove temporary files
+  * Add -Duse.maven.repo.local option to maven-debian-plugin:install
+    and install-doc to give the option to deploy artifacts on the
+    local (and temporary) Maven repository used by the Debian build
+    Typical use-case: bootstrapping the build of a project with 
+    some artifacts of the project pre-built and installed in the tmp repo
+    before the normal build is executed. See the antlr3 package for an example
+  * SysInstallMojo: clean the target directory before an installation if the
+    directory is a symlink that was created by copy-repo.sh
+
+ -- Ludovic Claude <ludovic.claude@laposte.net>  Sun, 16 May 2010 14:42:29 +0200
+
 maven-debian-helper (0.12) unstable; urgency=low
 
   * SysInstallDocMojo: Fix methods override to install -javadoc JAR flavors.

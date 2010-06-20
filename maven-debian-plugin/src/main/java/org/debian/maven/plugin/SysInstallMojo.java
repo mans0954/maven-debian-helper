@@ -120,6 +120,12 @@ public class SysInstallMojo extends AbstractMojo
    */
   private File repoDir;
 
+    /**
+     * Install the jar to /usr/share/java if true. Default is true
+     * @parameter expression="${install.to.usj}" default-value="true"
+     */
+  private boolean installToUsj = true;
+
   // ----------------------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------------------
@@ -182,7 +188,7 @@ public class SysInstallMojo extends AbstractMojo
   /**
    * returns e.g. /org/debian/maven/maven-debian-plugin/0.1/
    */
-  private String repoPath()
+  protected final String repoPath()
   {
     return "/" + groupId.replace( '.', '/' ) + "/" + artifactId + "/" + version + "/";
   }
@@ -190,7 +196,7 @@ public class SysInstallMojo extends AbstractMojo
   /**
    * returns e.g. /org/debian/maven/maven-debian-plugin/0.1/
    */
-  private String destRepoPath()
+  protected final String destRepoPath()
   {
     return "/" + destGroupId.replace( '.', '/' ) + "/" + destArtifactId + "/" + version + "/";
   }
@@ -198,7 +204,7 @@ public class SysInstallMojo extends AbstractMojo
   /**
    * returns e.g. /org/debian/maven/maven-debian-plugin/debian/
    */
-  private String debianRepoPath()
+  protected final String debianRepoPath()
   {
     return "/" + destGroupId.replace( '.', '/' ) + "/" + destArtifactId + "/" + debianVersion + "/";
   }
@@ -284,22 +290,22 @@ public class SysInstallMojo extends AbstractMojo
     return destArtifactId + "-" + debianVersion + ".jar";
   }
 
-  private String fullJarName()
+  protected final String fullJarName()
   {
     return jarDir + "/" + jarName();
   }
 
-  private String jarDestPath()
+  protected final String jarDestPath()
   {
     return fullRepoPath() + destJarName();
   }
 
-  private String jarDestRelPath()
+  protected final String jarDestRelPath()
   {
     return "../" + version + "/" + destJarName();
   }
 
-  private String debianJarDestPath()
+  protected final String debianJarDestPath()
   {
     return debianFullRepoPath() + debianJarName();
   }
@@ -307,17 +313,17 @@ public class SysInstallMojo extends AbstractMojo
   /** 
    * jar file name without version number
    */
-  private String compatName()
+  protected final String compatName()
   {
     return destArtifactId + ".jar";
   }
 
-  private String compatSharePath()
+  protected final String compatSharePath()
   {
     return packagePath() + "/usr/share/java/";
   }
 
-  private String compatRelPath()
+  protected final String compatRelPath()
   {
     return "../maven-repo" + destRepoPath() + destJarName();
   }
@@ -484,14 +490,27 @@ public class SysInstallMojo extends AbstractMojo
   }
 
   /**
+     * Prepare the destination  directories: remove the directory symlinks that were created
+     * by copy-repo.sh if they exist as they point to a directory owned by root and that cannot
+     * be modified.
+     */
+  protected void prepareDestDirs() {
+      // Simply try to delete the path. If it's a symlink, it will work, otherwise delete() returns false
+      new File(fullRepoPath()).delete();
+      new File(debianFullRepoPath()).delete();
+  }
+  /**
    * do the actual work
    */
   protected void runMojo() throws IOException
   {
     //initProperties();
     cleanPom();
+    prepareDestDirs();
     copyPom();
     copyJar();
-    symlinkJar();
+    if (installToUsj) {
+      symlinkJar();
+    }
   }
 }

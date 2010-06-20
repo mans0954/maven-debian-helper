@@ -61,6 +61,8 @@ public class DependenciesSolverTest extends TestCase {
         solver.setExploreProjects(true);
         solver.setPackageName("libplexus-active-collections-java");
         solver.setPackageType("maven");
+        solver.setListOfPoms(new File(testDir, "libplexus-active-collections-java.poms"));
+        solver.setNonInteractive(true);
 
         solver.solveDependencies();
 
@@ -81,13 +83,24 @@ public class DependenciesSolverTest extends TestCase {
         LineNumberReader fileReader = new LineNumberReader(new FileReader(file));
         LineNumberReader refReader = new LineNumberReader(read(resource));
 
+        String ref, test = null;
+        boolean skipReadTest = false;
         while (true) {
-            String test = fileReader.readLine();
-            String ref = refReader.readLine();
+            if (!skipReadTest) {
+                test = fileReader.readLine();
+
+                if (test != null && test.startsWith("#")) {
+                    continue;
+                }
+            }
+            skipReadTest = false;
+
+            ref = refReader.readLine();
             if (ref == null) {
                 return;
             }
             if (ref.startsWith("#")) {
+                skipReadTest = true;
                 continue;
             }
             assertEquals("Error in " + fileName, ref, test);

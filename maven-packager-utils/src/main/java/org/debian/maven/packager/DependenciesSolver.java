@@ -257,6 +257,12 @@ public class DependenciesSolver {
         if (listOfPoms != null && !listOfPoms.exists()) {
             try {
                 PrintWriter out = new PrintWriter(new FileWriter(listOfPoms));
+                out.println("# List of POM files for the package");
+                out.println("# Format of this file is:");
+                out.println("# <path to pom file> [option]");
+                out.println("# where option can be:");
+                out.println("#   --ignore: ignore this POM or");
+                out.println("#   --no-parent: remove the <parent> tag from the POM");
                 for (Iterator i = pomsConfig.iterator(); i.hasNext();) {
                     String config = (String) i.next();
                     out.println(config);
@@ -654,7 +660,7 @@ public class DependenciesSolver {
 
             if (ignoreDependency) {
                 ignoredDependencies.add(dependency);
-                ignoreRules.add(dependency.getGroupId() + " " + dependency.getArtifactId() + " maven-plugin *");
+                ignoreRules.add(dependency.getGroupId() + " " + dependency.getArtifactId() + " * *");
                 continue;
             }
 
@@ -675,7 +681,14 @@ public class DependenciesSolver {
                 if (!management) {
                     issues.add(sourcePomLoc + ": Dependency is not packaged in the Maven repository for Debian: " + dependency.getGroupId() + ":"
                             + dependency.getArtifactId() + ":" + dependency.getVersion());
+                    ignoreDependency = askIgnoreDependency(dependency, "This dependency cannot be found in the Debian Maven repository. Ignore this dependency?");
+                    if (ignoreDependency) {
+                        ignoredDependencies.add(dependency);
+                        ignoreRules.add(dependency.getGroupId() + " " + dependency.getArtifactId() + " * *");
+                        continue;
+                    }
                 }
+
                 return;
             }
 
