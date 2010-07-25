@@ -57,4 +57,3 @@ clean::
 	-$(RM) man/mvn-debian.1
 	mh_unpatchpoms -p$(PACKAGE)
 	mh_clean
-

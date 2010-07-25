@@ -40,7 +40,7 @@ public class InstallMojo extends SysInstallMojo
     if (useMavenRepoLocal) {
         return mavenRepoLocal.getAbsolutePath();
     } else {
-        return getDebianDir() + "/" + getDebianPackage();
+        return getDebianDir() + "/" + getDestPackage();
     }
   }
 

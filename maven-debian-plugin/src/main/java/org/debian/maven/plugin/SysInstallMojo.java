@@ -10,6 +10,7 @@ import java.util.Properties;
 import org.codehaus.plexus.util.FileUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.debian.maven.repo.ListOfPOMs;
 import org.debian.maven.repo.POMCleaner;
 import org.debian.maven.repo.POMTransformer;
 
@@ -105,6 +106,7 @@ public class SysInstallMojo extends AbstractMojo
    * @parameter expression="${debian.package}"
    */
   private String debianPackage;
+  private String destPackage;
 
   /**
    * @parameter expression="${maven.rules}" default-value="maven.rules"
@@ -175,6 +177,11 @@ public class SysInstallMojo extends AbstractMojo
   protected String getDebianPackage()
   {
       return debianPackage;
+  }
+
+  protected String getDestPackage()
+  {
+      return destPackage;    
   }
 
   /**
@@ -402,34 +409,51 @@ public class SysInstallMojo extends AbstractMojo
   private void cleanPom()
   {
     File pomOptionsFile = new File(debianDir, debianPackage + ".poms");
-    Map pomOptions = POMTransformer.getPomOptions(pomOptionsFile);
+    ListOfPOMs listOfPOMs = new ListOfPOMs(pomOptionsFile);
+
     // Use the saved pom before cleaning as it was untouched by the transform operation
-    File pom = new File(pomSrcPath() + ".save");
-    File originalPom = new File(pomSrcPath()).getAbsoluteFile();
-    if (! pom.exists())
+    String pomPath = pomSrcPath() + ".save";
+    File pomFile = new File(pomPath);
+    String originalPomPath = pomSrcPath();
+    File originalPom = new File(originalPomPath);
+    if (! pomFile.exists())
     {
-        pom = originalPom;
+        pomFile = originalPom;
+        pomPath = originalPomPath;
     }
 
-    String pomOption = (String) pomOptions.get(originalPom);
+    String relativePomPath = originalPom.getAbsolutePath();
+    relativePomPath = relativePomPath.substring(debianDir.getParentFile().getAbsolutePath().length() + 1);
+
+    ListOfPOMs.POMOptions pomOption = listOfPOMs.getPOMOptions(relativePomPath);
+
+    if (pomOption != null && pomOption.isIgnore()) {
+        throw new RuntimeException("POM file " + pomFile + " should be ignored");
+    }
+
+    destPackage = debianPackage;
+    if (pomOption != null && pomOption.getDestPackage() != null) {
+      destPackage = pomOption.getDestPackage();
+    }
 
     List params = new ArrayList();
     params.add("--keep-pom-version");
-    params.add("--package=" + debianPackage);
+      
+    params.add("--package=" + destPackage);
     String mavenRulesPath = new File(debianDir, mavenRules).getAbsolutePath();
     params.add("--rules=" + mavenRulesPath);
 
-    System.out.println("Cleaning pom file: " + pom + " with options:");
-    System.out.println("\t--keep-pom-version --package=" + debianPackage);
+    System.out.println("Cleaning pom file: " + pomFile + " with options:");
+    System.out.println("\t--keep-pom-version --package=" + destPackage);
     System.out.println("\t--rules=" + mavenRulesPath);
 
     // add optional --no-parent option
-    if (pomOption != null && !pomOption.isEmpty()) {
-        params.add(pomOption);
-        System.out.println("\t" + pomOption);
+    if (pomOption != null && pomOption.isNoParent()) {
+        params.add("--no-parent");
+        System.out.println("\t--no-parent");
     }
     
-    params.add(pom.getAbsolutePath());
+    params.add(pomFile.getAbsolutePath());
     params.add(cleanedPomSrcPath());
     params.add(cleanedPomPropertiesSrcPath());
 

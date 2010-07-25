@@ -89,7 +89,7 @@ public class DependenciesSolverTest extends TestCase {
             if (!skipReadTest) {
                 test = fileReader.readLine();
 
-                if (test != null && test.startsWith("#")) {
+                if (test != null && (test.startsWith("#") || test.trim().isEmpty())) {
                     continue;
                 }
             }
@@ -99,11 +99,11 @@ public class DependenciesSolverTest extends TestCase {
             if (ref == null) {
                 return;
             }
-            if (ref.startsWith("#")) {
+            if (ref.startsWith("#") || ref.trim().isEmpty()) {
                 skipReadTest = true;
                 continue;
             }
-            assertEquals("Error in " + fileName, ref, test);
+            assertEquals("Error in " + fileName, ref.trim(), test.trim());
         }
     }
 

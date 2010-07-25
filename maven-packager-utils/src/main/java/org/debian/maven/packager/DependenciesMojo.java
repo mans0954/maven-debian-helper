@@ -113,9 +113,7 @@ public class DependenciesMojo
         solver.setPackageName(packageName);
         solver.setPackageType(packageType);
         solver.setNonInteractive(nonInteractive);
-        if (listOfPoms != null) {
-            solver.setListOfPoms(listOfPoms);
-        }
+        solver.setListOfPoms(listOfPoms);
 
         solver.solveDependencies();
 

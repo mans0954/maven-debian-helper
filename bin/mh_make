@@ -74,6 +74,7 @@ if [ -z "$PACKAGE" ]; then
 	if [ -n "$FROM_SVN" ]; then
 		PACKAGE=$(basename ${FROM_SVN%%/tags/*} | sed 's/-[0-9\.].*//' )
 	fi
+	echo
     echo "Enter the name of the new Debian source package. If empty, it will defaults to $PACKAGE"
     read -p ">" USER_PACKAGE
     if [ -n "$USER_PACKAGE" ]; then
@@ -82,7 +83,13 @@ if [ -z "$PACKAGE" ]; then
 fi
 
 if [ -z "$BIN_PACKAGE" ]; then
-    BIN_PACKAGE="lib${PACKAGE}-java"
+    PKG=$PACKAGE
+    if [ -z "${PKG##lib*-java}" ]; then
+        BIN_PACKAGE="${PACKAGE}"
+    else
+        BIN_PACKAGE="lib${PACKAGE}-java"
+    fi
+	echo
     echo "Enter the name of the binary package. If empty, it will defaults to $BIN_PACKAGE"
     read -p ">" USER_PACKAGE
     if [ -n "$USER_PACKAGE" ]; then
@@ -91,18 +98,22 @@ if [ -z "$BIN_PACKAGE" ]; then
 fi
 
 if [ -z "$RUN_TESTS" ]; then
-    echo "Enter y (yes) or n (no) to run tests while building the package. Defaults to no"
-    read -p ">" RUN
-    if [ "$RUN" == "y" ]; then
-        RUN_TESTS="true"
+	echo
+    echo "Run tests while building the package?"
+    read -p "[y]/n > " RUN
+    RUN_TESTS="true"
+    if [ "$RUN" == "n" ]; then
+        RUN_TESTS="false"
     fi
 fi
 
 if [ -z "$GEN_JAVADOC" ]; then
-    echo "Enter y (yes) or n (no) to generate the Javadoc while building the package. Defaults to no"
-    read -p ">" GEN
-    if [ "$GEN" == "y" ]; then
-        GEN_JAVADOC="true"
+	echo
+    echo "Generate the Javadoc while building the package?"
+    read -p "[y]/n > " GEN
+    GEN_JAVADOC="true"
+    if [ "$GEN" == "n" ]; then
+        GEN_JAVADOC="false"
     fi
 fi
 
@@ -122,7 +133,11 @@ fi
 
 java -cp /usr/share/java/maven-project.jar:/usr/share/java/maven-repo-helper.jar:/usr/share/java/maven-packager-utils.jar:/usr/share/maven2/lib/maven-debian-uber.jar org.debian.maven.packager.DependenciesSolver --package="$BIN_PACKAGE" ${ANT:+--ant} ${GEN_JAVADOC:+--generate-javadoc} ${RUN_TESTS:+--run-tests} --maven-repo=/usr/share/maven-repo
 
-mh_patchpoms -p$BIN_PACKAGE -rdebian/maven.rules -idebian/maven.ignoreRules --keep-pom-version
+if [ $? != 0 ]; then
+    return
+fi
+
+mh_patchpoms -p$BIN_PACKAGE --debian-build -rdebian/maven.rules -idebian/maven.ignoreRules --keep-pom-version --maven-repo=debian/maven-repo
 
 mvn org.debian.maven:maven-packager-utils:$MH_VERSION:generate -Demail="$DEBEMAIL" -Dpackager="$DEBFULLNAME" -DpackagerLicense="$DEBLICENSE" -Dpackage="$PACKAGE" -Dbin.package="$BIN_PACKAGE" -DrunTests="$RUN_TESTS" -DgenerateJavadoc="$GEN_JAVADOC" -Dmaven.repo.local=/usr/share/maven-repo ${ANT:+-DpackageType=ant} ${FROM_SVN:+-DdownloadUrl=scm:svn:$FROM_SVN} --offline
 
@@ -137,3 +152,4 @@ if [ ! -f debian/changelog ]; then
     dch --create --newversion=${version}-1 --package=$PACKAGE "Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>"
 fi
 
+mh_unpatchpoms -p$BIN_PACKAGE

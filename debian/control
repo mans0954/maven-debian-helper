@@ -5,17 +5,17 @@ Maintainer: Debian Java Maintainers <pkg-java-maintainers@lists.alioth.debian.or
 Uploaders: Torsten Werner <twerner@debian.org>, Ludovic Claude <ludovic.claude@laposte.net>,
  Michael Koch <konqueror@gmx.de>, Damien Raude-Morvan <drazzib@debian.org>
 Build-Depends: cdbs, debhelper (>= 7), default-jdk, maven-ant-helper (>> 4), ant-optional, help2man
-Build-Depends-Indep: maven-repo-helper (>> 0.5),
+Build-Depends-Indep: maven-repo-helper (>= 1.2),
  junit, testng, libmaven-plugin-tools-java, libplexus-velocity-java, velocity,
  libmaven2-core-java
-Standards-Version: 3.8.4
+Standards-Version: 3.9.0
 Vcs-Svn: svn://svn.debian.org/svn/pkg-java/trunk/maven-debian-helper
 Vcs-Browser: http://svn.debian.org/wsvn/pkg-java/trunk/maven-debian-helper/
 Homepage: http://wiki.debian.org/Java/MavenBuilder
 
 Package: maven-debian-helper
 Architecture: all
-Depends: ${misc:Depends}, default-jdk, maven-repo-helper (>= 1.1), maven2 (>= 2.2.1-5),
+Depends: ${misc:Depends}, default-jdk, maven-repo-helper (>= 1.2), maven2 (>= 2.2.1-5),
  libmaven-clean-plugin-java, libmaven-resources-plugin-java,
  libmaven-compiler-plugin-java, libmaven-jar-plugin-java, libmaven-site-plugin-java,
  libsurefire-java, velocity, libplexus-velocity-java

@@ -35,7 +35,7 @@ DEB_MAVEN_REPO := $(CURDIR)/debian/maven-repo
 JAVA_OPTS = \
   $(shell test -n "$(DEB_MAVEN_PROPERTYFILE)" && echo -Dproperties.file.manual=$(DEB_MAVEN_PROPERTYFILE))
 
-DEB_PHONY_RULES += maven-sanity-check
+DEB_PHONY_RULES += maven-sanity-check before-mvn-build mvn-build after-mvn-build patch-poms unpatch-poms
 
 cdbs_use_maven_substvars := $(shell grep -q "{maven:\w*Depends}" debian/control && echo yes)
 cdbs_new_poms_file := $(shell test ! -f debian/$(DEB_JAR_PACKAGE).poms && echo yes)
@@ -80,9 +80,14 @@ post-patches:: patch-poms
 clean:: unpatch-poms
 	mh_clean
 
-common-build-arch common-build-indep:: debian/stamp-maven-build maven-sanity-check
+common-build-arch common-build-indep:: maven-sanity-check debian/stamp-maven-build
 debian/stamp-maven-build: debian/maven-repo before-mvn-build mvn-build after-mvn-build
 mvn-build:
+	# before-build target may be used to unpatch the pom files, so we need to check if
+	# patching the pom files is needed here, normally not
+	if [ ! -f pom.xml.save ]; then \
+		$(MAKE) -f debian/rules patch-poms; \
+	fi
 	$(DEB_MAVEN_INVOKE) $(DEB_MAVEN_BUILD_TARGET)
 	touch $@
 # Placeholders to insert custom processing before and after a Maven build
@@ -122,6 +127,9 @@ PLUGIN_DOC_ARGS = -Ddebian.dir=$(CURDIR)/debian -Ddebian.package=$(DEB_DOC_PACKA
 
 common-build-arch common-build-indep:: debian/stamp-maven-doc
 debian/stamp-maven-doc: debian/stamp-maven-build
+	if [ ! -f pom.xml.save ]; then \
+		$(MAKE) -f debian/rules patch-poms; \
+	fi
 	$(if $(DEB_MAVEN_DOC_TARGET),$(DEB_MAVEN_INVOKE) $(PLUGIN_DOC_ARGS) $(DEB_MAVEN_DOC_TARGET),@echo "DEB_MAVEN_DOC_TARGET unset, not generating documentation")
 	$(if $(DEB_MAVEN_DOC_TARGET),touch $@)
 

@@ -1,3 +1,19 @@
+maven-debian-helper (1.1) unstable; urgency=low
+
+  * debian/control: Update Standards-Version to 3.9.0, no changes
+  * Fix compilation issues with gcj
+  * mh_make: 
+      - update generated control to use Standards-Version 3.9.0
+      - improve useability and recognize more plugins and extensions
+      - read existing maven rules in debian folder, don't ask twice the
+        same questions.
+  * Support installing build artifacts in different packages with the
+    --package option in the <package>.poms file
+  * Add mvn-build to phony rules to avoid creating a file called
+    mvn-build during the build (Closes: #589635)
+
+ -- Ludovic Claude <ludovic.claude@laposte.net>  Mon, 28 Jun 2010 23:10:50 +0200
+
 maven-debian-helper (1.0) unstable; urgency=low
 
   * debian/control:

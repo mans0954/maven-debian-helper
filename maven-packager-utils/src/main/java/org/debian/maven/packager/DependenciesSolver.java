@@ -15,19 +15,11 @@ package org.debian.maven.packager;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.LineNumberReader;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -42,10 +34,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import org.debian.maven.repo.Dependency;
-import org.debian.maven.repo.POMInfo;
-import org.debian.maven.repo.POMReader;
-import org.debian.maven.repo.Repository;
+
+import org.debian.maven.repo.*;
 
 /**
  * Analyze the Maven dependencies and extract the Maven rules to use
@@ -55,11 +45,14 @@ import org.debian.maven.repo.Repository;
  */
 public class DependenciesSolver {
 
+    private static final Logger log = Logger.getLogger(DependenciesSolver.class.getName());
+
     // Plugins not useful for the build or whose use is against the
     // Debian policy
     private static final String[][] PLUGINS_TO_IGNORE = {
         {"org.apache.maven.plugins", "maven-ant-plugin"},
         {"org.apache.maven.plugins", "maven-archetype-plugin"},
+        {"org.apache.maven.plugins", "changelog-maven-plugin"},
         {"org.apache.maven.plugins", "maven-deploy-plugin"},
         {"org.apache.maven.plugins", "maven-release-plugin"},
         {"org.apache.maven.plugins", "maven-remote-resources-plugin"},
@@ -68,6 +61,8 @@ public class DependenciesSolver {
         {"org.apache.maven.plugins", "maven-stage-plugin"},
         {"org.apache.maven.plugins", "maven-eclipse-plugin"},
         {"org.apache.maven.plugins", "maven-idea-plugin"},
+        {"org.apache.maven.plugins", "maven-source-plugin"},
+        {"org.codehaus.mojo", "changelog-maven-plugin"},
         {"org.codehaus.mojo", "netbeans-freeform-maven-plugin"},
         {"org.codehaus.mojo", "nbm-maven-plugin"},
         {"org.codehaus.mojo", "ideauidesigner-maven-plugin"},
@@ -86,6 +81,7 @@ public class DependenciesSolver {
         {"org.apache.maven.plugins", "maven-changelog-plugin"},
         {"org.apache.maven.plugins", "maven-changes-plugin"},
         {"org.apache.maven.plugins", "maven-checkstyle-plugin"},
+        {"org.apache.maven.plugins", "maven-clover-plugin"},
         {"org.apache.maven.plugins", "maven-docck-plugin"},
         {"org.apache.maven.plugins", "maven-javadoc-plugin"},
         {"org.apache.maven.plugins", "maven-jxr-plugin"},
@@ -94,6 +90,7 @@ public class DependenciesSolver {
         {"org.apache.maven.plugins", "maven-surefire-report-plugin"},
         {"org.apache.maven.plugins", "maven-pdf-plugin"},
         {"org.apache.maven.plugins", "maven-site-plugin"},
+        {"org.codehaus.mojo", "changes-maven-plugin"},
         {"org.codehaus.mojo", "clirr-maven-plugin"},
         {"org.codehaus.mojo", "cobertura-maven-plugin"},
         {"org.codehaus.mojo", "taglist-maven-plugin"},
@@ -101,9 +98,12 @@ public class DependenciesSolver {
         {"org.codehaus.mojo", "docbook-maven-plugin"},
         {"org.codehaus.mojo", "javancss-maven-plugin"},
         {"org.codehaus.mojo", "jdepend-maven-plugin"},
+        {"org.codehaus.mojo", "jxr-maven-plugin"},
         {"org.codehaus.mojo", "dashboard-maven-plugin"},
         {"org.codehaus.mojo", "emma-maven-plugin"},
-        {"org.codehaus.mojo", "sonar-maven-plugin"},};
+        {"org.codehaus.mojo", "sonar-maven-plugin"},
+        {"org.jboss.maven.plugins", "maven-jdocbook-plugin"},
+    };
     private static final String[][] TEST_PLUGINS = {
         {"org.apache.maven.plugins", "maven-failsafe-plugin"},
         {"org.apache.maven.plugins", "maven-surefire-plugin"},
@@ -120,10 +120,13 @@ public class DependenciesSolver {
         {"org.apache.maven.wagon", "wagon-ftp"},
         {"org.apache.maven.wagon", "wagon-http"},
         {"org.apache.maven.wagon", "wagon-http-lightweight"},
-        {"org.apache.maven.wagon", "wagon-scm"},};
+        {"org.apache.maven.wagon", "wagon-scm"},
+        {"org.apache.maven.wagon", "wagon-webdav"},
+        {"org.jvnet.wagon-svn", "wagon-svn"},
+    };
 
     protected File baseDir;
-    protected File listOfPoms;
+    protected POMTransformer pomTransformer = new POMTransformer();
     protected File outputDirectory;
     protected String packageName;
     protected String packageType;
@@ -132,23 +135,47 @@ public class DependenciesSolver {
     protected List projects = new ArrayList();
     private Repository repository;
     private List issues = new ArrayList();
-    private List pomsConfig = new ArrayList();
     private List projectPoms = new ArrayList();
     private List toResolve = new ArrayList();
+    private Set knownProjectDependencies = new HashSet();
+    private Set ignoredDependencies = new TreeSet();
     private Set compileDepends = new TreeSet();
     private Set testDepends = new TreeSet();
     private Set runtimeDepends = new TreeSet();
     private Set optionalDepends = new TreeSet();
-    private Set rules = new TreeSet();
-    private Set ignoreRules = new TreeSet();
-    private Set cleanIgnoreRules = new TreeSet();
-    private Set ignoredDependencies = new HashSet();
+    private DependencyRuleSet cleanIgnoreRules = new DependencyRuleSet("Ignore rules to be applied during the Maven clean phase",
+            new File("debian/maven.cleanIgnoreRules"));
     private boolean checkedAptFile;
     private boolean runTests;
     private boolean generateJavadoc;
     private boolean nonInteractive;
     private boolean askedToFilterModules = false;
     private boolean filterModules = false;
+
+    public DependenciesSolver() {
+        pomTransformer.setVerbose(true);
+        pomTransformer.getRules().setDescription(readResource("maven.rules.description"));
+        pomTransformer.getIgnoreRules().setDescription(readResource("maven.ignoreRules.description"));
+        pomTransformer.getPublishedRules().setDescription(readResource("maven.publishedRules.description"));
+        cleanIgnoreRules.setDescription(readResource("maven.cleanIgnoreRules.description"));
+    }
+
+    private static String readResource(String resource) {
+        StringBuffer sb = new StringBuffer();
+        try {
+            InputStream is = DependenciesSolver.class.getResourceAsStream("/" + resource);
+            LineNumberReader r = new LineNumberReader(new InputStreamReader(is));
+            String line;
+            while ((line = r.readLine()) != null) {
+                sb.append(line);
+                sb.append("\n");
+            }
+            r.close();
+        } catch (IOException e) {
+            log.log(Level.SEVERE, "Cannot read resource " + resource, e);
+        }
+        return sb.toString();
+    }
 
     public void setRunTests(boolean b) {
         this.runTests = b;
@@ -170,7 +197,7 @@ public class DependenciesSolver {
         return false;
     }
 
-    private boolean isJavadocPlugin(Dependency dependency) {
+    private boolean isDocumentationOrReportPlugin(Dependency dependency) {
         return containsPlugin(DOC_PLUGINS, dependency);
     }
 
@@ -179,8 +206,8 @@ public class DependenciesSolver {
     }
 
     private boolean isDefaultMavenPlugin(Dependency dependency) {
-        if (repository != null && repository.getSuperPOM() != null) {
-            for (Iterator i = repository.getSuperPOM().getPluginManagement().iterator(); i.hasNext();) {
+        if (getRepository() != null && getRepository().getSuperPOM() != null) {
+            for (Iterator i = getRepository().getSuperPOM().getPluginManagement().iterator(); i.hasNext();) {
                 Dependency defaultPlugin = (Dependency) i.next();
                 if (defaultPlugin.equalsIgnoreVersion(dependency)) {
                     return true;
@@ -202,18 +229,29 @@ public class DependenciesSolver {
         return containsPlugin(PLUGINS_THAT_CAN_BE_IGNORED, dependency);
     }
 
-    private boolean askIgnoreDependency(Dependency dependency, String message) {
+    private boolean askIgnoreDependency(String sourcePomLoc, Dependency dependency, String message) {
+        return askIgnoreDependency(sourcePomLoc, dependency, message, true);
+    }
+
+    private boolean askIgnoreDependency(String sourcePomLoc, Dependency dependency, String message, boolean defaultToIgnore) {
         if (nonInteractive) {
             return false;
         }
+        System.out.println();
+        System.out.println("In " + sourcePomLoc + ":");
         System.out.println(message);
         System.out.println("  " + dependency);
-        System.out.print("[y]/n > ");
-        String s = System.console().readLine().trim().toLowerCase();
-        if (s.startsWith("n")) {
-            return false;
+        if (defaultToIgnore) {
+            System.out.print("[y]/n > ");
+        } else {
+            System.out.print("y/[n] > ");
         }
-        return true;
+        String s = readLine().trim().toLowerCase();
+        if (defaultToIgnore) {
+            return !s.startsWith("n");
+        } else {
+            return s.startsWith("y");
+        }
     }
 
     public void setNonInteractive(boolean nonInteractive) {
@@ -223,21 +261,25 @@ public class DependenciesSolver {
     private class ToResolve {
 
         private final File sourcePom;
-        private final Collection poms;
+        private final String listType;
         private final boolean buildTime;
         private final boolean mavenExtension;
         private final boolean management;
 
-        private ToResolve(File sourcePom, Collection poms, boolean buildTime, boolean mavenExtension, boolean management) {
+        private ToResolve(File sourcePom, String listType, boolean buildTime, boolean mavenExtension, boolean management) {
             this.sourcePom = sourcePom;
-            this.poms = poms;
+            this.listType = listType;
             this.buildTime = buildTime;
             this.mavenExtension = mavenExtension;
             this.management = management;
         }
 
         public void resolve() {
-            resolveDependencies(sourcePom, poms, buildTime, mavenExtension, management);
+            try {
+                resolveDependencies(sourcePom, listType, buildTime, mavenExtension, management);
+            } catch (Exception e) {
+                log.log(Level.SEVERE, "Cannot resolve dependencies on " + sourcePom, e);
+            }
         }
     }
 
@@ -245,169 +287,24 @@ public class DependenciesSolver {
         return baseDir;
     }
 
-    public File getListOfPoms() {
-        return listOfPoms;
-    }
-
-    public void setListOfPoms(File listOfPoms) {
-        this.listOfPoms = listOfPoms;
-    }
-
     public void saveListOfPoms() {
-        if (listOfPoms != null && !listOfPoms.exists()) {
-            try {
-                PrintWriter out = new PrintWriter(new FileWriter(listOfPoms));
-                out.println("# List of POM files for the package");
-                out.println("# Format of this file is:");
-                out.println("# <path to pom file> [option]");
-                out.println("# where option can be:");
-                out.println("#   --ignore: ignore this POM or");
-                out.println("#   --no-parent: remove the <parent> tag from the POM");
-                for (Iterator i = pomsConfig.iterator(); i.hasNext();) {
-                    String config = (String) i.next();
-                    out.println(config);
-                }
-                out.flush();
-                out.close();
-            } catch (Exception ex) {
-                Logger.getLogger(DependenciesSolver.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+        pomTransformer.getListOfPOMs().save();
     }
 
     public void saveMavenRules() {
-        File mavenRules = new File(outputDirectory, "maven.rules");
-        if (!mavenRules.exists()) {
-            try {
-                PrintWriter out = new PrintWriter(new FileWriter(mavenRules));
-                out.println("# Maven rules - transform Maven dependencies and plugins");
-                out.println("# Format of this file is:");
-                out.println("# [group] [artifact] [type] [version]");
-                out.println("# where each element can be either");
-                out.println("# - the exact string, for example org.apache for the group, or 3.1");
-                out.println("#   for the version. In this case, the element is simply matched");
-                out.println("#   and left as it is");
-                out.println("# - * (the star character, alone). In this case, anything will");
-                out.println("#   match and be left as it is. For example, using * on the");
-                out.println("#  position of the artifact field will match any artifact id");
-                out.println("# - a regular expression of the form s/match/replace/");
-                out.println("#   in this case, elements that match are transformed using");
-                out.println("#   the regex rule.");
-                out.println("# All elements much match before a rule can be applied");
-                out.println("# Example rule: match jar with groupid= junit, artifactid= junit");
-                out.println("# and version starting with 3., replacing the version with 3.x");
-                out.println("#   junit junit jar s/3\\..*/3.x/");
-
-                for (Iterator i = rules.iterator(); i.hasNext();) {
-                    String rule = (String) i.next();
-                    out.println(rule);
-                }
-                out.flush();
-                out.close();
-            } catch (IOException ex) {
-                Logger.getLogger(DependenciesSolver.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+        pomTransformer.getRules().save();
     }
 
     public void saveMavenPublishedRules() {
-        File mavenRules = new File(outputDirectory, "maven.publishedRules");
-        if (!mavenRules.exists()) {
-            try {
-                PrintWriter out = new PrintWriter(new FileWriter(mavenRules));
-                out.println("# Maven published rules - additional rules to publish, to help");
-                out.println("# the packaging work of Debian maintainers using mh_make");
-                out.println("# Format of this file is:");
-                out.println("# [group] [artifact] [type] [version]");
-                out.println("# where each element can be either");
-                out.println("# - the exact string, for example org.apache for the group, or 3.1");
-                out.println("#   for the version. In this case, the element is simply matched");
-                out.println("#   and left as it is");
-                out.println("# - * (the star character, alone). In this case, anything will");
-                out.println("#   match and be left as it is. For example, using * on the");
-                out.println("#  position of the artifact field will match any artifact id");
-                out.println("# - a regular expression of the form s/match/replace/");
-                out.println("#   in this case, elements that match are transformed using");
-                out.println("#   the regex rule.");
-                out.println("# All elements much match before a rule can be applied");
-                out.println("# Example rule: match any dependency whose group is ant,");
-                out.println("# replacing it with org.apache.ant");
-                out.println("#   s/ant/org.apache.ant/ * * s/.*/debian/");
-
-                out.flush();
-                out.close();
-            } catch (IOException ex) {
-                Logger.getLogger(DependenciesSolver.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+        pomTransformer.getPublishedRules().save();
     }
 
     public void saveMavenIgnoreRules() {
-        File mavenRules = new File(outputDirectory, "maven.ignoreRules");
-        if (!mavenRules.exists()) {
-            try {
-                PrintWriter out = new PrintWriter(new FileWriter(mavenRules));
-                out.println("# Maven ignore rules - ignore some Maven dependencies and plugins");
-                out.println("# Format of this file is:");
-                out.println("# [group] [artifact] [type] [version]");
-                out.println("# where each element can be either");
-                out.println("# - the exact string, for example org.apache for the group, or 3.1");
-                out.println("#   for the version. In this case, the element is simply matched");
-                out.println("#   and left as it is");
-                out.println("# - * (the star character, alone). In this case, anything will");
-                out.println("#   match and be left as it is. For example, using * on the");
-                out.println("#  position of the artifact field will match any artifact id");
-                out.println("# All elements much match before a rule can be applied");
-                out.println("# Example rule: match jar with groupid= junit, artifactid= junit");
-                out.println("# and version starting with 3., this dependency is then removed");
-                out.println("# from the POM");
-                out.println("#   junit junit jar s/3\\..*/3.x/");
-
-                for (Iterator i = ignoreRules.iterator(); i.hasNext();) {
-                    String rule = (String) i.next();
-                    out.println(rule);
-                }
-
-                out.flush();
-                out.close();
-            } catch (IOException ex) {
-                Logger.getLogger(DependenciesSolver.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+        pomTransformer.getIgnoreRules().save();
     }
 
     public void saveMavenCleanIgnoreRules() {
-        File mavenRules = new File(outputDirectory, "maven.cleanIgnoreRules");
-        if (!mavenRules.exists()) {
-            try {
-                PrintWriter out = new PrintWriter(new FileWriter(mavenRules));
-                out.println("# Maven clean ignore rules - ignore some Maven dependencies and plugins during the clean phase");
-                out.println("# Format of this file is:");
-                out.println("# [group] [artifact] [type] [version]");
-                out.println("# where each element can be either");
-                out.println("# - the exact string, for example org.apache for the group, or 3.1");
-                out.println("#   for the version. In this case, the element is simply matched");
-                out.println("#   and left as it is");
-                out.println("# - * (the star character, alone). In this case, anything will");
-                out.println("#   match and be left as it is. For example, using * on the");
-                out.println("#  position of the artifact field will match any artifact id");
-                out.println("# All elements much match before a rule can be applied");
-                out.println("# Example rule: match jar with groupid= junit, artifactid= junit");
-                out.println("# and version starting with 3., this dependency is then removed");
-                out.println("# from the POM");
-                out.println("#   junit junit jar s/3\\..*/3.x/");
-
-                for (Iterator i = cleanIgnoreRules.iterator(); i.hasNext();) {
-                    String rule = (String) i.next();
-                    out.println(rule);
-                }
-
-                out.flush();
-                out.close();
-            } catch (IOException ex) {
-                Logger.getLogger(DependenciesSolver.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+        cleanIgnoreRules.save();
     }
 
     public void saveSubstvars() {
@@ -417,7 +314,7 @@ public class DependenciesSolver {
             try {
                 depVars.load(new FileReader(dependencies));
             } catch (IOException ex) {
-                Logger.getLogger(DependenciesSolver.class.getName()).log(Level.SEVERE, null, ex);
+                log.log(Level.SEVERE, "Error while reading file " + dependencies, ex);
             }
         }
         depVars.put("maven.CompileDepends", toString(compileDepends));
@@ -436,14 +333,22 @@ public class DependenciesSolver {
         depVars.put("maven.DocDepends", toString(docRuntimeDepends));
         depVars.put("maven.DocOptionalDepends", toString(docOptionalDepends));
         try {
-            depVars.store(new FileWriter(dependencies), "List of dependencies for " + packageName + ", generated for use by debian/control");
+            depVars.store(new FileOutputStream(dependencies), "List of dependencies for " + packageName + ", generated for use by debian/control");
         } catch (IOException ex) {
-            Logger.getLogger(DependenciesSolver.class.getName()).log(Level.SEVERE, null, ex);
+            log.log(Level.SEVERE, "Error while saving file " + dependencies, ex);
         }
     }
 
     public void setBaseDir(File baseDir) {
         this.baseDir = baseDir;
+    }
+
+    public void setListOfPoms(File listOfPoms) {
+        if (pomTransformer.getListOfPOMs() == null) {
+            pomTransformer.setListOfPOMs(new ListOfPOMs(listOfPoms));
+        } else {
+            pomTransformer.getListOfPOMs().setListOfPOMsFile(listOfPoms);
+        }
     }
 
     public boolean isExploreProjects() {
@@ -468,6 +373,10 @@ public class DependenciesSolver {
 
     public void setOutputDirectory(File outputDirectory) {
         this.outputDirectory = outputDirectory;
+        pomTransformer.getRules().setRulesFile(new File(outputDirectory, "maven.rules"));
+        pomTransformer.getIgnoreRules().setRulesFile(new File(outputDirectory, "maven.ignoreRules"));
+        pomTransformer.getPublishedRules().setRulesFile(new File(outputDirectory, "maven.publishedRules"));
+        cleanIgnoreRules.setRulesFile(new File(outputDirectory, "maven.cleanIgnoreRules"));
     }
 
     public String getPackageName() {
@@ -498,14 +407,22 @@ public class DependenciesSolver {
         return issues;
     }
 
+    private Repository getRepository() {
+        if (repository == null && mavenRepo != null) {
+            repository = new Repository(mavenRepo);
+            repository.scan();
+        }
+        return repository;
+    }
+
     public void solveDependencies() {
+        pomTransformer.setRepository(getRepository());
+        pomTransformer.usePluginVersionsFromRepository();
+
         File f = outputDirectory;
         if (!f.exists()) {
             f.mkdirs();
         }
-
-        repository = new Repository((mavenRepo));
-        repository.scan();
 
         if (exploreProjects) {
             File pom = new File(baseDir, "pom.xml");
@@ -531,7 +448,7 @@ public class DependenciesSolver {
         resolveDependenciesNow();
 
         if (!issues.isEmpty()) {
-            System.err.println("WARNING:");
+            System.err.println("ERROR:");
             for (Iterator i = issues.iterator(); i.hasNext();) {
                 String issue = (String) i.next();
                 System.err.println(issue);
@@ -541,67 +458,82 @@ public class DependenciesSolver {
     }
 
     private void resolveDependencies(File projectPom) {
-        POMReader reader = new POMReader();
         String pomRelPath = projectPom.getAbsolutePath().substring(baseDir.getAbsolutePath().length() + 1);
+        boolean noParent = false;
+
         try {
-            POMInfo pom = reader.readPom(projectPom);
+            POMInfo pom = getPOM(projectPom);
             pom.setProperties(new HashMap());
             pom.getProperties().put("debian.package", getPackageName());
 //            System.out.println("Register POM " + pom.getThisPom().getGroupId() + ":" + pom.getThisPom().getArtifactId()
 //                    + ":" + pom.getThisPom().getVersion());
-            repository.registerPom(projectPom, pom);
+            try {
+                getRepository().registerPom(projectPom, pom);
+            } catch (DependencyNotFoundException e) {
+                System.out.println("Cannot find parent dependency " + e.getDependency());
+                if (!nonInteractive) {
+                    noParent = askIgnoreDependency(pomRelPath, pom.getParent(), "Ignore the parent POM for this POM?");
+                    if (noParent) {
+                        pom.setParent(null);
+                        try {
+                            getRepository().registerPom(projectPom, pom);
+                        } catch (DependencyNotFoundException e1) {
+                            // ignore
+                        }
+                    }
+                }
+            }
+
+            knownProjectDependencies.add(pom.getThisPom());
 
             if (filterModules) {
                 System.out.println("Include the module " + pomRelPath + " ?");
                 System.out.print("[y]/n > ");
-                String s = System.console().readLine().trim().toLowerCase();
+                String s = readLine().trim().toLowerCase();
                 boolean includeModule = !s.startsWith("n");
                 if (!includeModule) {
-                    pomsConfig.add(pomRelPath + " --ignore");
+                    ListOfPOMs.POMOptions options = pomTransformer.getListOfPOMs().getOrCreatePOMOptions(pomRelPath);
+                    options.setIgnore(true);
                     String type = "*";
                     if (pom.getThisPom().getType() != null) {
                         type = pom.getThisPom().getType();
                     }
-                    ignoreRules.add(pom.getThisPom().getGroupId() + " " + pom.getThisPom().getArtifactId()
-                            + " " + type + " *");
+                    String rule = pom.getThisPom().getGroupId() + " " + pom.getThisPom().getArtifactId()
+                            + " " + type + " *";
+                    pomTransformer.getIgnoreRules().add(new DependencyRule(rule));
                     return;
                 }
             }
 
-            boolean noParent = false;
             if (pom.getParent() != null) {
-                POMInfo parentPom = repository.searchMatchingPOM(pom.getParent());
-                if (parentPom == null || parentPom.equals(repository.getSuperPOM())) {
+                POMInfo parentPom = getRepository().searchMatchingPOM(pom.getParent());
+                if (parentPom == null || parentPom.equals(getRepository().getSuperPOM())) {
                     noParent = true;
                 }
                 if (!baseDir.equals(projectPom.getParentFile())) {
 //                    System.out.println("Checking the parent dependency in the sub project " + projectPom);
-                    Set parentDependencies = new TreeSet();
-                    parentDependencies.add(pom.getParent());
-                    resolveDependenciesLater(projectPom, parentDependencies, false, false, false);
+                    resolveDependenciesLater(projectPom, POMInfo.PARENT, false, false, false);
                 }
             }
 
             projectPoms.add(pom.getThisPom());
-            if (noParent) {
-                pomsConfig.add(pomRelPath + " --no-parent");
-            } else {
-                pomsConfig.add(pomRelPath);
-            }
+            pomTransformer.getListOfPOMs().getOrCreatePOMOptions(pomRelPath).setNoParent(noParent);
 
-            resolveDependenciesLater(projectPom, pom.getDependencies(), false, false, false);
-            resolveDependenciesLater(projectPom, pom.getDependencyManagement(), false, false, true);
-            resolveDependenciesLater(projectPom, pom.getPlugins(), true, true, false);
-            resolveDependenciesLater(projectPom, pom.getPluginDependencies(), true, true, false);
-            resolveDependenciesLater(projectPom, pom.getPluginManagement(), true, true, true);
-            resolveDependenciesLater(projectPom, pom.getExtensions(), true, true, false);
+            resolveDependenciesLater(projectPom, POMInfo.DEPENDENCIES, false, false, false);
+            resolveDependenciesLater(projectPom, POMInfo.DEPENDENCY_MANAGEMENT_LIST, false, false, true);
+            resolveDependenciesLater(projectPom, POMInfo.PLUGINS, true, true, false);
+            resolveDependenciesLater(projectPom, POMInfo.PLUGIN_DEPENDENCIES, true, true, false);
+            resolveDependenciesLater(projectPom, POMInfo.PLUGIN_MANAGEMENT, true, true, true);
+            resolveDependenciesLater(projectPom, POMInfo.REPORTING_PLUGINS, true, true, false);
+            resolveDependenciesLater(projectPom, POMInfo.EXTENSIONS, true, true, false);
 
             if (exploreProjects && !pom.getModules().isEmpty()) {
                 if (!nonInteractive && !askedToFilterModules) {
                     System.out.println("This project contains modules. Include all modules?");
                     System.out.print("[y]/n > ");
-                    String s = System.console().readLine().trim().toLowerCase();
+                    String s = readLine().trim().toLowerCase();
                     filterModules = s.startsWith("n");
+                    askedToFilterModules = true;
                 }
                 for (Iterator i = pom.getModules().iterator(); i.hasNext();) {
                     String module = (String) i.next();
@@ -609,10 +541,24 @@ public class DependenciesSolver {
                     resolveDependencies(modulePom);
                 }
             }
-        } catch (XMLStreamException ex) {
-            Logger.getLogger(DependenciesSolver.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(DependenciesSolver.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            log.log(Level.SEVERE, "Error while resolving " + projectPom, ex);
+        }
+    }
+
+    private POMInfo getPOM(File projectPom) throws XMLStreamException, IOException {
+        File tmpDest = File.createTempFile("pom", ".tmp");
+        tmpDest.deleteOnExit();
+        return pomTransformer.transformPom(projectPom, tmpDest);
+    }
+
+    private String readLine() {
+        LineNumberReader consoleReader = new LineNumberReader(new InputStreamReader(System.in));
+        try {
+            return consoleReader.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
         }
     }
 
@@ -624,49 +570,63 @@ public class DependenciesSolver {
         }
     }
 
-    private void resolveDependenciesLater(File sourcePom, Collection poms, boolean buildTime, boolean mavenExtension, boolean management) {
-        toResolve.add(new ToResolve(sourcePom, poms, buildTime, mavenExtension, management));
+    private void resolveDependenciesLater(File sourcePom, String listType, boolean buildTime, boolean mavenExtension, boolean management) {
+        toResolve.add(new ToResolve(sourcePom, listType, buildTime, mavenExtension, management));
     }
 
-    private void resolveDependencies(File sourcePom, Collection poms, boolean buildTime, boolean mavenExtension, boolean management) {
+    private void resolveDependencies(File sourcePom, String listType, boolean buildTime, boolean mavenExtension, boolean management) throws Exception {
         String sourcePomLoc = sourcePom.getAbsolutePath();
         String baseDirPath = baseDir.getAbsolutePath();
         sourcePomLoc = sourcePomLoc.substring(baseDirPath.length() + 1, sourcePomLoc.length());
+
+        List poms = getPOM(sourcePom).getDependencyList(listType);
 
         nextDependency:
         for (Iterator i = poms.iterator(); i.hasNext();) {
             Dependency dependency = (Dependency) i.next();
             if (containsDependencyIgnoreVersion(ignoredDependencies, dependency) ||
+                containsDependencyIgnoreVersion(knownProjectDependencies, dependency) ||
                     (management && isDefaultMavenPlugin(dependency))) {
                 continue;
             }
 
             boolean ignoreDependency = false;
             if (canIgnorePlugin(dependency)) {
-                ignoreDependency = askIgnoreDependency(dependency, "This plugin is not useful for the build or its use is against Debian policies. Ignore this plugin?");
+                ignoreDependency = askIgnoreDependency(sourcePomLoc, dependency, "This plugin is not useful for the build or its use is against Debian policies. Ignore this plugin?");
             } else if (canIgnoreExtension(dependency)) {
-                ignoreDependency = askIgnoreDependency(dependency, "This extension is not useful for the build or its use is against Debian policies. Ignore this extension?");
+                ignoreDependency = askIgnoreDependency(sourcePomLoc, dependency, "This extension is not useful for the build or its use is against Debian policies. Ignore this extension?");
             } else if (canBeIgnoredPlugin(dependency)) {
-                ignoreDependency = askIgnoreDependency(dependency, "This plugin may be ignored in some cases. Ignore this plugin?");
+                ignoreDependency = askIgnoreDependency(sourcePomLoc, dependency, "This plugin may be ignored in some cases. Ignore this plugin?");
             } else if (!runTests) {
                 if ("test".equals(dependency.getScope())) {
-                    ignoreDependency = askIgnoreDependency(dependency, "Tests are turned off. Ignore this test dependency?");
+                    ignoreDependency = askIgnoreDependency(sourcePomLoc, dependency, "Tests are turned off. Ignore this test dependency?");
                 } else if (isTestPlugin(dependency)) {
-                    ignoreDependency = askIgnoreDependency(dependency, "Tests are turned off. Ignore this test plugin?");
+                    ignoreDependency = askIgnoreDependency(sourcePomLoc, dependency, "Tests are turned off. Ignore this test plugin?");
                 }
-            } else if (!generateJavadoc && isJavadocPlugin(dependency)) {
-                ignoreDependency = askIgnoreDependency(dependency, "Documentation is turned off. Ignore this documentation plugin?");
+            } else if (!generateJavadoc && isDocumentationOrReportPlugin(dependency)) {
+                ignoreDependency = askIgnoreDependency(sourcePomLoc, dependency, "Documentation is turned off. Ignore this documentation plugin?");
             }
 
             if (ignoreDependency) {
                 ignoredDependencies.add(dependency);
-                ignoreRules.add(dependency.getGroupId() + " " + dependency.getArtifactId() + " * *");
+                String ruleDef = dependency.getGroupId() + " " + dependency.getArtifactId() + " * *";
+                pomTransformer.getIgnoreRules().add(new DependencyRule(ruleDef));
                 continue;
             }
 
-            POMInfo pom = repository.searchMatchingPOM(dependency);
+            POMInfo pom = getRepository().searchMatchingPOM(dependency);
+            if (pom == null && dependency.getVersion() == null) {
+                // Set a dummy version and try again
+                for (int version = 0; version < 10; version++) {
+                    dependency.setVersion(version + ".0");
+                    pom = getRepository().searchMatchingPOM(dependency);
+                    if (pom != null) {
+                        break;
+                    }
+                }
+            }
             if (pom == null && "maven-plugin".equals(dependency.getType())) {
-                List matchingPoms = repository.searchMatchingPOMsIgnoreVersion(dependency);
+                List matchingPoms = getRepository().searchMatchingPOMsIgnoreVersion(dependency);
                 if (matchingPoms.size() > 1) {
                     issues.add(sourcePomLoc + ": More than one version matches the plugin " + dependency.getGroupId() + ":"
                             + dependency.getArtifactId() + ":" + dependency.getVersion());
@@ -679,12 +639,28 @@ public class DependenciesSolver {
             }
             if (pom == null) {
                 if (!management) {
-                    issues.add(sourcePomLoc + ": Dependency is not packaged in the Maven repository for Debian: " + dependency.getGroupId() + ":"
-                            + dependency.getArtifactId() + ":" + dependency.getVersion());
-                    ignoreDependency = askIgnoreDependency(dependency, "This dependency cannot be found in the Debian Maven repository. Ignore this dependency?");
+                    if ("maven-plugin".equals(dependency.getType()) && packageType.equals("ant")) {
+                        ignoreDependency = true;
+                    }
+                    if (!ignoreDependency && isDocumentationOrReportPlugin(dependency)) {
+                        ignoreDependency = askIgnoreDependency(sourcePomLoc, dependency,
+                                "This documentation or report plugin cannot be found in the Maven repository for Debian. Ignore this plugin?");
+                    }
+                    if (!ignoreDependency) {
+                        if ("maven-plugin".equals(dependency.getType())) {
+                            issues.add(sourcePomLoc + ": Plugin is not packaged in the Maven repository for Debian: " + dependency.getGroupId() + ":"
+                                    + dependency.getArtifactId() + ":" + dependency.getVersion());
+                            ignoreDependency = askIgnoreDependency(sourcePomLoc, dependency, "This plugin cannot be found in the Debian Maven repository. Ignore this plugin?", false);
+                        } else {
+                            issues.add(sourcePomLoc + ": Dependency is not packaged in the Maven repository for Debian: " + dependency.getGroupId() + ":"
+                                    + dependency.getArtifactId() + ":" + dependency.getVersion());
+                            ignoreDependency = askIgnoreDependency(sourcePomLoc, dependency, "This dependency cannot be found in the Debian Maven repository. Ignore this dependency?", false);
+                        }
+                    }
                     if (ignoreDependency) {
                         ignoredDependencies.add(dependency);
-                        ignoreRules.add(dependency.getGroupId() + " " + dependency.getArtifactId() + " * *");
+                        String ruleDef = dependency.getGroupId() + " " + dependency.getArtifactId() + " * *";
+                        pomTransformer.getIgnoreRules().add(new DependencyRule(ruleDef));
                         continue;
                     }
                 }
@@ -696,7 +672,8 @@ public class DependenciesSolver {
             // they need to be added to maven.cleanIgnoreRules to avoid errors during
             // a mvn clean
             if ("maven-plugin".equals(dependency.getType()) && containsDependencyIgnoreVersion(projectPoms, dependency)) {
-                cleanIgnoreRules.add(dependency.getGroupId() + " " + dependency.getArtifactId() + " maven-plugin *");
+                String ruleDef = dependency.getGroupId() + " " + dependency.getArtifactId() + " maven-plugin *";
+                cleanIgnoreRules.add(new DependencyRule(ruleDef));
             }
 
             // Discover the library to import for the dependency
@@ -739,7 +716,8 @@ public class DependenciesSolver {
             if (mavenRules != null) {
                 StringTokenizer st = new StringTokenizer(mavenRules, ",");
                 while (st.hasMoreTokens()) {
-                    rules.add(st.nextToken().trim());
+                    String ruleDef = st.nextToken().trim();
+                    pomTransformer.getRules().add(new DependencyRule(ruleDef));
                 }
             }
         }
@@ -874,7 +852,7 @@ public class DependenciesSolver {
         public String getResult() {
             return result;
         }
-    };
+    }
 
     public static void main(String[] args) {
         if (args.length == 0 || "-h".equals(args[0]) || "--help".equals(args[0])) {
@@ -885,10 +863,10 @@ public class DependenciesSolver {
             System.out.println("  -v, --verbose: be extra verbose");
             System.out.println("  -p<package>, --package=<package>: name of the Debian package containing");
             System.out.println("    this library");
-            System.out.println("  -r<rules>, --rules=<rules>: path to the file containing the");
-            System.out.println("    extra rules to apply when cleaning the POM");
-            System.out.println("  -i<rules>, --published-rules=<rules>: path to the file containing the");
-            System.out.println("    extra rules to publish in the property debian.mavenRules in the cleaned POM");
+//            System.out.println("  -r<rules>, --rules=<rules>: path to the file containing the");
+//            System.out.println("    extra rules to apply when cleaning the POM");
+//            System.out.println("  -i<rules>, --published-rules=<rules>: path to the file containing the");
+//            System.out.println("    extra rules to publish in the property debian.mavenRules in the cleaned POM");
             System.out.println("  --ant: use ant for the packaging");
             System.out.println("  --run-tests: run the unit tests");
             System.out.println("  --generate-javadoc: generate Javadoc");
@@ -943,6 +921,10 @@ public class DependenciesSolver {
         solver.saveMavenCleanIgnoreRules();
         solver.saveMavenPublishedRules();
         solver.saveSubstvars();
+
+        if (!solver.getIssues().isEmpty()) {
+            System.exit(1);
+        }
     }
 
     private static int inc(int i, String[] args) {
