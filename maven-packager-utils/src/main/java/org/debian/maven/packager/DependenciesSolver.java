@@ -16,20 +16,11 @@ package org.debian.maven.packager;
  * limitations under the License.
  */
 import java.io.*;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -151,6 +142,7 @@ public class DependenciesSolver {
     private boolean nonInteractive;
     private boolean askedToFilterModules = false;
     private boolean filterModules = false;
+    private Map pomInfoCache = new HashMap();
 
     public DependenciesSolver() {
         pomTransformer.setVerbose(true);
@@ -480,6 +472,13 @@ public class DependenciesSolver {
                         } catch (DependencyNotFoundException e1) {
                             // ignore
                         }
+                        ListOfPOMs.POMOptions options = pomTransformer.getListOfPOMs().getOrCreatePOMOptions(pomRelPath);
+                        options.setNoParent(true);
+                        resetPOM(projectPom);
+                        pom = getPOM(projectPom);
+                        try {
+                            getRepository().registerPom(projectPom, pom);
+                        } catch (DependencyNotFoundException ignore) {}
                     }
                 }
             }
@@ -547,9 +546,25 @@ public class DependenciesSolver {
     }
 
     private POMInfo getPOM(File projectPom) throws XMLStreamException, IOException {
+        POMInfo info = (POMInfo) pomInfoCache.get(projectPom.getAbsolutePath());
+        if (info != null) {
+            return info;
+        }
         File tmpDest = File.createTempFile("pom", ".tmp");
         tmpDest.deleteOnExit();
-        return pomTransformer.transformPom(projectPom, tmpDest);
+        String pomRelPath = projectPom.getAbsolutePath().substring(baseDir.getAbsolutePath().length() + 1);
+        ListOfPOMs.POMOptions options = pomTransformer.getListOfPOMs().getPOMOptions(pomRelPath);
+        boolean noParent = false;
+        if (options != null) {
+            noParent = options.isNoParent();
+        }
+        info = pomTransformer.transformPom(projectPom, tmpDest, noParent, false, null, null);
+        pomInfoCache.put(projectPom.getAbsolutePath(), info);
+        return info;
+    }
+
+    private void resetPOM(File projectPom) {
+         pomInfoCache.remove(projectPom.getAbsolutePath());
     }
 
     private String readLine() {

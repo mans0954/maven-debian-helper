@@ -137,7 +137,7 @@ if [ $? != 0 ]; then
     return
 fi
 
-mh_patchpoms -p$BIN_PACKAGE --debian-build -rdebian/maven.rules -idebian/maven.ignoreRules --keep-pom-version --maven-repo=debian/maven-repo
+mh_patchpoms -p$BIN_PACKAGE -rdebian/maven.rules -idebian/maven.ignoreRules --keep-pom-version
 
 mvn org.debian.maven:maven-packager-utils:$MH_VERSION:generate -Demail="$DEBEMAIL" -Dpackager="$DEBFULLNAME" -DpackagerLicense="$DEBLICENSE" -Dpackage="$PACKAGE" -Dbin.package="$BIN_PACKAGE" -DrunTests="$RUN_TESTS" -DgenerateJavadoc="$GEN_JAVADOC" -Dmaven.repo.local=/usr/share/maven-repo ${ANT:+-DpackageType=ant} ${FROM_SVN:+-DdownloadUrl=scm:svn:$FROM_SVN} --offline
 

@@ -1,3 +1,10 @@
+maven-debian-helper (1.1.1) UNRELEASED; urgency=low
+
+  * mh_make: fix issue when no-parent option is needed. Thanks Torsten
+    for the report
+
+ -- Ludovic Claude <ludovic.claude@laposte.net>  Tue, 10 Aug 2010 23:38:02 +0200
+
 maven-debian-helper (1.1) unstable; urgency=low
 
   * debian/control: Update Standards-Version to 3.9.0, no changes
