@@ -1,9 +1,13 @@
 maven-debian-helper (1.1.1) UNRELEASED; urgency=low
 
+  [ Ludovic Claude ]
   * mh_make: fix issue when no-parent option is needed. Thanks Torsten
     for the report
 
- -- Ludovic Claude <ludovic.claude@laposte.net>  Tue, 10 Aug 2010 23:38:02 +0200
+  [ Damien Raude-Morvan ]
+  * DependenciesSolver: Fix ClassCastException when using mh_make.
+
+ -- Damien Raude-Morvan <drazzib@debian.org>  Sun, 05 Sep 2010 18:05:27 +0200
 
 maven-debian-helper (1.1) unstable; urgency=low
 

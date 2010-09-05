@@ -129,7 +129,7 @@ public class DependenciesSolver {
     private List projectPoms = new ArrayList();
     private List toResolve = new ArrayList();
     private Set knownProjectDependencies = new HashSet();
-    private Set ignoredDependencies = new TreeSet();
+    private Set ignoredDependencies = new HashSet();
     private Set compileDepends = new TreeSet();
     private Set testDepends = new TreeSet();
     private Set runtimeDepends = new TreeSet();
