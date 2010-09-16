@@ -94,7 +94,7 @@ mvn-build:
 before-mvn-build::
 after-mvn-build::
 
-cleanbuilddir:: DEB_PATCHPOMS_ARGS += --clean-ignore-rules=debian/maven.cleanIgnoreRules
+cleanbuilddir:: DEB_PATCHPOMS_ARGS += --ignore-rules=debian/maven.ignoreRules --clean-ignore-rules=debian/maven.cleanIgnoreRules
 cleanbuilddir:: maven-sanity-check post-patches debian/maven-repo
 	-$(DEB_MAVEN_INVOKE) $(DEB_MAVEN_CLEAN_TARGET)
 	$(RM) -r $(DEB_MAVEN_REPO) debian/stamp-maven-build

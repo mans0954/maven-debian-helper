@@ -82,10 +82,10 @@ public class DependenciesMojo
      */
     protected File mavenRepo;
     /**
-     * Type of the package (e.g. 'maven' or 'ant')
-     * @parameter expression="${nonInteractive}" default-value="false"
+     * Interactive execution will ask questions to the user
+     * @parameter expression="${interactive}" default-value="true"
      */
-    protected boolean nonInteractive;
+    protected boolean interactive;
 
     public void execute()
             throws MojoExecutionException {
@@ -112,7 +112,7 @@ public class DependenciesMojo
         solver.setOutputDirectory(outputDirectory);
         solver.setPackageName(packageName);
         solver.setPackageType(packageType);
-        solver.setNonInteractive(nonInteractive);
+        solver.setInteractive(interactive);
         solver.setListOfPoms(listOfPoms);
 
         solver.solveDependencies();

@@ -62,7 +62,7 @@ public class DependenciesSolverTest extends TestCase {
         solver.setPackageName("libplexus-active-collections-java");
         solver.setPackageType("maven");
         solver.setListOfPoms(new File(testDir, "libplexus-active-collections-java.poms"));
-        solver.setNonInteractive(true);
+        solver.setInteractive(false);
 
         solver.solveDependencies();
 
