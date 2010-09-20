@@ -1,4 +1,4 @@
-maven-debian-helper (1.2) unstable; urgency=low
+maven-debian-helper (1.2) experimental; urgency=low
 
   [ Ludovic Claude ]
   * debian/control: Update Standards-Version to 3.9.1, no changes
