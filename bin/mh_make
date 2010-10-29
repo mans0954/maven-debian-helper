@@ -69,12 +69,18 @@ GEN_JAVADOC=$(getarg d javadoc)
 ANT=$(getarg a ant)
 FROM_SVN=$(getarg s from-svn)
 
+if [ "$FROM_SVN" == "true" ]; then
+	echo "The syntax for the --for-svn option is --from-svn=<url>, please try again"
+	exit 1
+fi
+
 if [ -z "$PACKAGE" ]; then
     PACKAGE="$(basename $(pwd) | sed 's/-[0-9\.].*//')"
-	if [ -n "$FROM_SVN" ]; then
-		PACKAGE=$(basename ${FROM_SVN%%/tags/*} | sed 's/-[0-9\.].*//' )
-	fi
-	echo
+    if [ -n "$FROM_SVN" ]; then
+	PACKAGE=$(echo "$FROM_SVN" | sed 's/-[0-9].*//')
+        PACKAGE=$(echo "$PACKAGE" | sed 's|.*/||' )
+    fi
+    echo
     echo "Enter the name of the new Debian source package. If empty, it will defaults to $PACKAGE"
     read -p ">" USER_PACKAGE
     if [ -n "$USER_PACKAGE" ]; then
@@ -134,22 +140,23 @@ fi
 java -cp /usr/share/java/maven-project.jar:/usr/share/java/maven-repo-helper.jar:/usr/share/java/maven-packager-utils.jar:/usr/share/maven2/lib/maven-debian-uber.jar org.debian.maven.packager.DependenciesSolver --package="$BIN_PACKAGE" ${ANT:+--ant} ${GEN_JAVADOC:+--generate-javadoc} ${RUN_TESTS:+--run-tests} --maven-repo=/usr/share/maven-repo
 
 if [ $? != 0 ]; then
-    return
+    exit 1
 fi
+
+eval $(cat debian/$BIN_PACKAGE.substvars | sed -e 's/maven\./maven_/' | grep maven_UpstreamPackageVersion)
 
 mh_patchpoms -p$BIN_PACKAGE -rdebian/maven.rules -idebian/maven.ignoreRules --keep-pom-version
 
 mvn org.debian.maven:maven-packager-utils:$MH_VERSION:generate -Demail="$DEBEMAIL" -Dpackager="$DEBFULLNAME" -DpackagerLicense="$DEBLICENSE" -Dpackage="$PACKAGE" -Dbin.package="$BIN_PACKAGE" -DrunTests="$RUN_TESTS" -DgenerateJavadoc="$GEN_JAVADOC" -Dmaven.repo.local=/usr/share/maven-repo ${ANT:+-DpackageType=ant} ${FROM_SVN:+-DdownloadUrl=scm:svn:$FROM_SVN} --offline
 
-rm -f debian/*.substvars
+if [ $? != 0 ]; then
+    exit 1
+fi
 
 if [ ! -f debian/changelog ]; then
-    mkdir -p debian/tmp
-    mh_cleanpom -p$PACKAGE pom.xml.save debian/tmp/pom.xml debian/tmp/pom.properties
-    source debian/tmp/pom.properties
-    rm -R debian/tmp
-    version=$(echo $version | sed -re's/-(alpha|beta)-?/~\1/')
-    dch --create --newversion=${version}-1 --package=$PACKAGE "Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>"
+    debianVersion=$(echo ${maven_UpstreamPackageVersion} | sed -re's/-(alpha|beta)-?/~\1/')
+    dch --create --newversion=${debianVersion}-1 --package=$PACKAGE "Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>"
 fi
 
 mh_unpatchpoms -p$BIN_PACKAGE
+rm -f debian/*.substvars

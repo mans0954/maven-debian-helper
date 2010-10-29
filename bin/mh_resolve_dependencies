@@ -19,6 +19,8 @@ syntax()
    echo -e "\t-p<package> --package=<package>: name of the package"
    echo -e "\t-a --ant: use Ant for the packaging instead of Maven"
    echo -e "\t-n --non-interactive: non interactive mode, don't ask questions"
+   echo -e "\t-o --offline: don't ever connect to the internet, for Debian build"
+   echo -e "\t  compatibility."
    echo -e "\t-v --verbose: show more information while running"
    echo -e ""
    echo -e "Description:"
@@ -35,11 +37,12 @@ syntax()
    exit 1
 }
 
-ARGS="p package a ant v verbose n non-interactive" parseargs "$@"
+ARGS="p package a ant v verbose n non-interactive o offline" parseargs "$@"
 
 PACKAGE=$(getarg p package)
 ANT=$(getarg a ant)
 NON_INTERACTIVE=$(getarg n non-interactive)
+OFFLINE=$(getarg o offline)
 
 if [ -z "$PACKAGE" ]; then
     if [ "$ARGC" -gt "0" ]; then
@@ -62,6 +65,6 @@ if [ ! -e .debianVersion -a ! -e debian/stamp-poms-patched ]; then
     fi
 fi
 
-mvn org.debian.maven:maven-packager-utils:$MH_VERSION:dependencies -Dpackage="$PACKAGE" ${ANT:+-DpackageType=ant} -Dmaven.repo.local=/usr/share/maven-repo ${NON_INTERACTIVE:+-DnonInteractive=true} --offline
+mvn org.debian.maven:maven-packager-utils:$MH_VERSION:dependencies -Dpackage="$PACKAGE" ${ANT:+-DpackageType=ant} -Dmaven.repo.local=/usr/share/maven-repo ${NON_INTERACTIVE:+-Dinteractive=false} ${OFFLINE:+-Doffline=true}
 
 perl -p -i -e 's/maven\./maven:/' debian/${PACKAGE}.substvars

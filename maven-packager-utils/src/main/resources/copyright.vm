@@ -1,72 +1,29 @@
 #set ($space = " ")
 Format-Specification: http://dep.debian.net/deps/dep5/
 Name: ${project.Name}
-Maintainer: ${project.Organization.Name}
-Source: ${project.Url}
-
-Files: *
-#set ($copyrightHeader = "Copyright: ")
+#set ($maintainerHeader = "Maintainer: ")
 #foreach ($developer in $project.Developers)
-${copyrightHeader} ${copyrightYear}, ${developer.Name} #if (${developer.Email})<${developer.Email}>
-#set ($copyrightHeader = "           ")
+${maintainerHeader} ${developer.Name} #if (${developer.Email})<${developer.Email}> as developer
+#set ($maintainerHeader = "           ")
 #else $space
 #end
 #end
 #foreach ($contributor in $project.Contributors)
-${copyrightHeader} ${copyrightYear}, ${contributor.Name} #if (${contributor.Email})<${contributor.Email}>
-#set ($copyrightHeader = "           ")
+${maintainerHeader} ${contributor.Name} #if (${contributor.Email})<${contributor.Email}> as contributor
+#set ($maintainerHeader = "           ")
 #else $space
 #end
 #end
-#set ($knownLicenses = ["Apache-2.0", "BSD", "GFDL-1.2", "GPL-2", "LGPL-2.1", "Artistic", "GPL-3", "LGPL-2", "LGPL-3"])
-#foreach ($license in $project.Licenses)
-#set ($licenseName = "")
-#if ($license.Name)#set ($licenseName = $license.Name.toLowerCase() + " ")#end
-#set ($licenseUrl = "")
-#if ($license.Url)#set ($licenseUrl = $license.Url.toLowerCase())#end
-#if ($licenseName.indexOf("mit ") >= 0 || $licenseUrl.indexOf("mit-license") >= 0)
-#set ($x = $licenses.add("MIT"))
-#elseif ($licenseName.indexOf("bsd ") >= 0 || $licenseUrl.indexOf("bsd-license") >= 0)
-#set ($x = $licenses.add("BSD"))
-#elseif ($licenseName.indexOf("artistic ") >= 0 || $licenseUrl.indexOf("artistic-license") >= 0)
-#set ($x = $licenses.add("Artistic"))
-#elseif ($licenseName.indexOf("apache ") >= 0 || $licenseUrl.indexOf("apache") >= 0)
-#if ($licenseName.indexOf("2.") >= 0 || $licenseUrl.indexOf("2.") >= 0)
-#set ($x = $licenses.add("Apache-2.0"))
-#end
-#elseif ($licenseName.indexOf("lgpl ") >= 0 || $licenseUrl.indexOf("lgpl") >= 0)
-#if ($licenseName.indexOf("2.1") >= 0 || $licenseUrl.indexOf("2.1") >= 0)
-#set ($x = $licenses.add("LGPL-2.1"))
-#elseif ($licenseName.indexOf("2") >= 0 || $licenseUrl.indexOf("2") >= 0)
-#set ($x = $licenses.add("LGPL-2"))
-#elseif ($licenseName.indexOf("3") >= 0 || $licenseUrl.indexOf("3") >= 0)
-#set ($x = $licenses.add("LGPL-2"))
-#end
-#elseif ($licenseName.indexOf("gpl ") >= 0 || $licenseUrl.indexOf("gpl") >= 0)
-#if ($licenseName.indexOf("2") >= 0 || $licenseUrl.indexOf("2") >= 0)
-#set ($x = $licenses.add("GPL-2"))
-#elseif ($licenseName.indexOf("3") >= 0 || $licenseUrl.indexOf("3") >= 0)
-#set ($x = $licenses.add("GPL-3"))
-#else
-#if ($licenseName)#set ($x = $licenses.add("$licenseName"))#set ($packagerLicense="$licenseName")
-#elseif($licenseUrl)#set ($x = $licenses.add("$licenseUrl"))
-#else#set ($x = $licenses.add("UNKNOWN-LICENSE"))
-#end
-#end
-#end
-#end
-#if ($licenses.isEmpty())
-#set ($x = $licenses.add("NOT-FOUND"))
-#end
-License: #foreach($license in $licenses)${license}#if($velocityHasNext) or #end#end
+Source: ${project.Url}
 
+Files: *
+Copyright: ${copyrightYear}, ${copyrightOwner}
+License: #foreach($license in $licenses)${license}#if($velocityHasNext) or #end#end
 
 Files: debian/*
 Copyright: ${currentYear}, ${packager} <${packagerEmail}>
 License: ${packagerLicense}
-#set ($license = "${packagerLicense}")
-#set ($license = $license.replace("+",""))
-#set ($x = $licenses.add("${license}"))
+#set ($x = $licenses.add("${packagerLicense}"))
 
 #foreach ($license in $licenses)
 License: $license

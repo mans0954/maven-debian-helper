@@ -86,6 +86,11 @@ public class DependenciesMojo
      * @parameter expression="${interactive}" default-value="true"
      */
     protected boolean interactive;
+    /**
+     * Offline prevents any download from Internet
+     * @parameter expression="${offline}" default-value="false"
+     */
+    protected boolean offline;
 
     public void execute()
             throws MojoExecutionException {
@@ -106,14 +111,21 @@ public class DependenciesMojo
             }
         }
 
-        solver.setProjects(projects);
         solver.setBaseDir(basedir);
         solver.setMavenRepo(mavenRepo);
         solver.setOutputDirectory(outputDirectory);
         solver.setPackageName(packageName);
         solver.setPackageType(packageType);
         solver.setInteractive(interactive);
+        solver.setOffline(offline);
         solver.setListOfPoms(listOfPoms);
+
+        if (solver.getListOfPOMs().getFirstPOM() == null && collectedProjects != null) {
+            for (Iterator i = collectedProjects.iterator(); i.hasNext();) {
+                MavenProject subProject = (MavenProject) i.next();
+                solver.getListOfPOMs().addPOM(subProject.getFile());
+            }
+        }
 
         solver.solveDependencies();
 

@@ -1,0 +1,6 @@
+#List of dependencies for libplexus-utils2-java, generated for use by debian/control
+#Sun Oct 10 23:31:00 CEST 2010
+maven.CompileDepends=libmaven-compiler-plugin-java (>\= 2.0.2), libsurefire-java
+maven.Depends=
+maven.OptionalDepends=
+maven.TestDepends=

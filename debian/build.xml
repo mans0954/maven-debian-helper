@@ -7,37 +7,37 @@
     <property file="/usr/share/maven-ant-helper/maven-defaults.properties"/>
 
     <macrodef name="cleanmodule">
-	    <attribute name="dir"/>
-	    <sequential>
-		  <ant target="clean" antfile="${maven.build}" dir="@{dir}">
+        <attribute name="dir"/>
+        <sequential>
+          <ant target="clean" antfile="${maven.build}" dir="@{dir}">
             <property name="debian.dir" location="debian" />
             <property name="project.dir" value="@{dir}" />
           </ant> 
-	    </sequential>
+        </sequential>
     </macrodef>
 
     <macrodef name="packagemodule">
-	    <attribute name="dir"/>
-	    <sequential>
-		<ant target="package" antfile="${maven.build}" dir="@{dir}">
-          <property name="debian.dir" location="debian" />
-          <property name="project.dir" value="@{dir}" />
-          <property name="keep-cleaned-pom" value="true" />
-		</ant>
-	    </sequential>
+        <attribute name="dir"/>
+        <sequential>
+          <ant target="package-and-local-install" antfile="${maven.build}" dir="@{dir}">
+            <property name="debian.dir" location="debian" />
+            <property name="project.dir" value="@{dir}" />
+            <property name="keep-cleaned-pom" value="true" />
+          </ant>
+        </sequential>
     </macrodef>
 
     <macrodef name="package-plugin-module">
-	    <attribute name="dir"/>
-	    <sequential>
-		<ant target="package" antfile="${maven.build}" dir="@{dir}">
-          <property name="debian.dir" location="debian" />
-          <property name="project.dir" value="@{dir}" />
-          <property name="maven.generate.target" value="plugin:descriptor" />
-          <property name="keep-cleaned-pom" value="true" />
-          <property name="use-local-repo" value="true" />
-		</ant>
-	    </sequential>
+        <attribute name="dir"/>
+        <sequential>
+          <ant target="package-and-local-install" antfile="${maven.build}" dir="@{dir}">
+            <property name="debian.dir" location="debian" />
+            <property name="project.dir" value="@{dir}" />
+            <property name="maven.generate.target" value="plugin:descriptor" />
+            <property name="keep-cleaned-pom" value="true" />
+            <property name="use-local-repo" value="true" />
+          </ant>
+        </sequential>
     </macrodef>
 
     <target name="clean">

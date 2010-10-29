@@ -52,10 +52,10 @@ maven-sanity-check:
 	fi
 
 debian/$(DEB_JAR_PACKAGE).poms:
-	mh_lspoms --non-interactive -p$(DEB_JAR_PACKAGE)
+	mh_lspoms --non-interactive --offline -p$(DEB_JAR_PACKAGE)
 
 debian/maven.rules:
-	mh_lspoms --non-interactive -p$(DEB_JAR_PACKAGE) --force
+	mh_lspoms --non-interactive --offline -p$(DEB_JAR_PACKAGE) --force
 
 ifeq (, $(DEB_DOC_PACKAGE))
 DEB_PATCHPOMS_ARGS += --build-no-docs
@@ -109,7 +109,7 @@ PLUGIN_ARGS = -Ddebian.dir=$(CURDIR)/debian -Ddebian.package=$(DEB_JAR_PACKAGE) 
 common-install-arch common-install-indep:: common-install-impl
 common-install-impl::
 	$(if $(DEB_MAVEN_INSTALL_TARGET),$(DEB_MAVEN_INVOKE) $(PLUGIN_ARGS) $(DEB_MAVEN_INSTALL_TARGET),@echo "DEB_MAVEN_INSTALL_TARGET unset, skipping default maven.mk common-install target")
-	$(if $(cdbs_use_maven_substvars), mh_resolve_dependencies --non-interactive -p$(DEB_JAR_PACKAGE))
+	$(if $(cdbs_use_maven_substvars), mh_resolve_dependencies --non-interactive --offline -p$(DEB_JAR_PACKAGE))
 
 ifeq (,$(findstring nocheck,$(DEB_BUILD_OPTIONS)))
 common-build-arch common-build-indep:: debian/stamp-maven-check

@@ -15,12 +15,11 @@ package org.debian.maven.packager;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import org.apache.maven.model.License;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -34,6 +33,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.MavenProject;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.debian.maven.repo.ListOfPOMs;
 
 /**
  * Generate the Debian files for packaging the current Maven project.
@@ -142,7 +142,6 @@ public class GenerateDebianFilesMojo
         }
 
         try {
-
             Properties velocityProperties = new Properties();
             velocityProperties.put("resource.loader", "class");
             velocityProperties.put("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
@@ -153,10 +152,112 @@ public class GenerateDebianFilesMojo
             context.put("binPackage", binPackageName);
             context.put("packager", packager);
             context.put("packagerEmail", email);
-            context.put("packagerLicense", packagerLicense);
             context.put("project", project);
             context.put("runTests", Boolean.valueOf(runTests));
             context.put("generateJavadoc", Boolean.valueOf(generateJavadoc));
+
+            if (project.getName() == null || project.getName().isEmpty()) {
+                System.out.println("POM does not contain the project name. Please enter the name of the project:");
+                project.setName(readLine());
+            }
+            if (project.getUrl() == null || project.getUrl().isEmpty()) {
+                System.out.println("\"POM does not contain the project URL. Please enter the URL of the project:");
+                project.setUrl(readLine());
+            }
+
+            Set licenses = new TreeSet();
+            String[] knownLicenses = {"Apache-2.0", "GFDL-1.2", "GFDL-1.3", "GPL-2", "LGPL-2.1", "Artistic", "GPL-3", "LGPL-2", "LGPL-3"};
+            for (Iterator i = project.getLicenses().iterator(); i.hasNext(); ) {
+                License license = (License) i.next();
+                String licenseName = "";
+                if (license.getName() != null) {
+                    licenseName = license.getName() + " ";
+                }
+                String licenseUrl = "";
+                if (license.getUrl() != null) {
+                    licenseUrl = license.getUrl().toLowerCase();
+                }
+                boolean recognized = false;
+                if (licenseName.indexOf("mit ") >= 0 || licenseUrl.indexOf("mit-license") >= 0) {
+                    licenses.add("MIT");
+                    recognized = true;
+                } else if (licenseName.indexOf("bsd ") >= 0 || licenseUrl.indexOf("bsd-license") >= 0) {
+                    licenses.add("BSD");
+                    recognized = true;
+                } else if (licenseName.indexOf("artistic ") >= 0 || licenseUrl.indexOf("artistic-license") >= 0) {
+                    licenses.add("Artistic");
+                    recognized = true;
+                } else if (licenseName.indexOf("apache ") >= 0 || licenseUrl.indexOf("apache") >= 0) {
+                    if (licenseName.indexOf("2.") >= 0 || licenseUrl.indexOf("2.") >= 0) {
+                        licenses.add("Apache-2.0");
+                        recognized = true;
+                    } else if (licenseName.indexOf("1.0") >= 0 || licenseUrl.indexOf("1.0") >= 0) {
+                        licenses.add("Apache-1.0");
+                        recognized = true;
+                    } else if (licenseName.indexOf("1.1") >= 0 || licenseUrl.indexOf("1.1") >= 0) {
+                        licenses.add("Apache-1.1");
+                        recognized = true;
+                    }
+                } else if (licenseName.indexOf("lgpl ") >= 0 || licenseUrl.indexOf("lgpl") >= 0) {
+                    if (licenseName.indexOf("2.1") >= 0 || licenseUrl.indexOf("2.1") >= 0) {
+                        licenses.add("LGPL-2.1");
+                        recognized = true;
+                    } else if (licenseName.indexOf("2") >= 0 || licenseUrl.indexOf("2") >= 0) {
+                        licenses.add("LGPL-2");
+                        recognized = true;
+                    } else if (licenseName.indexOf("3") >= 0 || licenseUrl.indexOf("3") >= 0) {
+                        licenses.add("LGPL-2");
+                        recognized = true;
+                    }
+                } else if (licenseName.indexOf("gpl ") >= 0 || licenseUrl.indexOf("gpl") >= 0) {
+                    if (licenseName.indexOf("2") >= 0 || licenseUrl.indexOf("2") >= 0) {
+                        licenses.add("GPL-2");
+                        recognized = true;
+                    } else if (licenseName.indexOf("3") >= 0 || licenseUrl.indexOf("3") >= 0) {
+                        licenses.add("GPL-3");
+                        recognized = true;
+                    }
+                }
+                if (!recognized) {
+                    System.out.println("License " + licenseName + licenseUrl + " was not recognized, please enter a license name preferably in one of:");
+                    System.out.println("Apache Artistic BSD FreeBSD ISC CC-BY CC-BY-SA CC-BY-ND CC-BY-NC CC-BY-NC-SA CC-BY-NC-ND CC0 CDDL CPL Eiffel");
+                    System.out.println("Expat GPL LGPL GFDL GFDL-NIV LPPL MPL Perl PSF QPL W3C-Software ZLIB Zope");
+                    String s = readLine();
+                    if (s.length() > 0) {
+                        licenses.add(s);
+                    }
+                }
+            }
+            if (licenses.isEmpty()) {
+                System.out.println("License was not found, please enter a license name preferably in one of:");
+                System.out.println("Apache Artistic BSD FreeBSD ISC CC-BY CC-BY-SA CC-BY-ND CC-BY-NC CC-BY-NC-SA CC-BY-NC-ND CC0 CDDL CPL Eiffel");
+                System.out.println("Expat GPL LGPL GFDL GFDL-NIV LPPL MPL Perl PSF QPL W3C-Software ZLIB Zope");
+                String s = readLine();
+                if (s.length() > 0) {
+                    licenses.add(s);
+                }
+            }
+            context.put("licenses", licenses);
+
+            if (licenses.size() == 1) {
+                packagerLicense = (String) licenses.iterator().next();
+            } else {
+                // TODO - ask for the chosen packager license
+            }
+            context.put("packagerLicense", packagerLicense);
+
+            String copyrightOwner = "";
+            if (project.getOrganization() != null) {
+                copyrightOwner = project.getOrganization().getName();
+            }
+            if (copyrightOwner == null || copyrightOwner.isEmpty()) {
+                Iterator devs = project.getDevelopers().iterator();
+                if (devs.hasNext()) {
+                    copyrightOwner = (String) devs.next();
+                }
+            }
+            // TODO - ask for the copyright owner
+            context.put("copyrightOwner", copyrightOwner);
 
             String copyrightYear;
             int currentYear = new GregorianCalendar().get(Calendar.YEAR);
@@ -170,8 +271,27 @@ public class GenerateDebianFilesMojo
             }
             context.put("copyrightYear", copyrightYear);
             context.put("currentYear", new Integer(currentYear));
-            context.put("licenses", new TreeSet());
+
             List description = new ArrayList();
+            if (project.getDescription() == null || project.getDescription().trim().isEmpty()) {
+                System.out.println("Please enter a short description of the project, press Enter twice to stop.");
+                StringBuffer sb = new StringBuffer();
+                int emptyEnterCount = 0;
+                while (emptyEnterCount < 2) {
+                    String s = readLine();
+                    if (s.isEmpty()) {
+                        emptyEnterCount++;
+                    } else {
+                        if (emptyEnterCount > 0) {
+                            emptyEnterCount = 0;
+                            sb.append("\n");
+                        }
+                        sb.append(s);
+                        sb.append("\n");
+                    }
+                }
+                project.setDescription(sb.toString());
+            }
             if (project.getDescription() != null) {
                 StringTokenizer st = new StringTokenizer(project.getDescription().trim(), "\n\t ");
                 StringBuffer descLine = new StringBuffer();
@@ -205,20 +325,36 @@ public class GenerateDebianFilesMojo
                     depends.addAll(split(substvars.getProperty("maven.DocOptionalDepends")));
                 }
                 if ("maven".equals(packageType)) {
+                    boolean seenJavadocPlugin = false;
                     // Remove dependencies that are implied by maven-debian-helper
-                    depends.remove("libmaven-clean-plugin-java");
-                    depends.remove("libmaven-resources-plugin-java");
-                    depends.remove("libmaven-compiler-plugin-java");
-                    depends.remove("libmaven-jar-plugin-java");
-                    depends.remove("libmaven-site-plugin-java");
-                    depends.remove("libsurefire-java");
-                    depends.remove("velocity");
-                    depends.remove("libplexus-velocity-java");
-                    if (generateJavadoc) {
+                    for (Iterator i = depends.iterator(); i.hasNext();) {
+                        String dependency = (String) i.next();
+                        if (dependency.startsWith("libmaven-clean-plugin-java") ||
+                                dependency.startsWith("libmaven-resources-plugin-java") ||
+                                dependency.startsWith("libmaven-compiler-plugin-java") ||
+                                dependency.startsWith("libmaven-jar-plugin-java") ||
+                                dependency.startsWith("libmaven-site-plugin-java") ||
+                                dependency.startsWith("libsurefire-java") ||
+                                dependency.startsWith("velocity") ||
+                                dependency.startsWith("libplexus-velocity-java")) {
+                            i.remove();
+                        } else if (dependency.startsWith("libmaven-javadoc-plugin-java")) {
+                            seenJavadocPlugin = true;
+                        }
+                    }
+                    if (generateJavadoc && !seenJavadocPlugin) {
                         depends.add("libmaven-javadoc-plugin-java");
                     }
                 } else if ("ant".equals(packageType)) {
                     // Remove dependencies that are implied by ant packaging
+                    for (Iterator i = depends.iterator(); i.hasNext(); ) {
+                        String dependency = (String) i.next();
+                        if (dependency.equals("ant") ||
+                                dependency.startsWith("ant ") ||
+                                dependency.startsWith("ant-optional")) {
+                            i.remove();
+                        }
+                    }
                     depends.remove("ant");
                     depends.remove("ant-optional");
                 }
@@ -232,6 +368,7 @@ public class GenerateDebianFilesMojo
                         String library = (String) i.next();
                         buildJars.addAll(listSharedJars(library));
                     }
+                    buildJars.add("ant-junit");
                     context.put("buildJars", buildJars);
                 }
             } else {
@@ -239,17 +376,30 @@ public class GenerateDebianFilesMojo
             }
 
             if ("ant".equals(packageType)) {
-                List pomDirs = new ArrayList();
-                if (collectedProjects.isEmpty()) {
-                    pomDirs.add("");
-                }
+                ListOfPOMs listOfPOMs = new ListOfPOMs(new File(outputDirectory, "debian/" + binPackageName + ".poms"));
                 for (Iterator i = collectedProjects.iterator(); i.hasNext();) {
                     MavenProject mavenProject = (MavenProject) i.next();
                     String basedir = project.getBasedir().getAbsolutePath();
                     String dirRelPath = mavenProject.getBasedir().getAbsolutePath().substring(basedir.length() + 1);
-                    pomDirs.add(dirRelPath);
+                    if (! "pom".equals(mavenProject.getPackaging())) {
+                        String pomFile = dirRelPath + "/pom.xml";
+                        listOfPOMs.getOrCreatePOMOptions(pomFile).setJavaLib(true);
+                        String extension = mavenProject.getPackaging();
+                        if (extension.equals("bundle")) {
+                            extension = "jar";
+                        }
+                        if (extension.equals("webapp")) {
+                            extension = "war";
+                        }
+                        if (mavenProject.getArtifact() != null && mavenProject.getArtifact().getFile() != null) {
+                            extension = mavenProject.getArtifact().getFile().toString();
+                            extension = extension.substring(extension.lastIndexOf('.') + 1);
+                        }
+                        listOfPOMs.getOrCreatePOMOptions(pomFile).setArtifact(dirRelPath + "/" + mavenProject.getArtifactId() + "-*."
+                            + extension);
+                    }
                 }
-                context.put("pomDirs", pomDirs);
+                listOfPOMs.save();
             }
 
             String projectVersion = project.getVersion();
@@ -377,6 +527,16 @@ public class GenerateDebianFilesMojo
         return jars;
     }
 
+    private String readLine() {
+        LineNumberReader consoleReader = new LineNumberReader(new InputStreamReader(System.in));
+        try {
+            return consoleReader.readLine().trim();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
     private List split(String s) {
         List l = new ArrayList();
         StringTokenizer st = new StringTokenizer(s, ",");
@@ -398,3 +558,4 @@ public class GenerateDebianFilesMojo
         int TARBALL = 3;
     }
 }
+

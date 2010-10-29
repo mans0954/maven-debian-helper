@@ -4,56 +4,59 @@ include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/ant.mk
 
 PACKAGE              := $(DEB_SOURCE_PACKAGE)
-VERSION              := $(DEB_UPSTREAM_VERSION)
+VERSION              := $(shell echo ${DEB_UPSTREAM_VERSION} | sed -r 's/([0-9\.]+).*/\1/')
 JAVA_HOME            := /usr/lib/jvm/default-java
 DEB_JARS             := ant-nodeps classworlds maven-core maven-artifact maven-artifact-manager maven-model \
  maven-compat maven-plugin-api maven-project maven-scm-api velocity file-management plexus-utils \
  plexus-container-default-alpha maven-repo-helper
 DEB_ANT_BUILD_TARGET := package #javadoc
 DEB_ANT_BUILDFILE    := debian/build.xml
-DEB_ANT_ARGS         := -Dpackage=$(PACKAGE) -Dbin.package=$(PACKAGE) -Dversion=$(VERSION)
+DEB_ANT_ARGS         := -Dpackage=$(PACKAGE) -Dbin.package=$(PACKAGE)
 API_DOCS             := target/api
 
-debian/tmp:
-	mkdir -p debian/tmp
+debian/.mh:
+	mkdir -p debian/.mh
 
-debian/tmp/bin: debian/tmp
-	cp -R bin debian/tmp/
+debian/.mh/bin: debian/.mh
+	cp -R bin debian/.mh/
 
-debian/tmp/etc: debian/tmp
-	cp -R etc debian/tmp/
+debian/.mh/etc: debian/.mh
+	cp -R etc debian/.mh/
 
-debian/tmp/share: debian/tmp
-	cp -R share debian/tmp/
+debian/.mh/share: debian/.mh
+	cp -R share debian/.mh/
 
-makebuilddir/$(PACKAGE):: debian/tmp/bin debian/tmp/etc debian/tmp/share
+makebuilddir/$(PACKAGE):: debian/.mh/bin debian/.mh/etc debian/.mh/share
 
 # Generation of man pages
 SCRIPTS       := $(wildcard bin/mh_*)
-MAN_PAGES     := $(addprefix debian/tmp/doc/,$(addsuffix .1, $(notdir $(SCRIPTS))))
-debian/tmp/mh_% : bin/mh_%
-	mkdir -p debian/tmp
+MAN_PAGES     := $(addprefix debian/.mh/doc/,$(addsuffix .1, $(notdir $(SCRIPTS))))
+debian/.mh/mh_% : bin/mh_%
+	mkdir -p debian/.mh
 	cp $< $@
 	chmod +x $@
-debian/tmp/doc/mh_%.1 : debian/tmp/mh_% 
-	mkdir -p debian/tmp/doc
+debian/.mh/doc/mh_%.1 : debian/.mh/mh_% 
+	mkdir -p debian/.mh/doc
 	help2man -N -o $@ $<
 man-pages: $(MAN_PAGES)
 build/$(PACKAGE):: man-pages
 
 install/$(PACKAGE)::
-	mh_installpoms -p$(PACKAGE)
-	mh_installjar -p$(PACKAGE) -l maven-debian-helper/pom.xml maven-debian-helper/target/maven-debian-helper-$(VERSION).jar
-	mh_installjar -p$(PACKAGE) -l maven-debian-plugin/pom.xml maven-debian-plugin/target/maven-debian-plugin-$(VERSION).jar
-	mh_installjar -p$(PACKAGE) -l maven-build-nodocs/pom.xml maven-build-nodocs/target/maven-build-nodocs-$(VERSION).jar
-	mh_installjar -p$(PACKAGE) -l maven-packager-utils/pom.xml maven-packager-utils/target/maven-packager-utils-$(VERSION).jar
+	mh_install -p$(PACKAGE)
 	pod2man -c 'Maven for Debian GNU/Linux' \
 	  -r maven-debian-helper-$(DEB_UPSTREAM_VERSION) \
 	  man/mvn-debian.pod > man/mvn-debian.1
 	dh_installman $(MAN_PAGES) man/mvn-debian.1
 
 clean::
-	-rm -rf debian/tmp
 	-$(RM) man/mvn-debian.1
 	mh_unpatchpoms -p$(PACKAGE)
 	mh_clean
+
+# Helper target, to use when updating the version of this package
+update-package-version:
+	perl -p -i -e "s/^    <version>([0-9\.]+<)/    <version>${VERSION}</" pom.xml
+	perl -p -i -e "s/^        <version>([0-9\.]+<)/        <version>${VERSION}</" maven-build-nodocs/pom.xml maven-debian-helper/pom.xml maven-debian-plugin/pom.xml
+	perl -p -i -e "s/maven-debian-helper \(>= ([0-9\.]+\)/maven-debian-helper \(>= ${VERSION})/" share/cdbs/1/class/maven-vars.mk maven-packager-utils/src/main/resources/control.vm
+
+

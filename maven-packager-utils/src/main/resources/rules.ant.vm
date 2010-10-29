@@ -15,30 +15,26 @@ ${space}\
 #end
 #end
 
-PACKAGE              := $(DEB_SOURCE_PACKAGE)
-VERSION              := $(DEB_UPSTREAM_VERSION)
 JAVA_HOME            := /usr/lib/jvm/default-java
 DEB_JARS             := ant-nodeps #if (!$buildJars.isEmpty()) #printJars($buildJars)#end $space
 DEB_ANT_BUILDFILE    := /usr/share/maven-ant-helper/maven-build.xml
-DEB_ANT_ARGS         := -Dbasedir=$(realpath .) -Dpackage=$(PACKAGE) -Dversion=$(VERSION)
+DEB_ANT_ARGS         := -Dbasedir=$(realpath .) -Dpackage=$(PACKAGE)
 #if ($generateJavadoc)
+DEB_ANT_BUILD_TARGET := package javadoc
 API_DOCS             := target/docs/api
 #end
 
 get-orig-source:
 	uscan --download-version $(DEB_UPSTREAM_VERSION) --force-download --rename
 
-binary-post-install/lib$(PACKAGE)-java::
-	mh_installpoms -plib$(PACKAGE)-java
-#foreach ( $dir in $pomDirs )
-#if ($dir != '') #set ($dir = '$dir/') #end
-	mh_installjar -plib$(PACKAGE)-java -l ${dir}pom.xml ${dir}target/$(PACKAGE)-$(VERSION).jar
-#end
+binary-post-install/$binPackage::
+	mh_install -p$binPackage
 
 #if ($generateJavadoc)
-binary-post-install/lib$(PACKAGE)-java-doc::
-	dh_install -plib$(PACKAGE)-java-doc $(API_DOCS) usr/share/doc/lib$(PACKAGE)-java
+binary-post-install/$binPackage-doc::
+	dh_install -p$binPackage-doc $(API_DOCS) usr/share/doc/$binPackage
 
 #end
 clean::
-	-rm -rf debian/tmp
+	-mh_clean
+

@@ -18,10 +18,10 @@ Section: java
 Priority: optional
 Maintainer: Debian Java Maintainers <pkg-java-maintainers@lists.alioth.debian.org>
 Uploaders: ${packager} <${packagerEmail}>
-Build-Depends: debhelper (>= 7), cdbs, default-jdk, ant-optional, maven-ant-helper (>> 4)
+Build-Depends: debhelper (>= 7), cdbs, default-jdk, ant-optional, maven-ant-helper (>> 6.7)
 Build-Depends-Indep: maven-repo-helper,
 #printDependencies($compileDependencies)$space
-Standards-Version: 3.9.0
+Standards-Version: 3.9.1
 Vcs-Svn: svn://svn.debian.org/svn/pkg-java/trunk/${package}
 Vcs-Browser: http://svn.debian.org/wsvn/pkg-java/trunk/${package}
 Homepage:#if(${project.Url}) ${project.Url} #else TODO #end
@@ -47,7 +47,6 @@ Description: ${project.Name}
 #end
 #end
 
-
 #if ($generateJavadoc)
 Package: ${binPackage}-doc
 Architecture: all
@@ -66,7 +65,6 @@ Description: Documentation for ${project.Name}
 #end
 #end
 #end
-
  .
  This package provides the API documentation for ${binPackage}.
 #end

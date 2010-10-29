@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.codehaus.plexus</groupId>
+	<artifactId>plexus-container-default</artifactId>
+	<version>1.0-alpha</version>
+	<packaging>jar</packaging>
+	<properties>
+		<debian.originalVersion>1.0-alpha-9-stable-1</debian.originalVersion>
+		<debian.package>libplexus-container-default-java</debian.package>
+		<debian.mavenRules><![CDATA[org.codehaus.plexus plexus-container-default jar s/1\.0-alpha.*/1.0-alpha/ *]]></debian.mavenRules>
+	</properties>
+	
+	<name>Default Plexus Container</name>
+	<dependencies>
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-utils</artifactId>
+			<version>debian</version>
+		</dependency>
+		<dependency>
+			<groupId>classworlds</groupId>
+			<artifactId>classworlds</artifactId>
+			<version>debian</version>
+		</dependency>
+	</dependencies>
+</project>

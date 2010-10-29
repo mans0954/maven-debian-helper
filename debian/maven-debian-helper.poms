@@ -1,5 +1,5 @@
-pom.xml --no-parent
-maven-debian-helper/pom.xml
-maven-debian-plugin/pom.xml
-maven-build-nodocs/pom.xml
-maven-packager-utils/pom.xml
+pom.xml --no-parent --has-package-version
+maven-debian-helper/pom.xml --has-package-version --artifact=maven-debian-helper/target/maven-debian-helper-*.jar --java-lib
+maven-debian-plugin/pom.xml --has-package-version --artifact=maven-debian-plugin/target/maven-debian-plugin-*.jar --java-lib
+maven-build-nodocs/pom.xml --has-package-version --artifact=maven-build-nodocs/target/maven-build-nodocs-*.jar --java-lib
+maven-packager-utils/pom.xml --has-package-version --artifact=maven-packager-utils/target/maven-packager-utils-*.jar --java-lib
