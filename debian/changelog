@@ -1,4 +1,4 @@
-maven-debian-helper (1.3) UNRELEASED; urgency=low
+maven-debian-helper (1.3) experimental; urgency=low
 
   * ${maven:Depends} and similar substitution vars: add
     version constraints when possible

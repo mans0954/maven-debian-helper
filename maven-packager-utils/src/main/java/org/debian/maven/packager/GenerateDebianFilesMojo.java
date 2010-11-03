@@ -15,6 +15,7 @@ package org.debian.maven.packager;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import org.apache.maven.model.Developer;
 import org.apache.maven.model.License;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -161,12 +162,11 @@ public class GenerateDebianFilesMojo
                 project.setName(readLine());
             }
             if (project.getUrl() == null || project.getUrl().isEmpty()) {
-                System.out.println("\"POM does not contain the project URL. Please enter the URL of the project:");
+                System.out.println("POM does not contain the project URL. Please enter the URL of the project:");
                 project.setUrl(readLine());
             }
 
             Set licenses = new TreeSet();
-            String[] knownLicenses = {"Apache-2.0", "GFDL-1.2", "GFDL-1.3", "GPL-2", "LGPL-2.1", "Artistic", "GPL-3", "LGPL-2", "LGPL-3"};
             for (Iterator i = project.getLicenses().iterator(); i.hasNext(); ) {
                 License license = (License) i.next();
                 String licenseName = "";
@@ -241,23 +241,45 @@ public class GenerateDebianFilesMojo
 
             if (licenses.size() == 1) {
                 packagerLicense = (String) licenses.iterator().next();
-            } else {
-                // TODO - ask for the chosen packager license
+            }
+            if (packagerLicense == null) {
+                System.out.println("Packager license for the debian/ filse was not found, please enter a license name preferably in one of:");
+                System.out.println("Apache Artistic BSD FreeBSD ISC CC-BY CC-BY-SA CC-BY-ND CC-BY-NC CC-BY-NC-SA CC-BY-NC-ND CC0 CDDL CPL Eiffel");
+                System.out.println("Expat GPL LGPL GFDL GFDL-NIV LPPL MPL Perl PSF QPL W3C-Software ZLIB Zope");
+                String s = readLine();
+                if (s.length() > 0) {
+                    packagerLicense = s;
+                }
             }
             context.put("packagerLicense", packagerLicense);
 
             String copyrightOwner = "";
+            String projectTeam = "";
             if (project.getOrganization() != null) {
                 copyrightOwner = project.getOrganization().getName();
+                projectTeam = project.getOrganization().getName() + " developers";
             }
             if (copyrightOwner == null || copyrightOwner.isEmpty()) {
                 Iterator devs = project.getDevelopers().iterator();
                 if (devs.hasNext()) {
-                    copyrightOwner = (String) devs.next();
+                    Developer dev = (Developer) devs.next();
+                    copyrightOwner = dev.getName();
+                    if (dev.getEmail() != null && !dev.getEmail().isEmpty()) {
+                        copyrightOwner += " <" + dev.getEmail() + ">";
+                    }
                 }
             }
-            // TODO - ask for the copyright owner
+            if (copyrightOwner == null || copyrightOwner.isEmpty()) {
+                System.out.println("Could not find who owns the copyright for the upstream sources, please enter his name:");
+                copyrightOwner = readLine();
+            }
             context.put("copyrightOwner", copyrightOwner);
+
+            if (projectTeam == null || projectTeam.isEmpty()) {
+                projectTeam = project.getName() + " developers";
+            }
+            context.put("copyrightOwner", copyrightOwner);
+            context.put("projectTeam", projectTeam);
 
             String copyrightYear;
             int currentYear = new GregorianCalendar().get(Calendar.YEAR);
@@ -376,7 +398,7 @@ public class GenerateDebianFilesMojo
             }
 
             if ("ant".equals(packageType)) {
-                ListOfPOMs listOfPOMs = new ListOfPOMs(new File(outputDirectory, "debian/" + binPackageName + ".poms"));
+                ListOfPOMs listOfPOMs = new ListOfPOMs(new File(outputDirectory, binPackageName + ".poms"));
                 for (Iterator i = collectedProjects.iterator(); i.hasNext();) {
                     MavenProject mavenProject = (MavenProject) i.next();
                     String basedir = project.getBasedir().getAbsolutePath();
@@ -511,6 +533,9 @@ public class GenerateDebianFilesMojo
 
     private List listSharedJars(String library) {
         final List jars = new ArrayList();
+        if (library.indexOf("(") > 0) {
+            library = library.substring(0, library.indexOf("(")).trim();
+        }
         DependenciesSolver.executeProcess(new String[]{"/usr/bin/dpkg", "--listfiles", library},
                 new DependenciesSolver.OutputHandler() {
 

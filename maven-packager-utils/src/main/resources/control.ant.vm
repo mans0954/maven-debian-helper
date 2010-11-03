@@ -19,7 +19,7 @@ Priority: optional
 Maintainer: Debian Java Maintainers <pkg-java-maintainers@lists.alioth.debian.org>
 Uploaders: ${packager} <${packagerEmail}>
 Build-Depends: debhelper (>= 7), cdbs, default-jdk, ant-optional, maven-ant-helper (>> 6.7)
-Build-Depends-Indep: maven-repo-helper,
+Build-Depends-Indep: maven-repo-helper (>= 1.4),
 #printDependencies($compileDependencies)$space
 Standards-Version: 3.9.1
 Vcs-Svn: svn://svn.debian.org/svn/pkg-java/trunk/${package}

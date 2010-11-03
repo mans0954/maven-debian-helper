@@ -68,6 +68,7 @@ RUN_TESTS=$(getarg t run-tests)
 GEN_JAVADOC=$(getarg d javadoc)
 ANT=$(getarg a ant)
 FROM_SVN=$(getarg s from-svn)
+VERBOSE=$(getarg v verbose)
 
 if [ "$FROM_SVN" == "true" ]; then
 	echo "The syntax for the --for-svn option is --from-svn=<url>, please try again"
@@ -124,6 +125,7 @@ if [ -z "$GEN_JAVADOC" ]; then
 fi
 
 if [ -n "$FROM_SVN" ]; then
+	echo
 	SVN_OPTIONS=
 	if [[ "$FROM_SVN" =~ https://.*\.dev\.java\.net/.* ]]; then
 		echo "Press enter if a password is asked"
@@ -137,7 +139,24 @@ if [ -e pom.xml.save ]; then
 	mh_unpatchpoms -p$BIN_PACKAGE
 fi
 
-java -cp /usr/share/java/maven-project.jar:/usr/share/java/maven-repo-helper.jar:/usr/share/java/maven-packager-utils.jar:/usr/share/maven2/lib/maven-debian-uber.jar org.debian.maven.packager.DependenciesSolver --package="$BIN_PACKAGE" ${ANT:+--ant} ${GEN_JAVADOC:+--generate-javadoc} ${RUN_TESTS:+--run-tests} --maven-repo=/usr/share/maven-repo
+echo
+echo "Checking that apt-file is installed and has been configured..."
+if [ -f /usr/bin/apt-file ]; then
+    apt-file search /usr/bin/mvnDebug | grep maven > /dev/null
+    if [ $? != 0 ]; then
+        echo "Warning: apt-file doesn't seem to be configured"
+        echo "Running sudo apt-file update"
+        sudo apt-file update
+    fi
+else
+    echo "Warning: apt-file doesn't seem to be installed"
+    echo "Installing apt-file using sudo apt-get install apt-file"
+    sudo apt-get install apt-file
+    sudo apt-file update
+fi
+
+echo
+java -cp /usr/share/java/maven-project.jar:/usr/share/java/maven-repo-helper.jar:/usr/share/java/maven-packager-utils.jar:/usr/share/maven2/lib/maven-debian-uber.jar org.debian.maven.packager.DependenciesSolver --package="$BIN_PACKAGE" ${ANT:+--ant} ${GEN_JAVADOC:+--generate-javadoc} ${RUN_TESTS:+--run-tests} ${VERBOSE:+--verbose} --maven-repo=/usr/share/maven-repo
 
 if [ $? != 0 ]; then
     exit 1
@@ -145,7 +164,7 @@ fi
 
 eval $(cat debian/$BIN_PACKAGE.substvars | sed -e 's/maven\./maven_/' | grep maven_UpstreamPackageVersion)
 
-mh_patchpoms -p$BIN_PACKAGE -rdebian/maven.rules -idebian/maven.ignoreRules --keep-pom-version
+mh_patchpoms ${VERBOSE:+--verbose} -p$BIN_PACKAGE -rdebian/maven.rules -idebian/maven.ignoreRules --keep-pom-version
 
 mvn org.debian.maven:maven-packager-utils:$MH_VERSION:generate -Demail="$DEBEMAIL" -Dpackager="$DEBFULLNAME" -DpackagerLicense="$DEBLICENSE" -Dpackage="$PACKAGE" -Dbin.package="$BIN_PACKAGE" -DrunTests="$RUN_TESTS" -DgenerateJavadoc="$GEN_JAVADOC" -Dmaven.repo.local=/usr/share/maven-repo ${ANT:+-DpackageType=ant} ${FROM_SVN:+-DdownloadUrl=scm:svn:$FROM_SVN} --offline
 
