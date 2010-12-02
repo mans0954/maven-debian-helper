@@ -1,5 +1,8 @@
 build.directory=target
+#if($generateJavadoc)
 javadoc.dir=target/apidocs
+javadoc.generate=true
+#end
 #if(!$runTests)
 maven.test.skip=true
 #end

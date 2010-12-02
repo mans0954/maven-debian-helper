@@ -110,7 +110,7 @@ if [ -z "$RUN_TESTS" ]; then
     read -p "[y]/n > " RUN
     RUN_TESTS="true"
     if [ "$RUN" == "n" ]; then
-        RUN_TESTS="false"
+        RUN_TESTS=
     fi
 fi
 
@@ -120,12 +120,41 @@ if [ -z "$GEN_JAVADOC" ]; then
     read -p "[y]/n > " GEN
     GEN_JAVADOC="true"
     if [ "$GEN" == "n" ]; then
-        GEN_JAVADOC="false"
+        GEN_JAVADOC=
     fi
+fi
+
+echo
+echo "Checking that apt-file is installed and has been configured..."
+if [ -f /usr/bin/apt-file ]; then
+    apt-file search /usr/bin/mvnDebug | grep maven > /dev/null
+    if [ $? != 0 ]; then
+        echo "Warning: apt-file doesn't seem to be configured"
+        echo "Running sudo apt-file update"
+        sudo apt-file update
+    else
+        echo '[ok]'
+    fi
+else
+    echo "Warning: apt-file doesn't seem to be installed"
+    echo "Installing apt-file using sudo apt-get install apt-file"
+    sudo apt-get install apt-file
+    sudo apt-file update
+fi
+
+echo
+echo "Checking that licensecheck is installed..."
+if [ ! -f /usr/bin/licensecheck ]; then
+    echo "Warning: licensecheck doesn't seem to be installed"
+    echo "Installing licensecheck using sudo apt-get install devscripts"
+    sudo apt-get install devscripts
+else
+    echo '[ok]'
 fi
 
 if [ -n "$FROM_SVN" ]; then
 	echo
+	echo "Downloading the upstream sources..."
 	SVN_OPTIONS=
 	if [[ "$FROM_SVN" =~ https://.*\.dev\.java\.net/.* ]]; then
 		echo "Press enter if a password is asked"
@@ -139,26 +168,26 @@ if [ -e pom.xml.save ]; then
 	mh_unpatchpoms -p$BIN_PACKAGE
 fi
 
-echo
-echo "Checking that apt-file is installed and has been configured..."
-if [ -f /usr/bin/apt-file ]; then
-    apt-file search /usr/bin/mvnDebug | grep maven > /dev/null
-    if [ $? != 0 ]; then
-        echo "Warning: apt-file doesn't seem to be configured"
-        echo "Running sudo apt-file update"
-        sudo apt-file update
-    fi
-else
-    echo "Warning: apt-file doesn't seem to be installed"
-    echo "Installing apt-file using sudo apt-get install apt-file"
-    sudo apt-get install apt-file
-    sudo apt-file update
+# Restore state after a brutal stop
+if [ -f debian/$BIN_PACKAGE.poms ]; then
+    mh_unpatchpoms -p$BIN_PACKAGE
+fi
+if [ -f debian/patches/series ]; then
+    quilt pop -a
+fi
+
+# Apply existing quilt patchs as source 3(quilt) is used in the package
+if [ -f debian/patches/series ]; then
+    quilt push -a
 fi
 
 echo
-java -cp /usr/share/java/maven-project.jar:/usr/share/java/maven-repo-helper.jar:/usr/share/java/maven-packager-utils.jar:/usr/share/maven2/lib/maven-debian-uber.jar org.debian.maven.packager.DependenciesSolver --package="$BIN_PACKAGE" ${ANT:+--ant} ${GEN_JAVADOC:+--generate-javadoc} ${RUN_TESTS:+--run-tests} ${VERBOSE:+--verbose} --maven-repo=/usr/share/maven-repo
+java -cp /usr/share/java/maven-project.jar:/usr/share/java/maven-repo-helper.jar:/usr/share/java/maven-packager-utils.jar:/usr/share/maven2/lib/maven-debian-uber.jar org.debian.maven.packager.DependenciesSolver --verbose --package="$BIN_PACKAGE" ${ANT:+--ant} ${GEN_JAVADOC:+--generate-javadoc} ${RUN_TESTS:+--run-tests} ${VERBOSE:+--verbose} --maven-repo=/usr/share/maven-repo
 
 if [ $? != 0 ]; then
+    if [ -f debian/patches/series ]; then
+        quilt pop -a
+    fi
     exit 1
 fi
 
@@ -169,6 +198,12 @@ mh_patchpoms ${VERBOSE:+--verbose} -p$BIN_PACKAGE -rdebian/maven.rules -idebian/
 mvn org.debian.maven:maven-packager-utils:$MH_VERSION:generate -Demail="$DEBEMAIL" -Dpackager="$DEBFULLNAME" -DpackagerLicense="$DEBLICENSE" -Dpackage="$PACKAGE" -Dbin.package="$BIN_PACKAGE" -DrunTests="$RUN_TESTS" -DgenerateJavadoc="$GEN_JAVADOC" -Dmaven.repo.local=/usr/share/maven-repo ${ANT:+-DpackageType=ant} ${FROM_SVN:+-DdownloadUrl=scm:svn:$FROM_SVN} --offline
 
 if [ $? != 0 ]; then
+    if [ -f debian/$BIN_PACKAGE.poms ]; then
+        mh_unpatchpoms -p$BIN_PACKAGE
+    fi
+    if [ -f debian/patches/series ]; then
+        quilt pop -a
+    fi
     exit 1
 fi
 
@@ -177,5 +212,12 @@ if [ ! -f debian/changelog ]; then
     dch --create --newversion=${debianVersion}-1 --package=$PACKAGE "Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>"
 fi
 
-mh_unpatchpoms -p$BIN_PACKAGE
+if [ -f debian/$BIN_PACKAGE.poms ]; then
+    mh_unpatchpoms -p$BIN_PACKAGE
+fi
+if [ -f debian/patches/series ]; then
+    quilt pop -a
+fi
+
 rm -f debian/*.substvars
+rm -f .debianVersion

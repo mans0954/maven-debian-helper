@@ -1,9 +1,20 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.debian.maven.packager;
+
+/*
+ * Copyright 2009 Ludovic Claude.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import java.io.File;
 import java.io.FileReader;
@@ -26,10 +37,6 @@ import org.debian.maven.repo.DependencyRule;
 import org.debian.maven.repo.ListOfPOMs;
 import org.debian.maven.repo.Repository;
 
-/**
- *
- * @author ludo
- */
 public class DependenciesSolverTest extends TestCase {
 
     private File testDir = new File("tmp");
@@ -180,7 +187,7 @@ public class DependenciesSolverTest extends TestCase {
     }
 
     public void testSolveOpenMRSApiDependencies() throws Exception {
-        useFile("openmrs/pom.xml", pomFile);
+        useFile("openmrs/api/pom.xml", pomFile);
         DependenciesSolver solver = new DependenciesSolver();
         solver.setMavenRepo(getFileInClasspath("repository/root.dir").getParentFile());
         solver.setOutputDirectory(testDir);
@@ -202,15 +209,15 @@ public class DependenciesSolverTest extends TestCase {
         assertTrue("Did not expect any issues", solver.getIssues().isEmpty());
 
         solver.setBaseDir(testDir);
-        solver.setListOfPoms(new File(testDir, "openmrs.poms"));
+        solver.setListOfPoms(new File(testDir, "openmrs-api.poms"));
 
         solver.saveListOfPoms();
         solver.saveMavenRules();
         solver.saveSubstvars();
 
-        assertFileEquals("openmrs.poms", "openmrs.poms");
-        assertFileEquals("openmrs.substvars", "openmrs.substvars");
-        assertFileEquals("openmrs.rules", "maven.rules");
+        assertFileEquals("openmrs-api.poms", "openmrs-api.poms");
+        assertFileEquals("openmrs-api.substvars", "openmrs.substvars");
+        assertFileEquals("openmrs-api.rules", "maven.rules");
     }
 
     protected void assertFileEquals(String resource, String fileName) throws Exception {

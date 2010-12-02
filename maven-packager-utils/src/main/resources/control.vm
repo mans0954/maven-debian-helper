@@ -19,7 +19,9 @@ Priority: optional
 Maintainer: Debian Java Maintainers <pkg-java-maintainers@lists.alioth.debian.org>
 Uploaders: ${packager} <${packagerEmail}>
 Build-Depends: debhelper (>= 7), cdbs, default-jdk, maven-debian-helper (>= 1.3)
+#if(!$compileDependencies.isEmpty())
 Build-Depends-Indep:#printDependencies($compileDependencies)$space
+#end
 Standards-Version: 3.9.1
 Vcs-Svn: svn://svn.debian.org/svn/pkg-java/trunk/${package}
 Vcs-Browser: http://svn.debian.org/wsvn/pkg-java/trunk/${package}
@@ -31,6 +33,9 @@ Architecture: all
 ## libraries should not depend on runtime - default-jre-headless | java2-runtime-headless,
 Depends: ${dollar}{misc:Depends}, ${dollar}{maven:Depends}
 Recommends: ${dollar}{maven:OptionalDepends}
+#if ($generateJavadoc)
+Suggests: ${binPackage}-doc
+#end
 Description: ${project.Name}
 #if ($description.isEmpty()) TODO - fill the description
 #else

@@ -15,6 +15,7 @@ package org.debian.maven.packager;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 

@@ -2,23 +2,28 @@
 Format-Specification: http://dep.debian.net/deps/dep5/
 Name: ${project.Name}
 #set ($maintainerHeader = "Maintainer: ")
-#foreach ($developer in $project.Developers)
-${maintainerHeader} ${developer.Name} #if (${developer.Email})<${developer.Email}> as developer
-#set ($maintainerHeader = "           ")
-#else $space
+#macro(printRoles $roles $defaultRole)
+#if ($roles.isEmpty())${defaultRole}
+#else
+#foreach ($role in $roles)
+${role}#if($velocityHasNext), #end
 #end
+#end
+#end
+#foreach ($developer in $project.Developers)
+${maintainerHeader} ${developer.Name}#if (${developer.Email}) <${developer.Email}>#end as #printRoles($developer.Roles, "Developer")$space
+#set ($maintainerHeader = "            ")
 #end
 #foreach ($contributor in $project.Contributors)
-${maintainerHeader} ${contributor.Name} #if (${contributor.Email})<${contributor.Email}> as contributor
-#set ($maintainerHeader = "           ")
-#else $space
-#end
+${maintainerHeader} ${contributor.Name}#if (${contributor.Email}) <${contributor.Email}>#end as #printRoles($developer.Roles, "Contributor")$space
+#set ($maintainerHeader = "            ")
 #end
 Source: ${project.Url}
 
 Files: *
 Copyright: ${copyrightYear}, ${copyrightOwner}
 License: #foreach($license in $licenses)${license}#if($velocityHasNext) or #end#end
+
 
 Files: debian/*
 Copyright: ${currentYear}, ${packager} <${packagerEmail}>
@@ -27,11 +32,12 @@ License: ${packagerLicense}
 
 #foreach ($license in $licenses)
 License: $license
+#set ($knownLicenses = ["Apache-2.0", "BSD", "GFDL-1.2", "GPL-2", "LGPL-2.1", "Artistic", "GPL-3", "LGPL-2", "LGPL-3"])
 #if ($knownLicenses.contains($license))
   On Debian GNU/Linux system you can find the complete text of the
   $license license in '/usr/share/common-licenses/$license'
 #else
-  TODO: include the full license text here
+  TODO: include the full text of the license here
 #end
 
 #end

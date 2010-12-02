@@ -1,40 +1,33 @@
 #!/usr/bin/make -f
 
-include /usr/share/cdbs/1/rules/debhelper.mk
-include /usr/share/cdbs/1/class/ant.mk
-#set ($space=' ')
-#macro(printJars $jars)
-#set ($lineLength=0)
-#foreach ($jar in $jars)
-#if($lineLength==0)${space}#end${jar}#if($velocityHasNext)${space}#end
-#set ($lineLength = $lineLength + $jar.length() + 2)
-#if ($lineLength > 70)
-${space}\
-#set ($lineLength=0)
-#end
-#end
-#end
+DEB_SOURCE_PACKAGE   := $(shell dpkg-parsechangelog | grep '^Source:' | cut -f 2 -d ' ')
+DEB_UPSTREAM_VERSION := $(shell dpkg-parsechangelog | egrep '^Version:' | cut -f 2 -d ' ' | cut -d: -f2- | sed 's/-[^-]*$$//')
 
-JAVA_HOME            := /usr/lib/jvm/default-java
-DEB_JARS             := ant-nodeps #if (!$buildJars.isEmpty()) #printJars($buildJars)#end $space
-DEB_ANT_BUILDFILE    := /usr/share/maven-ant-helper/maven-build.xml
-DEB_ANT_ARGS         := -Dbasedir=$(realpath .) -Dpackage=$(PACKAGE)
+#if ($project.packaging != "pom" || $project.modules.size() > 0)
+export JAVA_HOME=/usr/lib/jvm/default-java
+export CLASSPATH=$(shell for jar in `cat debian/build-classpath`; do if [ -f "$$jar" ]; then echo -n "$${jar}:"; fi; done)
+#if ($project.packaging == "pom" && $project.modules.size() > 0)
+export ANT_ARGS=-Dbasedir=$(realpath .) -Dpackage=$(DEB_SOURCE_PACKAGE) -f debian/build.xml
+#else
+export ANT_ARGS=-Dbasedir=$(realpath .) -Dpackage=$(DEB_SOURCE_PACKAGE) -f /usr/share/maven-ant-helper/maven-build.xml
+#end
 #if ($generateJavadoc)
 DEB_ANT_BUILD_TARGET := package javadoc
 API_DOCS             := target/docs/api
 #end
 
-get-orig-source:
-	uscan --download-version $(DEB_UPSTREAM_VERSION) --force-download --rename
-
-binary-post-install/$binPackage::
-	mh_install -p$binPackage
+#end
+%:
+#if ($project.packaging == "pom" && $project.modules.size() == 0)
+	dh $@ --with maven_repo_helper
+#else
+	dh $@ --buildsystem=ant --with maven_repo_helper
+#end
 
 #if ($generateJavadoc)
 binary-post-install/$binPackage-doc::
 	dh_install -p$binPackage-doc $(API_DOCS) usr/share/doc/$binPackage
 
 #end
-clean::
-	-mh_clean
-
+get-orig-source:
+	uscan --download-version $(DEB_UPSTREAM_VERSION) --force-download --rename

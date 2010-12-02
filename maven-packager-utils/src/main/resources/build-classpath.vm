@@ -1,0 +1,4 @@
+/usr/share/java/ant-nodeps.jar
+#foreach ($jar in $buildjars)
+/usr/share/java/${jar}.jar
+#end

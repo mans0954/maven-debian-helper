@@ -1,0 +1,6 @@
+#List of dependencies for openmrs, generated for use by debian/control
+#Sun Oct 24 23:51:45 CEST 2010
+maven.CompileDepends=libmaven-javadoc-plugin-java
+maven.Depends=junit4
+maven.OptionalDepends=
+maven.TestDepends=

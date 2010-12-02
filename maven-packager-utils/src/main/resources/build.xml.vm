@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+
+<project name="pkg-java" default="build-all" basedir="..">
+
+    <property file="debian/build.properties"/>
+    <property name="maven.build" value="/usr/share/maven-ant-helper/maven-build.xml"/>
+    <property file="/usr/share/maven-ant-helper/maven-defaults.properties"/>
+
+    <macrodef name="clean-module">
+        <attribute name="dir"/>
+        <sequential>
+          <ant target="clean" antfile="${maven.build}" dir="@{dir}">
+            <property name="debian.dir" location="debian" />
+            <property name="project.dir" value="@{dir}" />
+          </ant>
+        </sequential>
+    </macrodef>
+
+#if ($containsJars)
+    <macrodef name="package-module">
+        <attribute name="dir"/>
+        <sequential>
+          <ant target="package-and-local-install" antfile="${maven.build}" dir="@{dir}">
+            <property name="debian.dir" location="debian" />
+            <property name="project.dir" value="@{dir}" />
+            <property name="keep-cleaned-pom" value="true" />
+          </ant>
+        </sequential>
+    </macrodef>
+
+#end
+#if ($containsPlugins)
+    <macrodef name="package-plugin-module">
+        <attribute name="dir"/>
+        <sequential>
+          <ant target="package-and-local-install" antfile="${maven.build}" dir="@{dir}">
+            <property name="debian.dir" location="debian" />
+            <property name="project.dir" value="@{dir}" />
+            <property name="maven.generate.target" value="plugin:descriptor" />
+            <property name="keep-cleaned-pom" value="true" />
+            <property name="use-local-repo" value="true" />
+          </ant>
+        </sequential>
+    </macrodef>
+
+#end
+    <target name="clean">
+        <clean-module dir=""/>
+#foreach ($module in $collectedProjects)
+        <clean-module dir="${module.artifactId}"/>
+#end
+    </target>
+
+    <target name="package">
+        <package-module dir=""/>
+#foreach ($module in $collectedProjects)
+#if ($module.packaging == "maven-plugin")
+    <package-plugin-module dir="${module.artifactId}"/>
+#else
+        <package-module dir="${module.artifactId}"/>
+#end
+#end
+    </target>
+
+#if ($generateJavadoc)
+    <target name="javadoc">
+        <javadoc destdir="${javadoc.dir}">
+#foreach ($module in $collectedProjects)
+            <packageset dir="${module.artifactId}/src/main/java/"/>
+#end
+        </javadoc>
+    </target>
+
+    <target name="build-all" depends="package, javadoc" />
+#else
+    <target name="build-all" depends="package" />
+#end
+
+</project>

@@ -15,6 +15,7 @@ package org.debian.maven.packager;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.License;
 import org.apache.maven.plugin.AbstractMojo;
@@ -154,6 +155,7 @@ public class GenerateDebianFilesMojo
             context.put("packager", packager);
             context.put("packagerEmail", email);
             context.put("project", project);
+            context.put("collectedProjects", collectedProjects);
             context.put("runTests", Boolean.valueOf(runTests));
             context.put("generateJavadoc", Boolean.valueOf(generateJavadoc));
 
@@ -166,77 +168,7 @@ public class GenerateDebianFilesMojo
                 project.setUrl(readLine());
             }
 
-            Set licenses = new TreeSet();
-            for (Iterator i = project.getLicenses().iterator(); i.hasNext(); ) {
-                License license = (License) i.next();
-                String licenseName = "";
-                if (license.getName() != null) {
-                    licenseName = license.getName() + " ";
-                }
-                String licenseUrl = "";
-                if (license.getUrl() != null) {
-                    licenseUrl = license.getUrl().toLowerCase();
-                }
-                boolean recognized = false;
-                if (licenseName.indexOf("mit ") >= 0 || licenseUrl.indexOf("mit-license") >= 0) {
-                    licenses.add("MIT");
-                    recognized = true;
-                } else if (licenseName.indexOf("bsd ") >= 0 || licenseUrl.indexOf("bsd-license") >= 0) {
-                    licenses.add("BSD");
-                    recognized = true;
-                } else if (licenseName.indexOf("artistic ") >= 0 || licenseUrl.indexOf("artistic-license") >= 0) {
-                    licenses.add("Artistic");
-                    recognized = true;
-                } else if (licenseName.indexOf("apache ") >= 0 || licenseUrl.indexOf("apache") >= 0) {
-                    if (licenseName.indexOf("2.") >= 0 || licenseUrl.indexOf("2.") >= 0) {
-                        licenses.add("Apache-2.0");
-                        recognized = true;
-                    } else if (licenseName.indexOf("1.0") >= 0 || licenseUrl.indexOf("1.0") >= 0) {
-                        licenses.add("Apache-1.0");
-                        recognized = true;
-                    } else if (licenseName.indexOf("1.1") >= 0 || licenseUrl.indexOf("1.1") >= 0) {
-                        licenses.add("Apache-1.1");
-                        recognized = true;
-                    }
-                } else if (licenseName.indexOf("lgpl ") >= 0 || licenseUrl.indexOf("lgpl") >= 0) {
-                    if (licenseName.indexOf("2.1") >= 0 || licenseUrl.indexOf("2.1") >= 0) {
-                        licenses.add("LGPL-2.1");
-                        recognized = true;
-                    } else if (licenseName.indexOf("2") >= 0 || licenseUrl.indexOf("2") >= 0) {
-                        licenses.add("LGPL-2");
-                        recognized = true;
-                    } else if (licenseName.indexOf("3") >= 0 || licenseUrl.indexOf("3") >= 0) {
-                        licenses.add("LGPL-2");
-                        recognized = true;
-                    }
-                } else if (licenseName.indexOf("gpl ") >= 0 || licenseUrl.indexOf("gpl") >= 0) {
-                    if (licenseName.indexOf("2") >= 0 || licenseUrl.indexOf("2") >= 0) {
-                        licenses.add("GPL-2");
-                        recognized = true;
-                    } else if (licenseName.indexOf("3") >= 0 || licenseUrl.indexOf("3") >= 0) {
-                        licenses.add("GPL-3");
-                        recognized = true;
-                    }
-                }
-                if (!recognized) {
-                    System.out.println("License " + licenseName + licenseUrl + " was not recognized, please enter a license name preferably in one of:");
-                    System.out.println("Apache Artistic BSD FreeBSD ISC CC-BY CC-BY-SA CC-BY-ND CC-BY-NC CC-BY-NC-SA CC-BY-NC-ND CC0 CDDL CPL Eiffel");
-                    System.out.println("Expat GPL LGPL GFDL GFDL-NIV LPPL MPL Perl PSF QPL W3C-Software ZLIB Zope");
-                    String s = readLine();
-                    if (s.length() > 0) {
-                        licenses.add(s);
-                    }
-                }
-            }
-            if (licenses.isEmpty()) {
-                System.out.println("License was not found, please enter a license name preferably in one of:");
-                System.out.println("Apache Artistic BSD FreeBSD ISC CC-BY CC-BY-SA CC-BY-ND CC-BY-NC CC-BY-NC-SA CC-BY-NC-ND CC0 CDDL CPL Eiffel");
-                System.out.println("Expat GPL LGPL GFDL GFDL-NIV LPPL MPL Perl PSF QPL W3C-Software ZLIB Zope");
-                String s = readLine();
-                if (s.length() > 0) {
-                    licenses.add(s);
-                }
-            }
+            Set licenses = discoverLicenses();
             context.put("licenses", licenses);
 
             if (licenses.size() == 1) {
@@ -278,7 +210,6 @@ public class GenerateDebianFilesMojo
             if (projectTeam == null || projectTeam.isEmpty()) {
                 projectTeam = project.getName() + " developers";
             }
-            context.put("copyrightOwner", copyrightOwner);
             context.put("projectTeam", projectTeam);
 
             String copyrightYear;
@@ -383,6 +314,8 @@ public class GenerateDebianFilesMojo
                 context.put("compileDependencies", depends);
                 context.put("runtimeDependencies", split(substvars.getProperty("maven.Depends")));
                 context.put("optionalDependencies", split(substvars.getProperty("maven.OptionalDepends")));
+                context.put("javadocDependencies", split(substvars.getProperty("maven.DocDepends")));
+                context.put("javadocOptionalDependencies", split(substvars.getProperty("maven.DocOptionalDepends")));
 
                 if ("ant".equals(packageType)) {
                     Set buildJars = new TreeSet();
@@ -399,27 +332,10 @@ public class GenerateDebianFilesMojo
 
             if ("ant".equals(packageType)) {
                 ListOfPOMs listOfPOMs = new ListOfPOMs(new File(outputDirectory, binPackageName + ".poms"));
+                setupArtifactLocation(listOfPOMs, project);
                 for (Iterator i = collectedProjects.iterator(); i.hasNext();) {
                     MavenProject mavenProject = (MavenProject) i.next();
-                    String basedir = project.getBasedir().getAbsolutePath();
-                    String dirRelPath = mavenProject.getBasedir().getAbsolutePath().substring(basedir.length() + 1);
-                    if (! "pom".equals(mavenProject.getPackaging())) {
-                        String pomFile = dirRelPath + "/pom.xml";
-                        listOfPOMs.getOrCreatePOMOptions(pomFile).setJavaLib(true);
-                        String extension = mavenProject.getPackaging();
-                        if (extension.equals("bundle")) {
-                            extension = "jar";
-                        }
-                        if (extension.equals("webapp")) {
-                            extension = "war";
-                        }
-                        if (mavenProject.getArtifact() != null && mavenProject.getArtifact().getFile() != null) {
-                            extension = mavenProject.getArtifact().getFile().toString();
-                            extension = extension.substring(extension.lastIndexOf('.') + 1);
-                        }
-                        listOfPOMs.getOrCreatePOMOptions(pomFile).setArtifact(dirRelPath + "/" + mavenProject.getArtifactId() + "-*."
-                            + extension);
-                    }
+                    setupArtifactLocation(listOfPOMs, mavenProject);
                 }
                 listOfPOMs.save();
             }
@@ -465,15 +381,8 @@ public class GenerateDebianFilesMojo
                     context.put("tagMarker", tagMarker);
                     context.put("suffixUrl", suffixUrl);
 
-                    FileWriter out = new FileWriter(new File(outputDirectory, "watch"));
-                    Velocity.mergeTemplate("watch.svn.vm", "UTF8", context, out);
-                    out.flush();
-                    out.close();
-
-                    out = new FileWriter(new File(outputDirectory, "orig-tar.sh"));
-                    Velocity.mergeTemplate("orig-tar.svn.vm", "UTF8", context, out);
-                    out.flush();
-                    out.close();
+                    generateFile(context, "watch.svn.vm", outputDirectory, "watch");
+                    generateFile(context, "orig-tar.svn.vm", outputDirectory, "orig-tar.sh");
 
                     makeExecutable("debian/orig-tar.sh");
 
@@ -510,7 +419,29 @@ public class GenerateDebianFilesMojo
             }
 
             if ("ant".equals(packageType)) {
+                boolean containsJars = false;
+                boolean containsPlugins = false;
+                if (project.getPackaging().equals("pom") && project.getModules().size() > 0) {
+                    for (Iterator i = collectedProjects.iterator(); i.hasNext(); ) {
+                        MavenProject module = (MavenProject) i.next();
+                        if (module.getPackaging().equals("maven-plugin")) {
+                            containsPlugins = true;
+                        } else if (!module.getPackaging().equals("pom")) {
+                            containsJars = true;
+                        }
+                    }
+                    generateFile(context, "build.xml.vm", outputDirectory, "build.xml");
+                } else if (!project.getPackaging().equals("pom")) {
+                    if (project.getPackaging().equals("maven-plugin")) {
+                        containsPlugins = true;
+                    } else if (!project.getPackaging().equals("pom")) {
+                        containsJars = true;
+                    }
+                }
+                context.put("containsJars", Boolean.valueOf(containsJars));
+                context.put("containsPlugins", Boolean.valueOf(containsPlugins));
                 generateFile(context, "build.properties.ant.vm", outputDirectory, "build.properties");
+                generateFile(context, "build-classpath.vm", outputDirectory, "build-classpath");
             } else {
                 generateFile(context, "maven.properties.vm", outputDirectory, "maven.properties");
             }
@@ -521,6 +452,147 @@ public class GenerateDebianFilesMojo
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    private void setupArtifactLocation(ListOfPOMs listOfPOMs, MavenProject mavenProject) {
+        String basedir = project.getBasedir().getAbsolutePath();
+        String dirRelPath = mavenProject.getBasedir().getAbsolutePath().substring(basedir.length() + 1);
+        if (! "pom".equals(mavenProject.getPackaging())) {
+            String pomFile = dirRelPath + "/pom.xml";
+            listOfPOMs.getOrCreatePOMOptions(pomFile).setJavaLib(true);
+            String extension = mavenProject.getPackaging();
+            if (extension.equals("bundle")) {
+                extension = "jar";
+            }
+            if (extension.equals("webapp")) {
+                extension = "war";
+            }
+            if (mavenProject.getArtifact() != null && mavenProject.getArtifact().getFile() != null) {
+                extension = mavenProject.getArtifact().getFile().toString();
+                extension = extension.substring(extension.lastIndexOf('.') + 1);
+            }
+            ListOfPOMs.POMOptions pomOptions = listOfPOMs.getOrCreatePOMOptions(pomFile);
+            pomOptions.setArtifact(dirRelPath + "/target/" + mavenProject.getArtifactId() + "-*."
+                + extension);
+            if ("jar".equals(extension) && generateJavadoc && "ant".equals(packageType)) {
+                String artifactId = mavenProject.getArtifact().getArtifactId();
+                String docPom = dirRelPath + "/target/" + artifactId + ".javadoc.pom";
+                listOfPOMs.getOrCreatePOMOptions(docPom).setIgnorePOM(true);
+                listOfPOMs.getOrCreatePOMOptions(docPom).setArtifact(dirRelPath + "/target/" + artifactId + ".javadoc.jar");
+                listOfPOMs.getOrCreatePOMOptions(docPom).setClassifier("javadoc");
+                listOfPOMs.getOrCreatePOMOptions(docPom).setHasPackageVersion(pomOptions.getHasPackageVersion());
+                listOfPOMs.getOrCreatePOMOptions(docPom).setDestPackage(packageName + "-doc");
+            }
+            pomOptions.setJavaLib(true);
+            if (mavenProject.getArtifactId().matches(packageName + "\\d")) {
+                pomOptions.setUsjName(packageName);
+            }
+        }
+    }
+
+    private Set discoverLicenses() {
+        Set licenses = new TreeSet();
+        for (Iterator i = project.getLicenses().iterator(); i.hasNext(); ) {
+            License license = (License) i.next();
+            String licenseName = "";
+            if (license.getName() != null) {
+                licenseName = license.getName() + " ";
+            }
+            String licenseUrl = "";
+            if (license.getUrl() != null) {
+                licenseUrl = license.getUrl();
+            }
+            boolean recognized = recognizeLicense(licenses, licenseName, licenseUrl);
+            if (!recognized) {
+                System.out.println("License " + licenseName + licenseUrl + " was not recognized, please enter a license name preferably in one of:");
+                printAvailableLicenses();
+                System.out.print("> ");
+                String s = readLine();
+                if (s.length() > 0) {
+                    licenses.add(s);
+                }
+            }
+        }
+        LicenseCheckResult licenseResult = new LicenseCheckResult();
+        DependenciesSolver.executeProcess(new String[]{"/bin/sh", "-c", "licensecheck `find . -type f`"},
+                licenseResult);
+        for (Iterator i = licenseResult.getLicenses().iterator(); i.hasNext(); ) {
+            String license = (String) i.next();
+            boolean recognized = recognizeLicense(licenses, license, "");
+            if (!recognized) {
+                System.out.println("License " + license + " was not recognized, please enter a license name preferably in one of:");
+                printAvailableLicenses();
+                System.out.print("> ");
+                String s = readLine();
+                if (s.length() > 0) {
+                    licenses.add(s);
+                }
+            }
+        }
+
+        if (licenses.isEmpty()) {
+            System.out.println("License was not found, please enter a license name preferably in one of:");
+            printAvailableLicenses();
+            System.out.print("> ");
+            String s = readLine();
+            if (s.length() > 0) {
+                licenses.add(s);
+            }
+        }
+        return licenses;
+    }
+
+    private void printAvailableLicenses() {
+        System.out.println("Apache-2.0 Artistic BSD FreeBSD ISC CC-BY CC-BY-SA CC-BY-ND CC-BY-NC CC-BY-NC-SA");
+        System.out.println("CC-BY-NC-ND CC0 CDDL CPL Eiffel Expat GPL-2 GPL-3 LGPL-2 LGPL-2.1 LGPL-3");
+        System.out.println("GFDL-1.2 GFDL-1.3 GFDL-NIV LPPL MPL Perl PSF QPL W3C-Software ZLIB Zope");
+    }
+
+    boolean recognizeLicense(Set licenses, String licenseName, String licenseUrl) {
+        boolean recognized = false;
+        licenseName = licenseName.toLowerCase();
+        licenseUrl = licenseUrl.toLowerCase();
+        if (licenseName.indexOf("mit ") >= 0 || licenseUrl.indexOf("mit-license") >= 0) {
+            licenses.add("MIT");
+            recognized = true;
+        } else if (licenseName.indexOf("bsd ") >= 0 || licenseUrl.indexOf("bsd-license") >= 0) {
+            licenses.add("BSD");
+            recognized = true;
+        } else if (licenseName.indexOf("artistic ") >= 0 || licenseUrl.indexOf("artistic-license") >= 0) {
+            licenses.add("Artistic");
+            recognized = true;
+        } else if (licenseName.indexOf("apache ") >= 0 || licenseUrl.indexOf("apache") >= 0) {
+            if (licenseName.indexOf("2.") >= 0 || licenseUrl.indexOf("2.") >= 0) {
+                licenses.add("Apache-2.0");
+                recognized = true;
+            } else if (licenseName.indexOf("1.0") >= 0 || licenseUrl.indexOf("1.0") >= 0) {
+                licenses.add("Apache-1.0");
+                recognized = true;
+            } else if (licenseName.indexOf("1.1") >= 0 || licenseUrl.indexOf("1.1") >= 0) {
+                licenses.add("Apache-1.1");
+                recognized = true;
+            }
+        } else if (licenseName.indexOf("lgpl ") >= 0 || licenseUrl.indexOf("lgpl") >= 0) {
+            if (licenseName.indexOf("2.1") >= 0 || licenseUrl.indexOf("2.1") >= 0) {
+                licenses.add("LGPL-2.1");
+                recognized = true;
+            } else if (licenseName.indexOf("2") >= 0 || licenseUrl.indexOf("2") >= 0) {
+                licenses.add("LGPL-2");
+                recognized = true;
+            } else if (licenseName.indexOf("3") >= 0 || licenseUrl.indexOf("3") >= 0) {
+                licenses.add("LGPL-2");
+                recognized = true;
+            }
+        } else if (licenseName.indexOf("gpl ") >= 0 || licenseUrl.indexOf("gpl") >= 0) {
+            if (licenseName.indexOf("2") >= 0 || licenseUrl.indexOf("2") >= 0) {
+                licenses.add("GPL-2");
+                recognized = true;
+            } else if (licenseName.indexOf("3") >= 0 || licenseUrl.indexOf("3") >= 0) {
+                licenses.add("GPL-3");
+                recognized = true;
+            }
+        }
+        return recognized;
     }
 
     private void generateFile(VelocityContext context, String templateName, File destDir, String fileName) throws Exception {
@@ -573,6 +645,34 @@ public class GenerateDebianFilesMojo
 
     private void makeExecutable(String file) {
         DependenciesSolver.executeProcess(new String[]{"chmod", "+x", file}, new DependenciesSolver.NoOutputHandler());
+    }
+
+    static class LicenseCheckResult implements DependenciesSolver.OutputHandler {
+
+        private Set licenses = new TreeSet();
+        private Set copyrightOwners = new TreeSet();
+
+        public void newLine(String line) {
+            if (line.startsWith(".") && line.indexOf(":") > 0) {
+                int col = line.lastIndexOf(":");
+                String license = line.substring(col + 1).trim();
+                if (license.indexOf("UNKNOWN") >= 0) {
+                    return;
+                }
+                if (license.indexOf("*") >= 0) {
+                    license = license.substring(license.lastIndexOf("*") + 1).trim();
+                }
+                licenses.add(license);
+            }
+        }
+
+        public Set getLicenses() {
+            return licenses;
+        }
+
+        public Set getCopyrightOwners() {
+            return copyrightOwners;
+        }
     }
 
     interface DownloadType {
