@@ -18,7 +18,7 @@ Section: java
 Priority: optional
 Maintainer: Debian Java Maintainers <pkg-java-maintainers@lists.alioth.debian.org>
 Uploaders: ${packager} <${packagerEmail}>
-Build-Depends: debhelper (>= 7), cdbs, default-jdk, maven-debian-helper (>= 1.3)
+Build-Depends: debhelper (>= 7), cdbs, default-jdk, maven-debian-helper (>= 1.4)
 #if(!$compileDependencies.isEmpty())
 Build-Depends-Indep:#printDependencies($compileDependencies)$space
 #end

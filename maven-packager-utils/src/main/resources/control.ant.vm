@@ -18,7 +18,7 @@ Section: java
 Priority: optional
 Maintainer: Debian Java Maintainers <pkg-java-maintainers@lists.alioth.debian.org>
 Uploaders: ${packager} <${packagerEmail}>
-Build-Depends: debhelper (>= 7), default-jdk, maven-repo-helper (>= 1.4)#if ($project.packaging != "pom" || $project.modules.size() > 0), ant-optional, maven-ant-helper (>> 6.7)#end$space
+Build-Depends: debhelper (>= 7), default-jdk, maven-repo-helper (>= 1.5)#if ($project.packaging != "pom" || $project.modules.size() > 0), ant-optional, maven-ant-helper (>> 6.7)#end$space
 #if(!$compileDependencies.isEmpty())
 Build-Depends-Indep:#printDependencies($compileDependencies)$space
 #end

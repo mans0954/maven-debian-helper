@@ -4,7 +4,7 @@
 
     <groupId>org.debian.maven</groupId>
     <artifactId>maven-debian</artifactId>
-    <version>1.3</version>
+    <version>1.4</version>
     <packaging>pom</packaging>
     <name>helper tools for using Maven to build Debian packages</name>
 
@@ -38,7 +38,7 @@
             <dependency>
                 <groupId>org.debian.maven</groupId>
                 <artifactId>maven-repo-helper</artifactId>
-                <version>1.4</version>
+                <version>1.5</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
