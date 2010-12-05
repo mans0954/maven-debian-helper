@@ -28,7 +28,7 @@ _cdbs_class_maven_vars = 1
 
 # Declare Build-Deps for packages using this file
 CDBS_BUILD_DEPENDS := $(CDBS_BUILD_DEPENDS), cdbs (>= 0.4.43)
-CDBS_BUILD_DEPENDS := $(CDBS_BUILD_DEPENDS), maven-debian-helper (>= 1.5)
+CDBS_BUILD_DEPENDS := $(CDBS_BUILD_DEPENDS), maven-debian-helper (>= 1.4)
 
 # Maven home directory.  Doesn't need to be changed except when using
 # nonstandard Maven installations.

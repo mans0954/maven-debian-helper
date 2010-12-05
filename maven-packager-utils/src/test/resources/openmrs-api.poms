@@ -1,2 +1,5 @@
 pom.xml --no-parent
+test/pom.xml --ignore
 api/pom.xml
+web/pom.xml --ignore
+webapp/pom.xml --ignore

@@ -456,9 +456,12 @@ public class GenerateDebianFilesMojo
 
     private void setupArtifactLocation(ListOfPOMs listOfPOMs, MavenProject mavenProject) {
         String basedir = project.getBasedir().getAbsolutePath();
-        String dirRelPath = mavenProject.getBasedir().getAbsolutePath().substring(basedir.length() + 1);
+        String dirRelPath = "";
+        if (! mavenProject.getBasedir().equals(project.getBasedir())) {
+            dirRelPath = mavenProject.getBasedir().getAbsolutePath().substring(basedir.length() + 1) + "/";
+        }
         if (! "pom".equals(mavenProject.getPackaging())) {
-            String pomFile = dirRelPath + "/pom.xml";
+            String pomFile = dirRelPath + "pom.xml";
             listOfPOMs.getOrCreatePOMOptions(pomFile).setJavaLib(true);
             String extension = mavenProject.getPackaging();
             if (extension.equals("bundle")) {
@@ -472,13 +475,13 @@ public class GenerateDebianFilesMojo
                 extension = extension.substring(extension.lastIndexOf('.') + 1);
             }
             ListOfPOMs.POMOptions pomOptions = listOfPOMs.getOrCreatePOMOptions(pomFile);
-            pomOptions.setArtifact(dirRelPath + "/target/" + mavenProject.getArtifactId() + "-*."
+            pomOptions.setArtifact(dirRelPath + "target/" + mavenProject.getArtifactId() + "-*."
                 + extension);
             if ("jar".equals(extension) && generateJavadoc && "ant".equals(packageType)) {
                 String artifactId = mavenProject.getArtifact().getArtifactId();
-                String docPom = dirRelPath + "/target/" + artifactId + ".javadoc.pom";
+                String docPom = dirRelPath + "target/" + artifactId + ".javadoc.pom";
                 listOfPOMs.getOrCreatePOMOptions(docPom).setIgnorePOM(true);
-                listOfPOMs.getOrCreatePOMOptions(docPom).setArtifact(dirRelPath + "/target/" + artifactId + ".javadoc.jar");
+                listOfPOMs.getOrCreatePOMOptions(docPom).setArtifact(dirRelPath + "target/" + artifactId + ".javadoc.jar");
                 listOfPOMs.getOrCreatePOMOptions(docPom).setClassifier("javadoc");
                 listOfPOMs.getOrCreatePOMOptions(docPom).setHasPackageVersion(pomOptions.getHasPackageVersion());
                 listOfPOMs.getOrCreatePOMOptions(docPom).setDestPackage(packageName + "-doc");
@@ -513,6 +516,9 @@ public class GenerateDebianFilesMojo
                 }
             }
         }
+
+        System.out.println();
+        System.out.println("Checking licenses in the upstream sources...");
         LicenseCheckResult licenseResult = new LicenseCheckResult();
         DependenciesSolver.executeProcess(new String[]{"/bin/sh", "-c", "licensecheck `find . -type f`"},
                 licenseResult);
@@ -608,6 +614,8 @@ public class GenerateDebianFilesMojo
         if (library.indexOf("(") > 0) {
             library = library.substring(0, library.indexOf("(")).trim();
         }
+        System.out.println();
+        System.out.println("Look for shared jars in the package...");
         DependenciesSolver.executeProcess(new String[]{"/usr/bin/dpkg", "--listfiles", library},
                 new DependenciesSolver.OutputHandler() {
 
@@ -617,6 +625,7 @@ public class GenerateDebianFilesMojo
                             jar = jar.substring(0, jar.length() - 4);
                             if (!line.matches(".*/.*-\\d.*")) {
                                 jars.add(jar);
+                                System.out.println("  Add " + jar + " to the classpath");
                             }
                         }
                     }
@@ -636,9 +645,11 @@ public class GenerateDebianFilesMojo
 
     private List split(String s) {
         List l = new ArrayList();
-        StringTokenizer st = new StringTokenizer(s, ",");
-        while (st.hasMoreTokens()) {
-            l.add(st.nextToken().trim());
+        if (s != null) {
+            StringTokenizer st = new StringTokenizer(s, ",");
+            while (st.hasMoreTokens()) {
+                l.add(st.nextToken().trim());
+            }
         }
         return l;
     }

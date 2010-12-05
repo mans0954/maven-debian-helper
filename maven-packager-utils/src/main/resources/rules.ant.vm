@@ -11,10 +11,6 @@ export ANT_ARGS=-Dbasedir=$(realpath .) -Dpackage=$(DEB_SOURCE_PACKAGE) -f debia
 #else
 export ANT_ARGS=-Dbasedir=$(realpath .) -Dpackage=$(DEB_SOURCE_PACKAGE) -f /usr/share/maven-ant-helper/maven-build.xml
 #end
-#if ($generateJavadoc)
-DEB_ANT_BUILD_TARGET := package javadoc
-API_DOCS             := target/docs/api
-#end
 
 #end
 %:
@@ -24,10 +20,5 @@ API_DOCS             := target/docs/api
 	dh $@ --buildsystem=ant --with maven_repo_helper
 #end
 
-#if ($generateJavadoc)
-binary-post-install/$binPackage-doc::
-	dh_install -p$binPackage-doc $(API_DOCS) usr/share/doc/$binPackage
-
-#end
 get-orig-source:
 	uscan --download-version $(DEB_UPSTREAM_VERSION) --force-download --rename

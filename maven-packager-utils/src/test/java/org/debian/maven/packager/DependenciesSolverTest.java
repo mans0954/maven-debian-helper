@@ -194,6 +194,7 @@ public class DependenciesSolverTest extends TestCase {
         solver.setExploreProjects(false);
         solver.setPackageName("openmrs");
         solver.setPackageType("maven");
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.openmrs.test openmrs-test * *"));
         solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.openmrs.codehaus.mojo buildnumber-maven-plugin * *"));
         solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.codehaus.mojo build-helper-maven-plugin * *"));
         solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-assembly-plugin * *"));

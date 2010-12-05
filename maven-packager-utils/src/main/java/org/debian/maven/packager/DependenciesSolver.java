@@ -153,6 +153,8 @@ public class DependenciesSolver {
     private Map versionToRules = new HashMap();
     // Keep the list of known files and their package
     private Map filesInPackages = new HashMap();
+    // Keep the list of packages and dependencies
+    private Map versionedPackagesAndDependencies = new HashMap();
     private List defaultRules = new ArrayList();
 
     public DependenciesSolver() {
@@ -384,8 +386,12 @@ public class DependenciesSolver {
             docRuntimeDepends.add("default-jdk-doc");
             for (Iterator i = runtimeDepends.iterator(); i.hasNext();) {
                 String dependency = (String) i.next();
+                Dependency runtimeDependency = (Dependency) versionedPackagesAndDependencies.get(dependency);
                 if (dependency.indexOf(' ') > 0) {
                     dependency = dependency.substring(0, dependency.indexOf(' '));
+                }
+                if (runtimeDependency != null && "pom".equals(runtimeDependency.getType())) {
+                    continue;
                 }
                 String docPkg = searchPkg(new File("/usr/share/doc/" + dependency + "/api/index.html"));
                 if (docPkg != null) {
@@ -395,8 +401,12 @@ public class DependenciesSolver {
             Set docOptionalDepends = new TreeSet();
             for (Iterator i = optionalDepends.iterator(); i.hasNext();) {
                 String dependency = (String) i.next();
+                Dependency optionalDependency = (Dependency) versionedPackagesAndDependencies.get(dependency);
                 if (dependency.indexOf(' ') > 0) {
                     dependency = dependency.substring(0, dependency.indexOf(' '));
+                }
+                if (optionalDependency != null && "pom".equals(optionalDependency.getType())) {
+                    continue;
                 }
                 String docPkg = searchPkg(new File("/usr/share/doc/" + dependency + "/api/index.html"));
                 if (docPkg != null) {
@@ -1039,6 +1049,7 @@ public class DependenciesSolver {
                     runtimeDepends.add(libraryWithVersionConstraint);
                 }
             }
+            versionedPackagesAndDependencies.put(libraryWithVersionConstraint, dependency);
         }
 
         String mavenRules = (String) pom.getProperties().get("debian.mavenRules");

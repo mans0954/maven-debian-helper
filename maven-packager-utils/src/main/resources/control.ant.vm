@@ -18,7 +18,7 @@ Section: java
 Priority: optional
 Maintainer: Debian Java Maintainers <pkg-java-maintainers@lists.alioth.debian.org>
 Uploaders: ${packager} <${packagerEmail}>
-Build-Depends: debhelper (>= 7), default-jdk, maven-repo-helper (>= 1.5)#if ($project.packaging != "pom" || $project.modules.size() > 0), ant-optional, maven-ant-helper (>> 6.7)#end$space
+Build-Depends: debhelper (>= 7), default-jdk, maven-repo-helper (>= 1.5)#if ($project.packaging != "pom" || $project.modules.size() > 0), ant-optional, maven-ant-helper (>= 7.1)#end$space
 #if(!$compileDependencies.isEmpty())
 Build-Depends-Indep:#printDependencies($compileDependencies)$space
 #end
@@ -33,7 +33,7 @@ Architecture: all
 ## libraries should not depend on runtime - default-jre-headless | java2-runtime-headless,
 Depends: ${dollar}{misc:Depends},#printDependencies($runtimeDependencies)$space
 #if(!$optionalDependencies.isEmpty())
-Recommends: #printDependencies($optionalDependencies)
+Recommends: #printDependencies($optionalDependencies)$space
 #end
 #if ($generateJavadoc)
 Suggests: ${binPackage}-doc
@@ -54,9 +54,9 @@ Description: ${project.Name}
 Package: ${binPackage}-doc
 Architecture: all
 Section: doc
-Depends: ${dollar}{misc:Depends}, $printDependencies($javadocDependencies)$space
+Depends: ${dollar}{misc:Depends}, #printDependencies($javadocDependencies)$space
 #if(!$javadocOptionalDependencies.isEmpty())
-Recommends: #printDependencies($javadocOptionalDependencies)
+Recommends: #printDependencies($javadocOptionalDependencies)$space
 #end
 Suggests: ${binPackage}
 Description: Documentation for ${project.Name}
