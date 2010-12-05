@@ -71,5 +71,5 @@ Description: Documentation for ${project.Name}
 #end
 #end
  .
- This package provides the API documentation for ${binPackage}.
+ This package contains the API documentation of ${binPackage}.
 #end
