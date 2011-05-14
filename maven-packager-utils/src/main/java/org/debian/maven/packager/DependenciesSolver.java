@@ -16,20 +16,45 @@ package org.debian.maven.packager;
  * limitations under the License.
  */
 
-import java.io.*;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.xml.stream.XMLStreamException;
-
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.debian.maven.repo.*;
+import javax.xml.stream.XMLStreamException;
+
+import org.debian.maven.repo.Dependency;
+import org.debian.maven.repo.DependencyNotFoundException;
+import org.debian.maven.repo.DependencyRule;
+import org.debian.maven.repo.DependencyRuleSet;
+import org.debian.maven.repo.ListOfPOMs;
+import org.debian.maven.repo.POMHandler;
+import org.debian.maven.repo.POMInfo;
+import org.debian.maven.repo.POMTransformer;
+import org.debian.maven.repo.Repository;
+import org.debian.maven.repo.Rule;
 
 /**
  * Analyze the Maven dependencies and extract the Maven rules to use
@@ -923,6 +948,17 @@ public class DependenciesSolver {
                 // Don't add a rule to force the version of a Maven plugin, it's now done
                 // automatically at build time
             }
+        }
+        
+        // In case, we didn't found anything for "jar" packaging type, just check for a "bundle" type inside repository.
+        // drazzib: I'm not sure this is really the right way to fix that (ie. maybe we should install "bundle" artifacts
+        // directly with "jar" type inside Debian ?).
+        if (pom == null && "jar".equals(dependency.getType())) {
+            if (verbose) {
+                System.out.println("[check with bundle dependency type]");
+            }
+            dependency.setType("bundle");
+            pom = getRepository().searchMatchingPOM(dependency);
         }
 
         if (pom == null) {

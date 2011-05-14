@@ -92,6 +92,11 @@ public class DependenciesMojo
      * @parameter expression="${offline}" default-value="false"
      */
     protected boolean offline;
+    /**
+     * Try to be verbose
+     * @parameter expression="${verbose}" default-value="false"
+     */
+    protected boolean verbose;
 
     public void execute()
             throws MojoExecutionException {
@@ -120,6 +125,7 @@ public class DependenciesMojo
         solver.setInteractive(interactive);
         solver.setOffline(offline);
         solver.setListOfPoms(listOfPoms);
+        solver.setVerbose(verbose);
 
         if (solver.getListOfPOMs().getFirstPOM() == null && collectedProjects != null) {
             for (Iterator i = collectedProjects.iterator(); i.hasNext();) {

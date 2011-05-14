@@ -43,6 +43,7 @@ PACKAGE=$(getarg p package)
 ANT=$(getarg a ant)
 NON_INTERACTIVE=$(getarg n non-interactive)
 OFFLINE=$(getarg o offline)
+VERBOSE=$(getarg v verbose)
 
 if [ -z "$PACKAGE" ]; then
     if [ "$ARGC" -gt "0" ]; then
@@ -65,6 +66,6 @@ if [ ! -e .debianVersion -a ! -e debian/stamp-poms-patched ]; then
     fi
 fi
 
-mvn org.debian.maven:maven-packager-utils:$MH_VERSION:dependencies -Dpackage="$PACKAGE" ${ANT:+-DpackageType=ant} -Dmaven.repo.local=/usr/share/maven-repo ${NON_INTERACTIVE:+-Dinteractive=false} ${OFFLINE:+-Doffline=true}
+mvn org.debian.maven:maven-packager-utils:$MH_VERSION:dependencies -Dpackage="$PACKAGE" ${ANT:+-DpackageType=ant} -Dmaven.repo.local=/usr/share/maven-repo ${NON_INTERACTIVE:+-Dinteractive=false} ${OFFLINE:+-Doffline=true} ${VERBOSE:+-Dverbose=true}
 
 perl -p -i -e 's/maven\./maven:/' debian/${PACKAGE}.substvars
