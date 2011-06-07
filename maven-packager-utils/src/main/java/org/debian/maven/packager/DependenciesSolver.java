@@ -17,9 +17,10 @@ package org.debian.maven.packager;
  */
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -444,8 +445,25 @@ public class DependenciesSolver {
         if (packageVersion != null) {
             depVars.put("maven.UpstreamPackageVersion", packageVersion);
         }
+        // Write everything to debian/substvars
         try {
-            depVars.store(new FileOutputStream(dependencies), "List of dependencies for " + packageName + ", generated for use by debian/control");
+            FileWriter fstream = new FileWriter(dependencies);
+            BufferedWriter out = new BufferedWriter(fstream);
+            out.write("#List of dependencies for " + packageName + ", generated for use by debian/control");
+            out.write("\n");
+            Set propertiesNames = depVars.stringPropertyNames();
+            if (propertiesNames != null) {
+        	for (Iterator i = propertiesNames.iterator(); i.hasNext();) {
+        	   String propName = (String) i.next();
+        	   StringBuffer sb = new StringBuffer();
+        	   sb.append(propName);
+        	   sb.append("=");
+        	   sb.append(depVars.get(propName));
+        	   sb.append("\n");
+        	   out.write(sb.toString());
+                }
+            }
+            out.close();
         } catch (IOException ex) {
             log.log(Level.SEVERE, "Error while saving file " + dependencies, ex);
         }

@@ -1,3 +1,11 @@
+maven-debian-helper (1.4.3) UNRELEASED; urgency=low
+
+  * DependenciesSolver: Don't use Properties.store() method since
+    it escape some chars (like " >\=") from variables.
+    Replace it with simple FileWriter. Closes: #628272.
+
+ -- Damien Raude-Morvan <drazzib@debian.org>  Wed, 08 Jun 2011 00:51:52 +0200
+
 maven-debian-helper (1.4.2) unstable; urgency=low
 
   * mh_resolve_dependencies: Handle --verbose option has described in
