@@ -469,6 +469,12 @@ public class SysInstallMojo extends AbstractMojo
         System.out.println("\t--no-parent");
     }
     
+    // add options --keep-elements option
+    if (pomOption != null && pomOption.getKeepElements() != null) {
+        params.add("--keep-elements=" + pomOption.getKeepElements());
+        System.out.println("\t--keep-elements=" + pomOption.getKeepElements());
+    }
+    
     params.add(pomFile.getAbsolutePath());
     params.add(cleanedPomSrcPath());
     params.add(cleanedPomPropertiesSrcPath());
