@@ -67,6 +67,9 @@ DEB_MAVEN_ARGS =
 # Extra arguments for the mh_patchpoms command line
 DEB_PATCHPOMS_ARGS =
 
+# Extra arguments for the mh_resolve_dependencies command line
+DEB_RESOLVEDEP_ARGS =
+
 # If true, install the Maven jars to /usr/share/java automatically
 DEB_MAVEN_INSTALL_TO_USJ = true
 

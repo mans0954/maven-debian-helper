@@ -18,6 +18,7 @@ syntax()
    echo -e "\t-V --version: show the version"
    echo -e "\t-p<package> --package=<package>: name of the package"
    echo -e "\t-a --ant: use Ant for the packaging instead of Maven"
+   echo -e "\t-j --javadoc: resolve the Javadoc dependencies"
    echo -e "\t-n --non-interactive: non interactive mode, don't ask questions"
    echo -e "\t-o --offline: don't ever connect to the internet, for Debian build"
    echo -e "\t  compatibility."
@@ -37,10 +38,11 @@ syntax()
    exit 1
 }
 
-ARGS="p package a ant v verbose n non-interactive o offline" parseargs "$@"
+ARGS="p package a ant d javadoc v verbose n non-interactive o offline" parseargs "$@"
 
 PACKAGE=$(getarg p package)
 ANT=$(getarg a ant)
+GEN_JAVADOC=$(getarg j javadoc)
 NON_INTERACTIVE=$(getarg n non-interactive)
 OFFLINE=$(getarg o offline)
 VERBOSE=$(getarg v verbose)
@@ -66,6 +68,6 @@ if [ ! -e .debianVersion -a ! -e debian/stamp-poms-patched ]; then
     fi
 fi
 
-mvn org.debian.maven:maven-packager-utils:$MH_VERSION:dependencies -Dpackage="$PACKAGE" ${ANT:+-DpackageType=ant} -Dmaven.repo.local=/usr/share/maven-repo ${NON_INTERACTIVE:+-Dinteractive=false} ${OFFLINE:+-Doffline=true} ${VERBOSE:+-Dverbose=true} --offline
+mvn org.debian.maven:maven-packager-utils:$MH_VERSION:dependencies -Dpackage="$PACKAGE" ${ANT:+-DpackageType=ant} ${GEN_JAVADOC:+-DresolveJavadoc=true} -Dmaven.repo.local=/usr/share/maven-repo ${NON_INTERACTIVE:+-Dinteractive=false} ${OFFLINE:+-Doffline=true} ${VERBOSE:+-Dverbose=true} --offline
 
 perl -p -i -e 's/maven\./maven:/' debian/${PACKAGE}.substvars

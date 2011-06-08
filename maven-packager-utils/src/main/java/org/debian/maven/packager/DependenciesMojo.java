@@ -71,6 +71,11 @@ public class DependenciesMojo
      */
     protected String packageType;
     /**
+     * Should we also resolve Javadoc dependencies
+     * @parameter expression="${resolveJavadoc}" default-value="false"
+     */
+    protected boolean resolveJavadoc;
+    /**
      * Location for the list of POMs file.
      * @required
      * @parameter expression="debian/${package}.poms"
@@ -122,6 +127,7 @@ public class DependenciesMojo
         solver.setOutputDirectory(outputDirectory);
         solver.setPackageName(packageName);
         solver.setPackageType(packageType);
+        solver.setGenerateJavadoc(resolveJavadoc);
         solver.setInteractive(interactive);
         solver.setOffline(offline);
         solver.setListOfPoms(listOfPoms);

@@ -11,8 +11,11 @@ maven-debian-helper (1.4.3) unstable; urgency=low
   * SysInstallDocMojo, SysInstallMojo: Drop initProperties method and only rely
     on Maven mojo attributes injection of "debianPackage" and "destPackage".
     Closes: #628693.
+  * mh_resolve_dependencies: New --javadoc param, send from maven.mk CDBS file
+    to automatically compute Javadoc dependencies when there is some *-doc
+    package. Closes: #628703.
 
- -- Damien Raude-Morvan <drazzib@debian.org>  Wed, 08 Jun 2011 23:22:11 +0200
+ -- Damien Raude-Morvan <drazzib@debian.org>  Thu, 09 Jun 2011 00:11:08 +0200
 
 maven-debian-helper (1.4.2) unstable; urgency=low
 
