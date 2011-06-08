@@ -1,4 +1,4 @@
-maven-debian-helper (1.4.3) UNRELEASED; urgency=low
+maven-debian-helper (1.4.3) unstable; urgency=low
 
   * DependenciesSolver: Don't use Properties.store() method since
     it escape some chars (like " >\=") from variables.
@@ -8,8 +8,11 @@ maven-debian-helper (1.4.3) UNRELEASED; urgency=low
     Closes: #613364
   * mh_resolve_dependencies: Always launch Maven in offline mode
     with --offline option (as already done on mh_make). Closes: #629356
+  * SysInstallDocMojo, SysInstallMojo: Drop initProperties method and only rely
+    on Maven mojo attributes injection of "debianPackage" and "destPackage".
+    Closes: #628693.
 
- -- Damien Raude-Morvan <drazzib@debian.org>  Wed, 08 Jun 2011 00:51:52 +0200
+ -- Damien Raude-Morvan <drazzib@debian.org>  Wed, 08 Jun 2011 23:22:11 +0200
 
 maven-debian-helper (1.4.2) unstable; urgency=low
 

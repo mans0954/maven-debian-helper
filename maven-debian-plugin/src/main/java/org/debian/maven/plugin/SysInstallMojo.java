@@ -117,11 +117,18 @@ public class SysInstallMojo extends AbstractMojo
   private File debianDir;
 
   /**
-   * Debian package
+   * Debian package (send from commande line)
    *
    * @parameter expression="${debian.package}"
    */
   private String debianPackage;
+  
+  /**
+   * Debian package destination (set by xxx.poms file).
+   * By defaul, equals to <code>debianPackage</code> attribute.
+   *
+   * @parameter expression="${debian.package}"
+   */
   private String destPackage;
 
   /**
@@ -446,8 +453,6 @@ public class SysInstallMojo extends AbstractMojo
     if (pomOption != null && pomOption.isIgnore()) {
         throw new RuntimeException("POM file " + pomFile + " should be ignored");
     }
-
-    destPackage = debianPackage;
     if (pomOption != null && pomOption.getDestPackage() != null) {
       destPackage = pomOption.getDestPackage();
     }
@@ -516,26 +521,6 @@ public class SysInstallMojo extends AbstractMojo
   }
 
   /**
-   * Initialize some properties which don't seem to be set automatically
-   * by Maven Mojo mechanism.
-   */
-  protected void initProperties()
-  {
-    if (debianDir == null)
-    {
-      debianDir = new File(System.getProperty("debian.dir"));
-    }
-    if (debianPackage == null)
-    {
-      debianPackage = System.getProperty("debian.package");
-    }
-    if (repoDir == null)
-    {
-      repoDir = new File(System.getProperty("maven.repo.local"));
-    }
-  }
-
-  /**
      * Prepare the destination  directories: remove the directory symlinks that were created
      * by copy-repo.sh if they exist as they point to a directory owned by root and that cannot
      * be modified.
@@ -550,7 +535,6 @@ public class SysInstallMojo extends AbstractMojo
    */
   protected void runMojo() throws IOException
   {
-    //initProperties();
     cleanPom();
     prepareDestDirs();
     copyPom();

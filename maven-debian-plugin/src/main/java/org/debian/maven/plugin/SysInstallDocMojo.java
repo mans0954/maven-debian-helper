@@ -43,7 +43,6 @@ public class SysInstallDocMojo extends SysInstallMojo
    */
   protected void runMojo() throws IOException
   {
-    initProperties();
     copyJar();
   }
 
