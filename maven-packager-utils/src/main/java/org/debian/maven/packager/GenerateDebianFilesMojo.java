@@ -597,6 +597,10 @@ public class GenerateDebianFilesMojo
                 licenses.add("GPL-3");
                 recognized = true;
             }
+
+        } else if (licenseUrl.indexOf("http://creativecommons.org/licenses/by-sa/3.0") >= 0) {
+            licenses.add("CC-BY-SA-3.0");
+            recognized = true;
         }
         return recognized;
     }

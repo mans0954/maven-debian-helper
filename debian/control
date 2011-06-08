@@ -18,8 +18,7 @@ Depends: ${misc:Depends}, default-jdk, maven-repo-helper (>= 1.5), maven2 (>= 2.
  libmaven-clean-plugin-java, libmaven-resources-plugin-java,
  libmaven-compiler-plugin-java, libmaven-jar-plugin-java, libmaven-site-plugin-java,
  libsurefire-java, velocity, libplexus-velocity-java
-Recommends: apt-file, devscripts, subversion
-Suggests: libmaven-javadoc-plugin-java
+Suggests: libmaven-javadoc-plugin-java, apt-file, devscripts, subversion
 Description: Helper tools for building Debian packages with Maven
  Maven is a software project management and comprehension tool. Based on the
  concept of a project object model (POM), Maven can manage a project's build,

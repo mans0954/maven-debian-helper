@@ -194,11 +194,25 @@ public class DependenciesSolverTest extends TestCase {
         solver.setExploreProjects(false);
         solver.setPackageName("openmrs");
         solver.setPackageType("maven");
+        solver.setVerbose(true);
+        solver.getPomTransformer().addRule(new DependencyRule("cglib s/cglib-nodep/cglib jar s/.*/debian/ * *"));
+        // Some dependencies are ignored here because there's a long list of libraries not packaged yet in Debian
         solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.openmrs.test openmrs-test * *"));
         solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.openmrs.codehaus.mojo buildnumber-maven-plugin * *"));
         solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.codehaus.mojo build-helper-maven-plugin * *"));
         solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-assembly-plugin * *"));
         solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.springframework * * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("ca.uhn.hapi hapi * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.openmrs.simpleframework simple-xml * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.openmrs.hibernate * * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("stax stax* * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("dom4j dom4j * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("c3p0 c3p0 * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("net.sf.ehcache * * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("javax.mail mail * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("javax.mail mail * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.openmrs.liquibase * * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("xml-resolver xml-resolver * *"));
         File listOfPoms = getFileInClasspath("openmrs-api.poms");
         solver.setBaseDir(getFileInClasspath("openmrs/pom.xml").getParentFile());
         solver.setListOfPoms(new File(listOfPoms.getParent(), listOfPoms.getName()));
@@ -219,6 +233,41 @@ public class DependenciesSolverTest extends TestCase {
         assertFileEquals("openmrs-api.poms", "openmrs-api.poms");
         assertFileEquals("openmrs-api.substvars", "openmrs.substvars");
         assertFileEquals("openmrs-api.rules", "maven.rules");
+    }
+
+    public void testSolveBuildhelperPluginDependencies() throws Exception {
+        useFile("buildhelper-maven-plugin/pom.xml", pomFile);
+        DependenciesSolver solver = new DependenciesSolver();
+        solver.setMavenRepo(getFileInClasspath("repository/root.dir").getParentFile());
+        solver.setOutputDirectory(testDir);
+        solver.setExploreProjects(false);
+        solver.setPackageName("buildhelper-maven-plugin");
+        solver.setPackageType("maven");
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-changelog-plugin * * * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-changes-plugin * * * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-checkstyle-plugin * * * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-enforcer-plugin * * * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-project-info-reports-plugin * * * *"));
+        File listOfPoms = getFileInClasspath("buildhelper-maven-plugin.poms");
+        solver.setBaseDir(getFileInClasspath("buildhelper-maven-plugin/pom.xml").getParentFile());
+        solver.setListOfPoms(new File(listOfPoms.getParent(), listOfPoms.getName()));
+        solver.setInteractive(false);
+        solver.setOffline(true);
+
+        solver.solveDependencies();
+
+        assertTrue("Did not expect any issues", solver.getIssues().isEmpty());
+
+        solver.setBaseDir(testDir);
+        solver.setListOfPoms(new File(testDir, "buildhelper-maven-plugin.poms"));
+
+        solver.saveListOfPoms();
+        solver.saveMavenRules();
+        solver.saveSubstvars();
+
+        assertFileEquals("buildhelper-maven-plugin.poms", "buildhelper-maven-plugin.poms");
+        assertFileEquals("buildhelper-maven-plugin.substvars", "buildhelper-maven-plugin.substvars");
+        assertFileEquals("buildhelper-maven-plugin.rules", "maven.rules");
     }
 
     protected void assertFileEquals(String resource, String fileName) throws Exception {

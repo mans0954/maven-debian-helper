@@ -421,6 +421,7 @@ public class SysInstallMojo extends AbstractMojo
     if (jarFile.exists())
     {
       mkdir(compatSharePath());
+      System.out.println("Install link to " + artifactId + " into /usr/share/java");
       run(linkCommand(compatRelPath(), fullCompatPath()));
       run(linkCommand(compatRelPath(), versionedFullCompatPath()));
     }

@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+Copyright The Codehaus Foundation.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.codehaus.plexus</groupId>
+	<artifactId>plexus-utils</artifactId>
+	<version>1.5.15</version>
+	<packaging>jar</packaging>
+	<properties>
+		<debian.hasPackageVersion/>
+		<debian.org.codehaus.plexus.plexus-interpolation.originalVersion>1.11</debian.org.codehaus.plexus.plexus-interpolation.originalVersion>
+		<debian.originalVersion>1.5.15</debian.originalVersion>
+		<debian.package>libplexus-utils-java</debian.package>
+	</properties>
+	
+	<name>Plexus Common Utilities</name>
+	<description>A collection of various utility classes to ease working with strings, files, command lines, XML and more.</description>
+	<url>http://plexus.codehaus.org/plexus-utils</url>
+	<scm>
+		<connection>scm:svn:http://svn.codehaus.org/plexus/plexus-utils/tags/plexus-utils-1.5.15</connection>
+		<developerConnection>scm:svn:https://svn.codehaus.org/plexus/plexus-utils/tags/plexus-utils-1.5.15</developerConnection>
+		<url>http://fisheye.codehaus.org/browse/plexus/plexus-utils/tags/plexus-utils-1.5.15</url>
+	</scm>
+	<issueManagement>
+		<system>JIRA</system>
+		<url>http://jira.codehaus.org/browse/PLXUTILS</url>
+	</issueManagement>
+	<dependencies>
+		<dependency>
+			<!-- NOTE: plexus-interpolation is SHADED INTO plexus-utils.
+           This is done to provide a migration path from the old
+           interpolation classes in plexus-utils to the current
+           implementation, which was broken out into plexus-interpolation.
+           The old classes still exist in plexus-utils, but are 
+           DEPRECATED.
+      -->
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-interpolation</artifactId>
+			<version>debian</version>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.codehaus.plexus</groupId>
+					<artifactId>plexus-component-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.codehaus.plexus</groupId>
+					<artifactId>plexus-classworlds</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+</project>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.azeckoski</groupId>
+	<artifactId>reflectutils</artifactId>
+	<version>0.9.15</version>
+	<packaging>jar</packaging>
+	
+	<name>Reflection Utilities</name>
+	<url>http://code.google.com/p/reflectutils/</url>
+	<inceptionYear>2006</inceptionYear>
+	<description>A set of reflection utilities and miscellaneous utilities related to
+        working with classes and their fields with no dependencies which is compatiblewith java 1.5 and generics. The package was originally created by Aaron Zeckoski
+        for the Sakai Project and Generic DAO project but was repackaged to make itdistributable by request. It is used in the RSF framework
+        (http://www2.caret.cam.ac.uk/rsfwiki/) and the EntityBroker among other things.Note about the BeanUtils provided dependency: BeanUtils is not required if you are
+        not using it in your project. Note about the Hibernate provided dependency:Hibernate is not required if you are not using it in your project.</description>
+	<properties>
+		<beanutils.version>1.8.0</beanutils.version>
+		<debian.commons-beanutils.commons-beanutils.originalVersion>1.8.0</debian.commons-beanutils.commons-beanutils.originalVersion>
+		<debian.junit.junit.originalVersion>3.8.1</debian.junit.junit.originalVersion>
+		<debian.mavenRules>org.azeckoski reflectutils jar s/0\..*/0.x/ * *</debian.mavenRules>
+		<debian.originalVersion>0.9.15</debian.originalVersion>
+		<debian.package>libreflectutils-java</debian.package>
+	</properties>
+	<licenses>
+		<license>
+			<name>Apache License 2</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
+			<comments>For source code</comments>
+		</license>
+		<license>
+			<name>Creative Commons Attribution 3.0</name>
+			<url>http://creativecommons.org/licenses/by-sa/3.0/</url>
+			<comments>For documentation and other materials</comments>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<id>aaronz@vt.edu</id>
+			<name>Aaron Zeckoski</name>
+			<email>aaron@caret.cam.ac.uk</email>
+			<url>http://confluence.sakaiproject.org/confluence/display/~aaronz</url>
+			<organization>CARET</organization>
+			<organizationUrl>http://www.caret.cam.ac.uk/</organizationUrl>
+			<roles>
+				<role>Project Manager</role>
+				<role>Architect</role>
+				<role>Developer</role>
+			</roles>
+			<timezone>0</timezone>
+		</developer>
+	</developers>
+	<!-- define source code repository location -->
+	<scm>
+		<connection>scm:svn:http://reflectutils.googlecode.com/svn/tags/reflectutils-0.9.15</connection>
+		<developerConnection>scm:svn:https://reflectutils.googlecode.com/svn/tags/reflectutils-0.9.15</developerConnection>
+		<url>http://code.google.com/p/reflectutils/source/browse/tags/reflectutils-0.9.15</url>
+	</scm>
+	<dependencies>
+		<!--
+            optional BeanUtils dependency - only needed at runtime if you are using apache
+            bean utils along with this
+        -->
+		<dependency>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
+			<version>debian</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+	<!-- define javadocs and jxr docs -->
+</project>

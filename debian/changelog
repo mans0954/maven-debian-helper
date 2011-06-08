@@ -1,13 +1,19 @@
 maven-debian-helper (1.4.3) unstable; urgency=low
 
+  [ Ludovic Claude ]
+  * Move apt-file, devscripts, subversion from Recommends: to Suggests: as
+    they are only required when mh_make is used
+  * mh_make: rescan the Maven repository after the user installs a required package.
+
+  [ Damien Raude-Morvan ]
   * DependenciesSolver: Don't use Properties.store() method since
     it escape some chars (like " >\=") from variables.
     Replace it with simple FileWriter. Closes: #628272.
   * SysInstallMojo: Send "--keep-elements" flag to POMCleaner if its
     set in <pkg>.poms file. Thanks to James Page <james.page@canonical.com>.
     Closes: #613364
-  * mh_resolve_dependencies: Always launch Maven in offline mode
-    with --offline option (as already done on mh_make). Closes: #629356
+  * mh_resolve_dependencies: Also launch Maven in offline mode
+    (with --offline option) when --offline parameter is used. Closes: #629356
   * SysInstallDocMojo, SysInstallMojo: Drop initProperties method and only rely
     on Maven mojo attributes injection of "debianPackage" and "destPackage".
     Closes: #628693.
@@ -15,7 +21,7 @@ maven-debian-helper (1.4.3) unstable; urgency=low
     to automatically compute Javadoc dependencies when there is some *-doc
     package. Closes: #628703.
 
- -- Damien Raude-Morvan <drazzib@debian.org>  Thu, 09 Jun 2011 00:11:08 +0200
+ -- Ludovic Claude <ludovic.claude@laposte.net>  Thu, 09 Jun 2011 00:30:21 +0200
 
 maven-debian-helper (1.4.2) unstable; urgency=low
 

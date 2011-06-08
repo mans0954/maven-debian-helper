@@ -1,2 +1,9 @@
 
+cglib s/cglib-nodep/cglib jar s/.*/debian/ * *
+commons-collections commons-collections jar s/3\..*/3.x/ * *
 junit junit jar s/4\..*/4.x/ * *
+org.azeckoski reflectutils jar s/0\..*/0.x/ * *
+log4j log4j * s/1\.2\..*/1.2.x/ * *
+org.antlr antlr-runtime * s/3\..*/3.x/ * *
+asm * * s/2\..*/2.x/ * *
+s/velocity/org.apache.velocity/ * * s/.*/debian/ * *

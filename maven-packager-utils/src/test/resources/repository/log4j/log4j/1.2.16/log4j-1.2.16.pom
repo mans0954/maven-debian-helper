@@ -1,0 +1,117 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+-->
+<!--
+Usage notes:
+
+To build NTEventLogAppender.dll using MinGW, place mingw\bin on path for Windows or install mingw
+package on other platforms.  Build will execute gcc and windres on Windows and
+i586-mingw32msvc-gcc and i586-mingw32msvc-windres on other platforms.
+
+To build NTEventLogAppender.dll using Microsoft tools, run the appropriate vcvars for the
+target platform and specify -Dntdll_target=msbuild on the mvn command line.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>log4j</groupId>
+	<artifactId>log4j</artifactId>
+	<version>1.2.16</version>
+	<packaging>bundle</packaging>
+	<properties>
+		<debian.hasPackageVersion/>
+		<debian.javax.mail.mail.originalVersion>1.4.1</debian.javax.mail.mail.originalVersion>
+		<debian.junit.junit.originalVersion>3.8.2</debian.junit.junit.originalVersion>
+		<debian.mavenRules>log4j log4j * s/1\.2\..*/1.2.x/ * *</debian.mavenRules>
+		<debian.org.apache.geronimo.specs.geronimo-jms_1.1_spec.originalVersion>1.0</debian.org.apache.geronimo.specs.geronimo-jms_1.1_spec.originalVersion>
+		<debian.originalVersion>1.2.16</debian.originalVersion>
+		<debian.oro.oro.originalVersion>2.0.8</debian.oro.oro.originalVersion>
+		<debian.package>liblog4j1.2-java</debian.package>
+	</properties>
+	
+	<name>Apache Log4j</name>
+	<description>Apache Log4j 1.2</description>
+	<url>http://logging.apache.org/log4j/1.2/</url>
+	<issueManagement>
+		<system>Bugzilla</system>
+		<url>http://issues.apache.org/bugzilla/</url>
+	</issueManagement>
+	<inceptionYear>1999</inceptionYear>
+	<mailingLists>
+		<mailingList>
+			<name>log4j-user</name>
+			<subscribe>log4j-user-subscribe@logging.apache.org</subscribe>
+			<unsubscribe>log4j-user-unsubscribe@logging.apache.org</unsubscribe>
+			<post>log4j-user@logging.apache.org</post>
+			<archive>http://mail-archives.apache.org/mod_mbox/logging-log4j-user/</archive>
+			<otherArchives>
+				<otherArchive>http://marc.info/?l=log4j-user</otherArchive>
+				<otherArchive>http://dir.gmane.org/gmane.comp.jakarta.log4j.user</otherArchive>
+			</otherArchives>
+		</mailingList>
+		<mailingList>
+			<name>log4j-dev</name>
+			<subscribe>log4j-dev-subscribe@logging.apache.org</subscribe>
+			<unsubscribe>log4j-dev-unsubscribe@logging.apache.org</unsubscribe>
+			<post>log4j-dev@logging.apache.org</post>
+			<archive>http://mail-archives.apache.org/mod_mbox/logging-log4j-dev/</archive>
+			<otherArchives>
+				<otherArchive>http://marc.info/?l=log4j-dev</otherArchive>
+				<otherArchive>http://dir.gmane.org/gmane.comp.jakarta.log4j.devel</otherArchive>
+			</otherArchives>
+		</mailingList>
+	</mailingLists>
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<scm>
+		<connection>scm:svn:http://svn.apache.org/repos/asf/logging/log4j/tags/v1_2_16</connection>
+		<developerConnection>scm:svn:https://svn.apache.org/repos/asf/logging/log4j/tags/v1_2_16</developerConnection>
+		<url>http://svn.apache.org/viewvc/logging/log4j/tags/v1_2_16</url>
+	</scm>
+	<organization>
+		<name>Apache Software Foundation</name>
+		<url>http://www.apache.org</url>
+	</organization>
+	<dependencies>
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>debian</version>
+			<optional>true</optional>
+		</dependency>
+		<!--  the following dependency is not needed on JDK 1.5 and higher 
+    <dependency>
+      <groupId>com.sun.jmx</groupId>
+      <artifactId>jmxri</artifactId>
+      <version>1.2.1</version>
+      <optional>true</optional>
+    </dependency>
+    -->
+		<dependency>
+			<groupId>org.apache.geronimo.specs</groupId>
+			<artifactId>geronimo-jms_1.1_spec</artifactId>
+			<version>debian</version>
+			<optional>true</optional>
+		</dependency>
+	</dependencies>
+</project>

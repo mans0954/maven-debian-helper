@@ -68,6 +68,6 @@ if [ ! -e .debianVersion -a ! -e debian/stamp-poms-patched ]; then
     fi
 fi
 
-mvn org.debian.maven:maven-packager-utils:$MH_VERSION:dependencies -Dpackage="$PACKAGE" ${ANT:+-DpackageType=ant} ${GEN_JAVADOC:+-DresolveJavadoc=true} -Dmaven.repo.local=/usr/share/maven-repo ${NON_INTERACTIVE:+-Dinteractive=false} ${OFFLINE:+-Doffline=true} ${VERBOSE:+-Dverbose=true} --offline
+mvn org.debian.maven:maven-packager-utils:$MH_VERSION:dependencies -Dpackage="$PACKAGE" ${ANT:+-DpackageType=ant} ${GEN_JAVADOC:+-DresolveJavadoc=true} -Dmaven.repo.local=/usr/share/maven-repo ${NON_INTERACTIVE:+-Dinteractive=false} ${VERBOSE:+-Dverbose=true} ${OFFLINE:+-Doffline=true --offline}
 
 perl -p -i -e 's/maven\./maven:/' debian/${PACKAGE}.substvars

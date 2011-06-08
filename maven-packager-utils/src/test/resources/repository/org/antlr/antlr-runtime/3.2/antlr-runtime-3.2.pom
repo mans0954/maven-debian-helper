@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.antlr</groupId>
+	<artifactId>antlr-runtime</artifactId>
+	<version>3.2</version>
+	<packaging>jar</packaging>
+	<parent>
+		<groupId>org.antlr</groupId>
+		<artifactId>antlr-master</artifactId>
+		<version>3.x</version>
+	</parent>
+	<properties>
+		<debian.mavenRules>org.antlr antlr-runtime * s/3\..*/3.x/ * *</debian.mavenRules>
+		<debian.org.antlr.stringtemplate.originalVersion>3.2</debian.org.antlr.stringtemplate.originalVersion>
+		<debian.originalVersion>3.2</debian.originalVersion>
+		<debian.package>antlr3</debian.package>
+	</properties>
+	
+	<!--
+
+    Inherit from the ANTLR master pom, which tells us what
+    version we are and allows us to inherit dependencies
+    and so on.
+
+    -->
+	<name>Antlr 3 Runtime</name>
+	<description>A framework for constructing recognizers, compilers, and translators from grammatical descriptions containing Java, C#, C++, or Python actions.</description>
+	<url>http://www.antlr.org</url>
+	<developers>
+		<developer>
+			<name>Terence Parr</name>
+			<organization>USFCA</organization>
+			<organizationUrl>http://www.cs.usfca.edu</organizationUrl>
+			<email>parrt@antlr.org</email>
+			<roles>
+				<role>Project Leader</role>
+				<role>Developer - Java Target</role>
+			</roles>
+			<timezone>PST</timezone>
+		</developer>
+		<developer>
+			<name>Jim Idle</name>
+			<organization>Temporal Wave LLC</organization>
+			<organizationUrl>http://www.temporal-wave.com</organizationUrl>
+			<email>jimi@temporal-wave.com</email>
+			<roles>
+				<role>Developer - Maven stuff</role>
+				<role>Developer - C Target</role>
+			</roles>
+			<timezone>PST</timezone>
+		</developer>
+	</developers>
+	<scm>
+		<url>http://fisheye2.cenqua.com/browse/antlr</url>
+		<connection>http://fisheye2.cenqua.com/browse/antlr</connection>
+	</scm>
+	<!--
+    Definition of the ANTLR repositories. Note that you can only deploy
+    to the repositories via scp, and so the server must already know about
+    your public key. ONly ANTLR developers are allowed to deploy to the 
+    release and snapshot repositories, which are synced with the Maven central
+    repository.
+  -->
+	<dependencies>
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>stringtemplate</artifactId>
+			<version>3.x</version>
+			<scope>compile</scope>
+		</dependency>
+	</dependencies>
+</project>

@@ -1,0 +1,150 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.apache.velocity</groupId>
+	<artifactId>velocity</artifactId>
+	<version>debian</version>
+	<packaging>jar</packaging>
+	
+	<name>Apache Velocity</name>
+	<url>http://velocity.apache.org/engine/releases/velocity-1.6.2/</url>
+	<description>Apache Velocity is a general purpose template engine.</description>
+	<inceptionYear>2000</inceptionYear>
+	<developers>
+		<developer>
+			<name>Will Glass-Husain</name>
+			<id>wglass</id>
+			<email>wglass@forio.com</email>
+			<organization>Forio Business Simulations</organization>
+			<roles>
+				<role>Java Developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<name>Geir Magnusson Jr.</name>
+			<id>geirm</id>
+			<email>geirm@optonline.net</email>
+			<organization>Independent (DVSL Maven)</organization>
+			<roles>
+				<role>Java Developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<name>Daniel Rall</name>
+			<id>dlr</id>
+			<email>dlr@finemaltcoding.com</email>
+			<organization>CollabNet, Inc.</organization>
+			<roles>
+				<role>Java Developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<name>Henning P. Schmiedehausen</name>
+			<id>henning</id>
+			<email>hps@intermeta.de</email>
+			<organization>INTERMETA - Gesellschaft f??r Mehrwertdienste mbH</organization>
+			<roles>
+				<role>Java Developer</role>
+			</roles>
+			<timezone>2</timezone>
+		</developer>
+		<developer>
+			<name>Nathan Bubna</name>
+			<id>nbubna</id>
+			<email>nathan@esha.com</email>
+			<organization>ESHA Research</organization>
+			<roles>
+				<role>Java Developer</role>
+			</roles>
+		</developer>
+	</developers>
+	<dependencies>
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>3.x</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>debian</version>
+		</dependency>
+		<dependency>
+			<groupId>oro</groupId>
+			<artifactId>oro</artifactId>
+			<version>debian</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jdom</groupId>
+			<artifactId>jdom</artifactId>
+			<version>debian</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>debian</version>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>avalon-framework</groupId>
+					<artifactId>avalon-framework</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>log4j</groupId>
+					<artifactId>log4j</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>javax.servlet</groupId>
+					<artifactId>servlet-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.x</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>logkit</groupId>
+			<artifactId>logkit</artifactId>
+			<version>debian</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.ant</groupId>
+			<artifactId>ant</artifactId>
+			<version>debian</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>werken-xpath</groupId>
+			<artifactId>werken-xpath</artifactId>
+			<version>debian</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+	<scm>
+		<connection>scm:svn:http://svn.apache.org/repos/asf/velocity/engine/branches/1.6.x</connection>
+		<developerConnection>scm:svn:https://svn.apache.org/repos/asf/velocity/engine/branches/1.6.x</developerConnection>
+		<tag>HEAD</tag>
+		<url>http://svn.apache.org/viewvc/velocity/engine/branches/1.6.x</url>
+	</scm>
+	<properties>
+		<jira.browse.url>https://issues.apache.org/jira/browse</jira.browse.url>
+		<debian.originalVersion>1.6.2</debian.originalVersion>
+		<debian.package>velocity</debian.package>
+		<debian.mavenRules><![CDATA[s/velocity/org.apache.velocity/ * * s/.*/debian/ *]]></debian.mavenRules>
+	</properties>
+	<issueManagement>
+		<system>JIRA</system>
+		<url>${jira.browse.url}/VELOCITY</url>
+	</issueManagement>
+</project>

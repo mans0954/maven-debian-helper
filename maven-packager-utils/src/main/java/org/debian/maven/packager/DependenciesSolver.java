@@ -943,6 +943,33 @@ public class DependenciesSolver {
         }
 
         POMInfo pom = getRepository().searchMatchingPOM(dependency);
+        try {
+            if (pom == null && dependency.getVersion() == null && getPOM(sourcePom).getParent() != null) {
+                String version = getPOM(sourcePom).getVersionFromManagementDependency(dependency);
+                dependency.setVersion(version);
+                pom = getRepository().searchMatchingPOM(dependency);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (pom == null && dependency.getVersion() != null) {
+            List poms = getRepository().searchMatchingPOMsIgnoreVersion(dependency);
+            for (Iterator i = poms.iterator(); i.hasNext(); ) {
+                POMInfo potentialPom = (POMInfo) i.next();
+                String mavenRules = (String) potentialPom.getProperties().get("debian.mavenRules");
+                if (mavenRules != null) {
+                    StringTokenizer st = new StringTokenizer(mavenRules, ",");
+                    while (st.hasMoreTokens()) {
+                        String ruleDef = st.nextToken().trim();
+                        DependencyRule rule = new DependencyRule(ruleDef);
+                        if (rule.matches(dependency) && rule.apply(dependency).equals(potentialPom.getThisPom())) {
+                            pom = potentialPom;
+                            pomTransformer.getRules().add(rule);
+                        }
+                    }
+                }
+            }
+        }
         if (pom == null && dependency.getVersion() == null) {
             // Set a dummy version and try again
             for (int version = 0; version < 10; version++) {
@@ -1040,6 +1067,8 @@ public class DependenciesSolver {
                         System.out.print("[y]/n > ");
                         String s = readLine().trim().toLowerCase();
                         if (!s.startsWith("n")) {
+                            System.out.println("Rescanning /usr/share/maven-repo...");
+                            pomTransformer.getRepository().scan();
                             return resolveDependency(dependency, sourcePom, buildTime, mavenExtension, management);
                         } 
                     }
@@ -1080,27 +1109,29 @@ public class DependenciesSolver {
             if (pom.getOriginalVersion() != null && (pom.getProperties().containsKey("debian.hasPackageVersion"))) {
                 libraryWithVersionConstraint += " (>= " + version + ")";
             }
-            if (buildTime) {
-                if ("test".equals(dependency.getScope())) {
-                    testDepends.add(libraryWithVersionConstraint);
-                } else if ("maven-plugin".equals(dependency.getType())) {
-                    if (!packageType.equals("ant")) {
-                        compileDepends.add(libraryWithVersionConstraint);
-                    }
-                } else if (mavenExtension) {
-                    if (!packageType.equals("ant")) {
+            if (!management) {
+                if (buildTime) {
+                    if ("test".equals(dependency.getScope())) {
+                        testDepends.add(libraryWithVersionConstraint);
+                    } else if ("maven-plugin".equals(dependency.getType())) {
+                        if (!packageType.equals("ant")) {
+                            compileDepends.add(libraryWithVersionConstraint);
+                        }
+                    } else if (mavenExtension) {
+                        if (!packageType.equals("ant")) {
+                            compileDepends.add(libraryWithVersionConstraint);
+                        }
+                    } else {
                         compileDepends.add(libraryWithVersionConstraint);
                     }
                 } else {
-                    compileDepends.add(libraryWithVersionConstraint);
-                }
-            } else {
-                if (dependency.isOptional()) {
-                    optionalDepends.add(libraryWithVersionConstraint);
-                } else if ("test".equals(dependency.getScope())) {
-                    testDepends.add(libraryWithVersionConstraint);
-                } else {
-                    runtimeDepends.add(libraryWithVersionConstraint);
+                    if (dependency.isOptional()) {
+                        optionalDepends.add(libraryWithVersionConstraint);
+                    } else if ("test".equals(dependency.getScope())) {
+                        testDepends.add(libraryWithVersionConstraint);
+                    } else {
+                        runtimeDepends.add(libraryWithVersionConstraint);
+                    }
                 }
             }
             versionedPackagesAndDependencies.put(libraryWithVersionConstraint, dependency);

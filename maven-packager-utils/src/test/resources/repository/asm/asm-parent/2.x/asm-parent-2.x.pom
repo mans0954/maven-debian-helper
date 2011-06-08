@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>asm</groupId>
+	<artifactId>asm-parent</artifactId>
+	<version>2.x</version>
+	<packaging>pom</packaging>
+	<properties>
+		<debian.originalVersion>2.2.3</debian.originalVersion>
+		<debian.package>libasm2-java</debian.package>
+		<debian.mavenRules><![CDATA[asm * * s/2\..*/2.x/ * *]]></debian.mavenRules>
+	</properties>
+	
+	<name>ASM</name>
+	<description>A very small and fast Java bytecode manipulation framework</description>
+	<url>http://asm.objectweb.org/</url>
+	<organization>
+		<name>ObjectWeb</name>
+		<url>http://www.objectweb.org/</url>
+	</organization>
+	<inceptionYear>2000</inceptionYear>
+	<developers>
+		<developer>
+			<name>Eric Bruneton</name>
+			<id>ebruneton</id>
+			<email>Eric.Bruneton@rd.francetelecom.com</email>
+			<roles>
+				<role>Creator</role>
+				<role>Java Developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<name>Eugene Kuleshov</name>
+			<id>eu</id>
+			<email>eu@javatx.org</email>
+			<roles>
+				<role>Java Developer</role>
+			</roles>
+		</developer>
+	</developers>
+	<scm>
+		<connection>scm:cvs:pserver:anonymous@cvs.forge.objectweb.org:/cvsroot/asm:asm</connection>
+		<developerConnection>scm:cvs:ext:${maven.username}@cvs.forge.objectweb.org:/cvsroot/asm:asm</developerConnection>
+		<url>http://cvs.forge.objectweb.org/cgi-bin/viewcvs.cgi/asm/asm/</url>
+	</scm>
+	<issueManagement>
+		<url>http://forge.objectweb.org/tracker/?group_id=23</url>
+	</issueManagement>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<artifactId>asm</artifactId>
+				<groupId>asm</groupId>
+				<version>2.x</version>
+			</dependency>
+			<dependency>
+				<artifactId>asm-tree</artifactId>
+				<groupId>asm</groupId>
+				<version>2.x</version>
+			</dependency>
+			<dependency>
+				<artifactId>asm-analysis</artifactId>
+				<groupId>asm</groupId>
+				<version>2.x</version>
+			</dependency>
+			<dependency>
+				<artifactId>asm-commons</artifactId>
+				<groupId>asm</groupId>
+				<version>2.x</version>
+			</dependency>
+			<dependency>
+				<artifactId>asm-util</artifactId>
+				<groupId>asm</groupId>
+				<version>2.x</version>
+			</dependency>
+			<dependency>
+				<artifactId>asm-xml</artifactId>
+				<groupId>asm</groupId>
+				<version>2.x</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+</project>
