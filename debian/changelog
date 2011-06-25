@@ -8,9 +8,9 @@ maven-debian-helper (1.4.4) UNRELEASED; urgency=low
     (with --offline option) when --offline parameter is used.
 
   [ Damien Raude-Morvan ]
-  * Upload to unstable.
+  * md_make: Update debian/copyright template for latest DEP-5 format.
 
- -- Damien Raude-Morvan <drazzib@debian.org>  Thu, 23 Jun 2011 00:00:32 +0200
+ -- Damien Raude-Morvan <drazzib@debian.org>  Sat, 25 Jun 2011 13:36:55 +0200
 
 maven-debian-helper (1.4.3) unstable; urgency=low
 
