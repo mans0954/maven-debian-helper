@@ -3,6 +3,8 @@
 MH_VERSION=$(ls /usr/share/maven-repo/org/debian/maven/maven-packager-utils/ | sed 's|/||')
 . /usr/share/maven-repo-helper/mh_lib.sh
 
+CLASSPATH="/usr/share/java/maven-project.jar:/usr/share/java/maven-repo-helper.jar:/usr/share/java/maven-packager-utils.jar"
+
 syntax()
 {
    echo -e "Usage: mh_revolve_dependencies [option]... <package>"
@@ -23,6 +25,8 @@ syntax()
    echo -e "\t-o --offline: don't ever connect to the internet, for Debian build"
    echo -e "\t  compatibility."
    echo -e "\t-v --verbose: show more information while running"
+   echo -e "\t-b --base-directory: path to root directory of package"
+   echo -e "\t-n --non-explore: doesn't explore directories for pom.xml"
    echo -e ""
    echo -e "Description:"
    echo -e "This tool reads the POM files defined in debian/$package.poms"
@@ -38,7 +42,7 @@ syntax()
    exit 1
 }
 
-ARGS="p package a ant d javadoc v verbose n non-interactive o offline" parseargs "$@"
+ARGS="p package a ant d javadoc v verbose n non-interactive o offline b base-directory n non-explore" parseargs "$@"
 
 PACKAGE=$(getarg p package)
 ANT=$(getarg a ant)
@@ -46,6 +50,8 @@ GEN_JAVADOC=$(getarg j javadoc)
 NON_INTERACTIVE=$(getarg n non-interactive)
 OFFLINE=$(getarg o offline)
 VERBOSE=$(getarg v verbose)
+BASE_DIR=$(getarg b base-directory)
+NON_EXPLORE=$(getarg n non-explore)
 
 if [ -z "$PACKAGE" ]; then
     if [ "$ARGC" -gt "0" ]; then
@@ -68,6 +74,6 @@ if [ ! -e .debianVersion -a ! -e debian/stamp-poms-patched ]; then
     fi
 fi
 
-mvn org.debian.maven:maven-packager-utils:$MH_VERSION:dependencies -Dpackage="$PACKAGE" ${ANT:+-DpackageType=ant} ${GEN_JAVADOC:+-DresolveJavadoc=true} -Dmaven.repo.local=/usr/share/maven-repo ${NON_INTERACTIVE:+-Dinteractive=false} ${VERBOSE:+-Dverbose=true} ${OFFLINE:+-Doffline=true --offline}
+java $JAVA_OPTS -cp $CLASSPATH org.debian.maven.packager.DependenciesSolver ${NON_INTERACTIVE:+--non-interactive} ${NON_EXPLORE:+--non-explore} ${OFFLINE:+--offline} ${ANT:+--ant} ${GEN_JAVADOC:+--generate-javadoc} ${BASE_DIR:+--base-directory=$BASE_DIR} --package=$PACKAGE --maven-repo=/usr/share/maven-repo
 
 perl -p -i -e 's/maven\./maven:/' debian/${PACKAGE}.substvars

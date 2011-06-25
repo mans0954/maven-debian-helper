@@ -2,6 +2,7 @@ package org.debian.maven.packager;
 
 /*
  * Copyright 2009 Ludovic Claude.
+ * Copyright 2011 Damien Raude-Morvan.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1318,19 +1319,23 @@ public class DependenciesSolver {
             System.out.println("  -m<repo root>--maven-repo=<repo root>: location of the Maven repository,");
             System.out.println("    used to force the versions of the Maven plugins used in the current");
             System.out.println("    POM file with the versions found in the repository");
+            System.out.println("  --base-directory: path to root directory of package");
+            System.out.println("  --non-explore: doesn't explore directories for pom.xml");
             return;
         }
-        DependenciesSolver solver = new DependenciesSolver();
-
-        solver.setBaseDir(new File("."));
-        solver.setExploreProjects(true);
-        solver.setOutputDirectory(new File("debian"));
-
-        int i = inc(-1, args);
+        
+        // Default values
         boolean verbose = false;
         String debianPackage = "";
         String packageType = "maven";
         File mavenRepo = null;
+        File baseDirectory = new File(".");
+        
+        DependenciesSolver solver = new DependenciesSolver();
+        solver.setExploreProjects(true); // can be overriden by args
+        
+        // Parse parameters
+        int i = inc(-1, args);
         while (i < args.length && (args[i].trim().startsWith("-") || args[i].trim().isEmpty())) {
             String arg = args[i].trim();
             if ("--verbose".equals(arg) || "-v".equals(arg)) {
@@ -1353,14 +1358,21 @@ public class DependenciesSolver {
                 mavenRepo = new File(arg.substring(2));
             } else if (arg.startsWith("--maven-repo=")) {
                 mavenRepo = new File(arg.substring("--maven-repo=".length()));
+            } else if (arg.startsWith("-b")) {
+                baseDirectory = new File(arg.substring(2));
+            } else if (arg.startsWith("--base-directory=")) {
+            	baseDirectory = new File(arg.substring("--base-directory=".length()));
+            } else if (arg.equals("--non-explore")) {
+            	solver.setExploreProjects(false);
             }
             i = inc(i, args);
         }
-        File poms = new File(solver.getOutputDirectory(), debianPackage + ".poms");
 
+        solver.setBaseDir(baseDirectory);
+        solver.setOutputDirectory(new File(baseDirectory, "debian"));
         solver.setPackageName(debianPackage);
         solver.setPackageType(packageType);
-        solver.setExploreProjects(true);
+        File poms = new File(solver.getOutputDirectory(), debianPackage + ".poms");
         solver.setListOfPoms(poms);
 
         if (mavenRepo != null) {

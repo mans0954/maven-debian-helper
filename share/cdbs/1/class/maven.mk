@@ -2,7 +2,8 @@
 
 # Copyright © 2003 Stefan Gybas <sgybas@debian.org>
 # Copyright © 2008 Torsten Werner <twerner@debian.org>
-# Copyright © 2009 Ludovic Claude <ludovic.claude@laposte.net>
+# Copyright © 2009-2011 Ludovic Claude <ludovic.claude@laposte.net>
+# Copyright © 2010-2011 Damien Raude-Morvan <drazzib@debian.org>
 # Description: Builds and cleans packages which have an Maven pom.xml file
 #
 # This program is free software; you can redistribute it and/or
@@ -109,6 +110,7 @@ PLUGIN_ARGS = -Ddebian.dir=$(CURDIR)/debian -Ddebian.package=$(DEB_JAR_PACKAGE) 
 ifneq (, $(DEB_DOC_PACKAGE))
 DEB_RESOLVEDEP_ARGS += --javadoc
 endif
+DEB_RESOLVEDEP_ARGS += --base-directory=$(CURDIR) --non-explore
 
 common-install-arch common-install-indep:: common-install-impl
 common-install-impl::

@@ -8,9 +8,17 @@ maven-debian-helper (1.4.4) UNRELEASED; urgency=low
     (with --offline option) when --offline parameter is used.
 
   [ Damien Raude-Morvan ]
-  * md_make: Update debian/copyright template for latest DEP-5 format.
+  * mh_make: Update debian/copyright template for latest DEP-5 format.
+  * mh_resolve_dependencies: Don't use mvn directly but call to
+    DependenciesSolver main (so packages can have a main pom
+    in other directory than root).
+  * DependenciesSolver: Add new parameters :
+    - --non-explore: doesn't explore directories for pom.xml
+    - --base-directory: path to root directory of package
+  * maven.mk: Send base-directory and non-explore parameters when calling
+    mh_resolve_dependencies.
 
- -- Damien Raude-Morvan <drazzib@debian.org>  Sat, 25 Jun 2011 13:36:55 +0200
+ -- Damien Raude-Morvan <drazzib@debian.org>  Sun, 26 Jun 2011 00:40:54 +0200
 
 maven-debian-helper (1.4.3) unstable; urgency=low
 

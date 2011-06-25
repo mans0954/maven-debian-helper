@@ -2,6 +2,7 @@
 
 # Copyright © 2003 Stefan Gybas <sgybas@debian.org>
 # Copyright © 2008 Torsten Werner <twerner@debian.org>
+# Copyright © 2010-2011 Damien Raude-Morvan <drazzib@debian.org>
 # Description: Defines useful variables for packages which use Maven
 #
 # This program is free software; you can redistribute it and/or
