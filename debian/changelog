@@ -18,7 +18,7 @@ maven-debian-helper (1.4.4) unstable; urgency=low
   * maven.mk: Send base-directory and non-explore parameters when calling
     mh_resolve_dependencies.
 
- -- Damien Raude-Morvan <drazzib@debian.org>  Tue, 09 Aug 2011 21:07:09 +0200
+ -- Damien Raude-Morvan <drazzib@debian.org>  Tue, 16 Aug 2011 19:16:25 +0200
 
 maven-debian-helper (1.4.3) unstable; urgency=low
 
