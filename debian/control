@@ -7,7 +7,7 @@ Uploaders: Torsten Werner <twerner@debian.org>, Ludovic Claude <ludovic.claude@l
 Build-Depends: cdbs, debhelper (>= 7), default-jdk, maven-ant-helper (>> 6.7), ant-optional, help2man
 Build-Depends-Indep: maven-repo-helper (>= 1.5), junit, libmaven-plugin-tools-java,
  libplexus-velocity-java
-Standards-Version: 3.9.1
+Standards-Version: 3.9.2
 Vcs-Svn: svn://svn.debian.org/svn/pkg-java/trunk/maven-debian-helper
 Vcs-Browser: http://svn.debian.org/wsvn/pkg-java/trunk/maven-debian-helper/
 Homepage: http://wiki.debian.org/Java/MavenBuilder

@@ -3,11 +3,13 @@ maven-debian-helper (1.4.4) unstable; urgency=low
   [ Ludovic Claude ]
   * Move apt-file, devscripts, subversion from Recommends: to Suggests: as
     they are only required when mh_make is used
-  * mh_make: rescan the Maven repository after the user installs a required package.
+  * mh_make: rescan the Maven repository after the user installs a
+    required package.
   * mh_resolve_dependencies: Also launch Maven in offline mode
     (with --offline option) when --offline parameter is used.
 
   [ Damien Raude-Morvan ]
+  * Upload to unstable (Closes: #637656).
   * mh_make: Update debian/copyright template for latest DEP-5 format.
   * mh_resolve_dependencies: Don't use mvn directly but call to
     DependenciesSolver main (so packages can have a main pom
@@ -17,8 +19,9 @@ maven-debian-helper (1.4.4) unstable; urgency=low
     - --base-directory: path to root directory of package
   * maven.mk: Send base-directory and non-explore parameters when calling
     mh_resolve_dependencies.
+  * Bump Standards-Version to 3.9.2: no changes needed.
 
- -- Damien Raude-Morvan <drazzib@debian.org>  Tue, 16 Aug 2011 19:16:25 +0200
+ -- Damien Raude-Morvan <drazzib@debian.org>  Sat, 20 Aug 2011 16:25:50 +0200
 
 maven-debian-helper (1.4.3) unstable; urgency=low
 
