@@ -21,14 +21,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
-import org.codehaus.plexus.util.FileUtils;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.codehaus.plexus.util.FileUtils;
 import org.debian.maven.repo.ListOfPOMs;
 import org.debian.maven.repo.POMCleaner;
-import org.debian.maven.repo.POMTransformer;
 
 /**
  * Install pom and jar files into the /usr/share/hierarchy
@@ -108,6 +107,15 @@ public class SysInstallMojo extends AbstractMojo
    * @readonly
    */
   private String jarDir;
+  
+  /**
+   * finalname of the artifact
+   *
+   * @parameter expression="${project.build.finalName}"
+   * @required
+   * @readonly
+   */
+  private String finalName;
 
   /**
    * Debian directory
@@ -150,6 +158,21 @@ public class SysInstallMojo extends AbstractMojo
      * @parameter expression="${install.to.usj}" default-value="true"
      */
   private boolean installToUsj = true;
+
+  /**
+   * Basename of the JAR inside /usr/share/java
+   */
+	private String usjName;
+
+	/**
+	 * Version of the JAR install /usr/share/java
+	 */
+    private String usjVersion;
+
+    /**
+     * If true, disable installation of version-less JAR into /usr/share/java
+     */
+	private boolean noUsjVersionless;
 
   // ----------------------------------------------------------------------
   // Public methods
@@ -307,7 +330,16 @@ public class SysInstallMojo extends AbstractMojo
 
   protected String jarName()
   {
-    return artifactId + "-" + version + ".jar";
+	  String jarName = "";
+	  if (finalName != null && finalName.length() > 0)
+	  {
+		  jarName += finalName;
+	  }
+	  else
+	  {
+		  jarName += artifactId + "-" + version;
+	  }
+    return jarName + ".jar";
   }
   
   protected String destJarName()
@@ -358,17 +390,66 @@ public class SysInstallMojo extends AbstractMojo
     return "../maven-repo" + destRepoPath() + destJarName();
   }
 
+  /**
+   * Example: /usr/share/java/xml-apis.jar
+   */
   protected String fullCompatPath()
   {
-    return compatSharePath() + compatName();
-  }
-
-  protected String versionedFullCompatPath()
-  {
-    return compatSharePath() + destJarName();
+    return compatSharePath() + destUsjJarName();
   }
 
   /**
+   * Example: /usr/share/java/xml-apis-1.3.04.jar
+   */
+  protected String versionedFullCompatPath()
+  {
+    return compatSharePath() + destUsjVersionnedJarName();
+  }
+  
+  /**
+   * Compute version-less filename for installation into /usr/share/java
+   */
+  private String destUsjJarName() {
+	  String usjJarName = "";
+	  if (usjName != null && usjName.length() > 0)
+	  {
+		  usjJarName += usjName;
+	  }
+	  else
+	  {
+		  usjJarName += destArtifactId;
+	  }
+		  
+	  return usjJarName + ".jar";
+  }
+
+  /**
+   * Compute versionned filename for installation into /usr/share/java
+   */
+  private String destUsjVersionnedJarName() {
+	  String usjJarName = "";
+	  if (usjName != null && usjName.length() > 0)
+	  {
+		  usjJarName += usjName;
+	  }
+	  else
+	  {
+		  usjJarName += destArtifactId;
+	  }
+	  
+	  if (usjVersion != null && usjVersion.length() > 0)
+	  {
+		  usjJarName += "-" + usjVersion;
+	  }
+	  else
+	  {
+		  usjJarName += "-" + version;
+	  }
+		  
+	  return usjJarName + ".jar";
+  }
+
+/**
    * command for creating the relative symlink
    */
   private String[] linkCommand(String source, String dest)
@@ -422,7 +503,9 @@ public class SysInstallMojo extends AbstractMojo
     {
       mkdir(compatSharePath());
       System.out.println("Install link to " + artifactId + " into /usr/share/java");
-      run(linkCommand(compatRelPath(), fullCompatPath()));
+      if (!noUsjVersionless) {
+    	  run(linkCommand(compatRelPath(), fullCompatPath()));
+      }
       run(linkCommand(compatRelPath(), versionedFullCompatPath()));
     }
   }
@@ -456,6 +539,21 @@ public class SysInstallMojo extends AbstractMojo
     }
     if (pomOption != null && pomOption.getDestPackage() != null) {
       destPackage = pomOption.getDestPackage();
+    }
+    
+    // handle usj-name
+    if (pomOption != null && pomOption.getUsjName() != null) {
+      usjName = pomOption.getUsjName();
+    }
+    
+    // handle usj-version
+    if (pomOption != null && pomOption.getUsjVersion() != null) {
+      usjVersion = pomOption.getUsjVersion();
+    }
+    
+    // handle no-usj-versionless
+    if (pomOption != null) {
+      noUsjVersionless = pomOption.isNoUsjVersionless();
     }
 
     List params = new ArrayList();

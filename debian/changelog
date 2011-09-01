@@ -1,3 +1,12 @@
+maven-debian-helper (1.4.5) UNRELEASED; urgency=low
+
+  * SysInstallMojo: Support "finalName" attribute to override
+    expected artifact (conform to Maven standards).
+  * SysInstallMojo: Read usj-name, usj-version and no-usj-versionless.
+    Closes: #629621.
+
+ -- Damien Raude-Morvan <drazzib@debian.org>  Thu, 01 Sep 2011 02:06:42 +0200
+
 maven-debian-helper (1.4.4) unstable; urgency=low
 
   [ Ludovic Claude ]
