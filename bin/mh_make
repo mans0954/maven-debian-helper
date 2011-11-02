@@ -127,10 +127,12 @@ fi
 echo
 echo "Checking that apt-file is installed and has been configured..."
 if [ -f /usr/bin/apt-file ]; then
-    apt-file search /usr/bin/mvnDebug | grep maven > /dev/null
-    if [ $? != 0 ]; then
+    res="ok"
+    apt-file search /usr/bin/mvnDebug | grep maven > /dev/null || res="failed"
+    if [ $? != 0 ] || [ "$res" == "failed" ]; then
         echo "Warning: apt-file doesn't seem to be configured"
-        echo "Running sudo apt-file update"
+        echo "Running sudo apt-file update... (this operation may require that you"
+        echo "enter your password)"
         sudo apt-file update
     else
         echo '[ok]'
@@ -221,3 +223,4 @@ fi
 
 rm -f debian/*.substvars
 rm -f .debianVersion
+rm -f velocity.log

@@ -1,3 +1,16 @@
+maven-debian-helper (1.4.6) UNRELEASED; urgency=low
+
+  * Install jars in /usr/share/java (Closes: #636660)
+  * Now requires Java 1.5 or better to compile and run.
+  * Remove velocity.log after running mh_make (Closes: #641261)
+  * SysInstallMojo: read classifier and java-lib parameters.
+  * mh_make: upgrade Standard-Version (Closes: #641302)
+  * mh_make: clean up Debian emails of the form My Name<my.name@provider.com>
+    (Closes: #638788)
+  * mh_make: fix description in generated maven.rules (Closes: #639637)
+
+ -- Ludovic Claude <ludovic.claude@laposte.net>  Fri, 28 Oct 2011 16:07:26 +0200
+
 maven-debian-helper (1.4.5) unstable; urgency=low
 
   * SysInstallMojo: Support "finalName" attribute to override
@@ -14,8 +27,6 @@ maven-debian-helper (1.4.4) unstable; urgency=low
     they are only required when mh_make is used
   * mh_make: rescan the Maven repository after the user installs a
     required package.
-  * mh_resolve_dependencies: Also launch Maven in offline mode
-    (with --offline option) when --offline parameter is used.
 
   [ Damien Raude-Morvan ]
   * Upload to unstable (Closes: #637656).

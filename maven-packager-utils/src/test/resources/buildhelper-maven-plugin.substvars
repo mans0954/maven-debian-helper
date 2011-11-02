@@ -1,0 +1,5 @@
+#List of dependencies for buildhelper-maven-plugin, generated for use by debian/control
+maven.CompileDepends=libmaven-plugin-tools-java
+maven.Depends=libmaven2-core-java, libmojo-parent-java (>= 23), libplexus-utils-java (>= 1.5.15)
+maven.OptionalDepends=
+maven.TestDepends=

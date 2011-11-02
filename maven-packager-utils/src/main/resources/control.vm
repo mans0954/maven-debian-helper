@@ -22,7 +22,7 @@ Build-Depends: debhelper (>= 7), cdbs, default-jdk, maven-debian-helper (>= 1.4)
 #if(!$compileDependencies.isEmpty())
 Build-Depends-Indep:#printDependencies($compileDependencies)$space
 #end
-Standards-Version: 3.9.1
+Standards-Version: 3.9.2
 Vcs-Svn: svn://svn.debian.org/svn/pkg-java/trunk/${package}
 Vcs-Browser: http://svn.debian.org/wsvn/pkg-java/trunk/${package}
 Homepage:#if(${project.Url}) ${project.Url} #else TODO #end

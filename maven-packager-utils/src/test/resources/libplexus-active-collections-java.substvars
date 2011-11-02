@@ -1,6 +1,5 @@
 #List of dependencies for libplexus-active-collections-java, generated for use by debian/control
-#Wed Jun 24 22:57:35 BST 2009
-maven.CompileDepends=libplexus-maven-plugin-java (>\= 1.3.8), libsurefire-java
+maven.CompileDepends=libplexus-maven-plugin-java (>= 1.3.8), libsurefire-java
 maven.Depends=libplexus-component-api-java, libplexus-containers-java
 maven.OptionalDepends=
-maven.TestDepends=junit (>\= 3.8.1)
+maven.TestDepends=junit (>= 3.8.1)

@@ -142,6 +142,10 @@ public class GenerateDebianFilesMojo
             controlTemplate = "control.ant.vm";
             rulesTemplate = "rules.ant.vm";
         }
+        // #638788: clean up email
+        if (email != null && email.indexOf('<') >= 0 && email.indexOf('>') >= 0) {
+            email = email.substring(email.indexOf('<') + 1, email.indexOf('>') - 1);
+        }
 
         try {
             Properties velocityProperties = new Properties();

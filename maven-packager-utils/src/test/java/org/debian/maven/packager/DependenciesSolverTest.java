@@ -296,6 +296,7 @@ public class DependenciesSolverTest extends TestCase {
                 skipReadTest = true;
                 continue;
             }
+            assertNotNull("Error in " + fileName + ": expected " + ref.trim() + " but found nothing", test);
             assertEquals("Error in " + fileName, ref.trim(), test.trim());
         }
     }

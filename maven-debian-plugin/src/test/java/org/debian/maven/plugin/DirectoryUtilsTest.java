@@ -1,9 +1,9 @@
 package org.debian.maven.plugin;
 
-import java.io.IOException;
+import junit.framework.TestCase;
 
 /*
- * Copyright 2009 Torsten Werner, Ludovic Claude.
+ * Copyright 2011 Ludovic Claude.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,23 +18,12 @@ import java.io.IOException;
  * limitations under the License.
  */
 
-/**
- * Install the javadoc jar.
- *
- * @author Ludovic Claude
- * @goal sysinstall-doc
- */
-public class SysInstallDocMojo extends SysInstallMojo {
 
-    {
-        setClassifier("javadoc");
+public class DirectoryUtilsTest extends TestCase {
+
+    public void testRelativePath() {
+
+        assertEquals("../maven-repo/my/test/file.jar", DirectoryUtils.relativePath("/usr/share/java", "/usr/share/maven-repo/my/test/file.jar"));
+
     }
-
-    /**
-     * do the actual work
-     */
-    protected void runMojo() throws IOException {
-        copyJar();
-    }
-
 }

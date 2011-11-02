@@ -1,6 +1,5 @@
 #List of dependencies for openmrs, generated for use by debian/control
-#Sun Oct 24 23:51:45 CEST 2010
 maven.CompileDepends=libantlr-maven-plugin-java, libmaven-jar-plugin-java, libmaven-javadoc-plugin-java, libsurefire-java
-maven.Depends=antlr3, libasm2-java, libcglib-java, libcommons-beanutils-java, libcommons-collections3-java, libjaxp1.3-java, liblog4j1.2-java (>\= 1.2.15), libreflectutils-java, libslf4j-java, libxerces2-java, libxstream-java, velocity
+maven.Depends=antlr3, libasm2-java, libcglib-java, libcommons-beanutils-java, libcommons-collections3-java, libjaxp1.3-java, liblog4j1.2-java (>= 1.2.15), libreflectutils-java, libslf4j-java, libxerces2-java, libxstream-java, velocity
 maven.OptionalDepends=
 maven.TestDepends=
