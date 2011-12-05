@@ -113,6 +113,7 @@ public class DependenciesMojo
         DependenciesSolver solver = new DependenciesSolver();
 
         File basedir = project.getBasedir();
+        // TODO: use the list of project defined here for some initialisation step, I've forgotten what to do...
         List projects = new ArrayList();
         projects.add(project.getFile());
         if (collectedProjects != null) {

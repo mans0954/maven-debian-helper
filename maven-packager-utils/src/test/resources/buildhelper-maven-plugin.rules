@@ -1,3 +1,2 @@
 junit junit jar s/3\..*/3.x/ * *
 org.codehaus.mojo mojo-parent pom s/.*/debian/ * *
-org.apache.maven maven-plugin-api * s/2\..*/2.x/ * *

@@ -265,7 +265,7 @@ limitations under the License.
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>debian</version>
+			<version>3.x</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

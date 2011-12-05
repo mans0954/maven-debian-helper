@@ -1,4 +1,4 @@
-maven-debian-helper (1.4.6) UNRELEASED; urgency=low
+maven-debian-helper (1.5) UNRELEASED; urgency=low
 
   * Install jars in /usr/share/java (Closes: #636660)
   * Now requires Java 1.5 or better to compile and run.
@@ -8,6 +8,9 @@ maven-debian-helper (1.4.6) UNRELEASED; urgency=low
   * mh_make: clean up Debian emails of the form My Name<my.name@provider.com>
     (Closes: #638788)
   * mh_make: fix description in generated maven.rules (Closes: #639637)
+  * Fix failing tests in DependenciesSolverTest
+  * Run unit tests during the build,
+  * d/control: add B-D on libcommons-io-java as it's used by the junit tests.
 
  -- Ludovic Claude <ludovic.claude@laposte.net>  Fri, 28 Oct 2011 16:07:26 +0200
 

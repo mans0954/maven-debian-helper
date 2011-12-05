@@ -253,6 +253,7 @@ public class DependenciesSolverTest extends TestCase {
         solver.setListOfPoms(new File(listOfPoms.getParent(), listOfPoms.getName()));
         solver.setInteractive(false);
         solver.setOffline(true);
+        solver.setVerbose(true);
 
         solver.solveDependencies();
 
@@ -268,6 +269,43 @@ public class DependenciesSolverTest extends TestCase {
         assertFileEquals("buildhelper-maven-plugin.poms", "buildhelper-maven-plugin.poms");
         assertFileEquals("buildhelper-maven-plugin.substvars", "buildhelper-maven-plugin.substvars");
         assertFileEquals("buildhelper-maven-plugin.rules", "maven.rules");
+    }
+
+    // TODO: fix this test
+    public void XXXtestSolvePlexusCompilerDependencies() throws Exception {
+        useFile("plexus-compiler/pom.xml", pomFile);
+        DependenciesSolver solver = new DependenciesSolver();
+        solver.setMavenRepo(getFileInClasspath("repository/root.dir").getParentFile());
+        solver.setOutputDirectory(testDir);
+        solver.setExploreProjects(false);
+        solver.setPackageName("libplexus-compiler-java");
+        solver.setPackageType("maven");
+//        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-changelog-plugin * * * *"));
+//        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-changes-plugin * * * *"));
+//        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-checkstyle-plugin * * * *"));
+//        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-enforcer-plugin * * * *"));
+//        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-project-info-reports-plugin * * * *"));
+        File listOfPoms = getFileInClasspath("libplexus-compiler-java.poms");
+        solver.setBaseDir(getFileInClasspath("plexus-compiler/pom.xml").getParentFile());
+        solver.setListOfPoms(new File(listOfPoms.getParent(), listOfPoms.getName()));
+        solver.setInteractive(false);
+        solver.setOffline(true);
+        solver.setVerbose(true);
+
+        solver.solveDependencies();
+
+        assertTrue("Did not expect any issues", solver.getIssues().isEmpty());
+
+        solver.setBaseDir(testDir);
+        solver.setListOfPoms(new File(testDir, "libplexus-compiler-java.poms"));
+
+        solver.saveListOfPoms();
+        solver.saveMavenRules();
+        solver.saveSubstvars();
+
+        assertFileEquals("libplexus-compiler-java.poms", "libplexus-compiler-java.poms");
+        assertFileEquals("libplexus-compiler-java.substvars", "libplexus-compiler-java.substvars");
+        assertFileEquals("libplexus-compiler-java.rules", "maven.rules");
     }
 
     protected void assertFileEquals(String resource, String fileName) throws Exception {

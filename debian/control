@@ -4,9 +4,9 @@ Priority: optional
 Maintainer: Debian Java Maintainers <pkg-java-maintainers@lists.alioth.debian.org>
 Uploaders: Torsten Werner <twerner@debian.org>, Ludovic Claude <ludovic.claude@laposte.net>,
  Michael Koch <konqueror@gmx.de>, Damien Raude-Morvan <drazzib@debian.org>
-Build-Depends: cdbs, debhelper (>= 7), default-jdk, maven-ant-helper (>> 6.7), ant-optional, help2man
-Build-Depends-Indep: maven-repo-helper (>= 1.6), junit, libmaven-plugin-tools-java,
- libplexus-velocity-java
+Build-Depends: cdbs, debhelper (>= 7), default-jdk, maven-ant-helper (>= 7.0), ant-optional, help2man
+Build-Depends-Indep: maven-repo-helper (>= 1.7.1), junit, libmaven-plugin-tools-java,
+ libplexus-velocity-java, libcommons-io-java
 Standards-Version: 3.9.2
 Vcs-Svn: svn://svn.debian.org/svn/pkg-java/trunk/maven-debian-helper
 Vcs-Browser: http://svn.debian.org/wsvn/pkg-java/trunk/maven-debian-helper/
