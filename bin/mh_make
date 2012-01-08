@@ -172,10 +172,10 @@ fi
 
 # Restore state after a brutal stop
 if [ -f debian/$BIN_PACKAGE.poms ]; then
-    mh_unpatchpoms -p$BIN_PACKAGE
+    mh_unpatchpoms -p$BIN_PACKAGE || true
 fi
 if [ -f debian/patches/series ]; then
-    quilt pop -a
+    quilt pop -a || true
 fi
 
 # Apply existing quilt patchs as source 3(quilt) is used in the package

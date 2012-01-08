@@ -9,7 +9,7 @@ export CLASSPATH=$(shell for jar in `cat debian/build-classpath`; do if [ -f "$$
 #if ($project.packaging == "pom" && $project.modules.size() > 0)
 export ANT_ARGS=-Dbasedir=$(realpath .) -Dpackage=$(DEB_SOURCE_PACKAGE) -f debian/build.xml
 #else
-export ANT_ARGS=-Dbasedir=$(realpath .) -Dpackage=$(DEB_SOURCE_PACKAGE) -f /usr/share/maven-ant-helper/maven-build.xml
+export ANT_ARGS=-Dbasedir=$(realpath .) -Dpackage=$(DEB_SOURCE_PACKAGE) -Dversion=$(DEB_UPSTREAM_VERSION) -f /usr/share/maven-ant-helper/maven-build.xml
 #end
 
 #end

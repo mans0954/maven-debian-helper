@@ -45,7 +45,7 @@
     <target name="clean">
         <clean-module dir=""/>
 #foreach ($module in $collectedProjects)
-        <clean-module dir="${module.artifactId}"/>
+        <clean-module dir="${module.baseDir}"/>
 #end
     </target>
 
@@ -53,9 +53,9 @@
         <package-module dir=""/>
 #foreach ($module in $collectedProjects)
 #if ($module.packaging == "maven-plugin")
-    <package-plugin-module dir="${module.artifactId}"/>
+        <package-plugin-module dir="${module.baseDir}"/>
 #else
-        <package-module dir="${module.artifactId}"/>
+        <package-module dir="${module.baseDir}"/>
 #end
 #end
     </target>
@@ -64,7 +64,9 @@
     <target name="javadoc">
         <javadoc destdir="${javadoc.dir}">
 #foreach ($module in $collectedProjects)
-            <packageset dir="${module.artifactId}/src/main/java/"/>
+#if ($module.packaging != "pom")
+            <packageset dir="${module.baseDir}src/main/java/"/>
+#end
 #end
         </javadoc>
     </target>

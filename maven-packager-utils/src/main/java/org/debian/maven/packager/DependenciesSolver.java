@@ -26,16 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -89,6 +80,9 @@ public class DependenciesSolver {
     private static final String[][] PLUGINS_THAT_CAN_BE_IGNORED = {
         {"org.apache.maven.plugins", "maven-ant-plugin"},
         {"org.apache.maven.plugins", "maven-assembly-plugin"},
+        {"org.apache.maven.plugins", "maven-enforcer-plugin"},
+        {"org.apache.maven.plugins", "maven-gpg-plugin"},
+        {"org.apache.rat", "apache-rat-plugin"},
         {"org.codehaus.mojo", "buildnumber-maven-plugin"},
         {"org.apache.maven.plugins", "maven-verifier-plugin"},
         {"org.codehaus.mojo", "findbugs-maven-plugin"},
@@ -499,10 +493,36 @@ public class DependenciesSolver {
 
     public void setOutputDirectory(File outputDirectory) {
         this.outputDirectory = outputDirectory;
-        pomTransformer.getRules().setRulesFile(new File(outputDirectory, "maven.rules"));
-        pomTransformer.getIgnoreRules().setRulesFile(new File(outputDirectory, "maven.ignoreRules"));
-        pomTransformer.getPublishedRules().setRulesFile(new File(outputDirectory, "maven.publishedRules"));
-        cleanIgnoreRules.setRulesFile(new File(outputDirectory, "maven.cleanIgnoreRules"));
+        File rulesFile = new File(outputDirectory, "maven.rules");
+        if (rulesFile.exists() && verbose) {
+            System.out.println("Use existing rules:");
+        }
+        pomTransformer.getRules().setRulesFile(rulesFile);
+
+        File ignoreRulesFile = new File(outputDirectory, "maven.ignoreRules");
+        if (ignoreRulesFile.exists() && verbose) {
+            System.out.println();
+            System.out.println("Use existing ignore rules:");
+        }
+        pomTransformer.getIgnoreRules().setRulesFile(ignoreRulesFile);
+
+        File publishedRulesFile = new File(outputDirectory, "maven.publishedRules");
+        if (publishedRulesFile.exists() && verbose) {
+            System.out.println();
+            System.out.println("Use existing published rules:");
+        }
+        pomTransformer.getPublishedRules().setRulesFile(publishedRulesFile);
+
+        File cleanIgnoreRules = new File(outputDirectory, "maven.cleanIgnoreRules");
+        if (cleanIgnoreRules.exists() && verbose) {
+            System.out.println();
+            System.out.println("Use existing clean ignore rules:");
+        }
+        this.cleanIgnoreRules.setRulesFile(cleanIgnoreRules);
+
+        if (verbose) {
+            System.out.println();
+        }
     }
 
     public String getPackageName() {
@@ -737,6 +757,10 @@ public class DependenciesSolver {
                 String dependencyRule = pom.getThisPom().getGroupId() + " " + pom.getThisPom().getArtifactId()
                         + " " + pom.getThisPom().getType() + " " + selectedRule.toString();
                 pomTransformer.getRules().add(new DependencyRule(dependencyRule));
+                POMInfo transformedPom = pom.newPOMFromRules(pomTransformer.getRules().getRules(), getRepository());
+                getRepository().registerPom(projectPom, transformedPom);
+                projectPoms.add(transformedPom.getThisPom());
+
 
                 if ("bundle".equals(pom.getThisPom().getType())) {
                     System.out.println(pom.getThisPom().getGroupId() + ":" + pom.getThisPom().getArtifactId() +
@@ -1119,8 +1143,34 @@ public class DependenciesSolver {
                         System.out.println("[error] Please check manually that the library is up to date, otherwise it may be necessary to package version "
                                 + dependency.getVersion() + " in Debian.");
                     } else {
-                        System.out.println("[warning] Please install the missing dependency with this command:");
+                        System.out.println("[warning] Please install the missing dependency. Run the following command in another terminal:");
                         System.out.println("  sudo apt-get install " + pkg);
+                    }
+                }
+                if (interactive && pkg == null) {
+                    pkg = searchPkg(new File("/usr/share/java/" + dependency.getArtifactId() + ".jar"));
+                    if (pkg != null) {
+                        System.out.println("[error] Package " + pkg + " does not contain Maven dependency " + dependency + " but there seem to be a match");
+                        System.out.println("If the package contains already Maven artifacts but the names don't match, try to enter a substitution rule");
+                        System.out.println("of the form s/groupId/newGroupId/ s/artifactId/newArtifactId/ jar s/version/newVersion/ here:");
+                        System.out.print("> ");
+                        String newRule = readLine().trim();
+                        if (!newRule.isEmpty()) {
+                            DependencyRule userRule = new DependencyRule(newRule);
+                            pomTransformer.getRules().add(userRule);
+                            System.out.println("Please suggest the maintainer of package " + pkg + " to add this rule to debian/maven.publishedRules");
+                            return resolveDependency(dependency.applyRules(Arrays.asList(userRule)), sourcePom, buildTime, mavenExtension, management);
+                        }
+                    } else {
+                        System.out.println("[error] Cannot resolve Maven dependency " + dependency + ". If you know a package that contains a compatible dependency,");
+                        System.out.println("Try to enter a substitution rule of the form s/groupId/newGroupId/ s/artifactId/newArtifactId/ jar s/version/newVersion/ here:");
+                        System.out.print("> ");
+                        String newRule = readLine().trim();
+                        if (!newRule.isEmpty()) {
+                            DependencyRule userRule = new DependencyRule(newRule);
+                            pomTransformer.getRules().add(userRule);
+                            return resolveDependency(dependency.applyRules(Arrays.asList(userRule)), sourcePom, buildTime, mavenExtension, management);
+                        }
                     }
                 }
                 if (interactive) {
@@ -1199,6 +1249,7 @@ public class DependenciesSolver {
         if (verbose) {
             System.out.println("Dependency " + dependency + " found in package " + pkg);
             System.out.println("[ok]");
+            System.out.println();
         }
 
         if (resolvingParent) {
@@ -1475,6 +1526,8 @@ public class DependenciesSolver {
             String arg = args[i].trim();
             if ("--verbose".equals(arg) || "-v".equals(arg)) {
                 verbose = true;
+            } else if ("--debug".equals(arg)) {
+                log.setLevel(Level.FINEST);
             } else if (arg.startsWith("-p")) {
                 debianPackage = arg.substring(2);
             } else if (arg.startsWith("--package=")) {

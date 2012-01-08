@@ -159,7 +159,7 @@ public class GenerateDebianFilesMojo
             context.put("packager", packager);
             context.put("packagerEmail", email);
             context.put("project", project);
-            context.put("collectedProjects", collectedProjects);
+            context.put("collectedProjects", wrapMavenProjects(collectedProjects));
             context.put("runTests", Boolean.valueOf(runTests));
             context.put("generateJavadoc", Boolean.valueOf(generateJavadoc));
 
@@ -336,12 +336,19 @@ public class GenerateDebianFilesMojo
 
             if ("ant".equals(packageType)) {
                 ListOfPOMs listOfPOMs = new ListOfPOMs(new File(outputDirectory, binPackageName + ".poms"));
-                setupArtifactLocation(listOfPOMs, project);
+                ListOfPOMs listOfJavadocPOMs = null;
+                if (generateJavadoc && "ant".equals(packageType)) {
+                    listOfJavadocPOMs =  new ListOfPOMs(new File(outputDirectory, binPackageName + "-doc.poms"));
+                }
+                setupArtifactLocation(listOfPOMs, listOfJavadocPOMs, project);
                 for (Iterator i = collectedProjects.iterator(); i.hasNext();) {
                     MavenProject mavenProject = (MavenProject) i.next();
-                    setupArtifactLocation(listOfPOMs, mavenProject);
+                    setupArtifactLocation(listOfPOMs, listOfJavadocPOMs, mavenProject);
                 }
                 listOfPOMs.save();
+                if (listOfJavadocPOMs != null) {
+                    listOfJavadocPOMs.save();
+                }
             }
 
             String projectVersion = project.getVersion();
@@ -434,7 +441,6 @@ public class GenerateDebianFilesMojo
                             containsJars = true;
                         }
                     }
-                    generateFile(context, "build.xml.vm", outputDirectory, "build.xml");
                 } else if (!project.getPackaging().equals("pom")) {
                     if (project.getPackaging().equals("maven-plugin")) {
                         containsPlugins = true;
@@ -444,6 +450,10 @@ public class GenerateDebianFilesMojo
                 }
                 context.put("containsJars", Boolean.valueOf(containsJars));
                 context.put("containsPlugins", Boolean.valueOf(containsPlugins));
+
+                if (project.getPackaging().equals("pom") && project.getModules().size() > 0) {
+                    generateFile(context, "build.xml.vm", outputDirectory, "build.xml");
+                }
                 generateFile(context, "build.properties.ant.vm", outputDirectory, "build.properties");
                 generateFile(context, "build-classpath.vm", outputDirectory, "build-classpath");
             } else {
@@ -458,12 +468,17 @@ public class GenerateDebianFilesMojo
         }
     }
 
-    private void setupArtifactLocation(ListOfPOMs listOfPOMs, MavenProject mavenProject) {
-        String basedir = project.getBasedir().getAbsolutePath();
-        String dirRelPath = "";
-        if (! mavenProject.getBasedir().equals(project.getBasedir())) {
-            dirRelPath = mavenProject.getBasedir().getAbsolutePath().substring(basedir.length() + 1) + "/";
+    private List wrapMavenProjects(List<MavenProject> projects) {
+        List<WrappedProject> wrappedProjects = new ArrayList<WrappedProject>();
+        for (MavenProject aProject: projects) {
+            wrappedProjects.add(new WrappedProject(this.project, aProject));
         }
+        return wrappedProjects;
+    }
+
+    private void setupArtifactLocation(ListOfPOMs listOfPOMs, ListOfPOMs listOfJavadocPOMs, MavenProject mavenProject) {
+        String dirRelPath = new WrappedProject(project, mavenProject).getBaseDir();
+
         if (! "pom".equals(mavenProject.getPackaging())) {
             String pomFile = dirRelPath + "pom.xml";
             listOfPOMs.getOrCreatePOMOptions(pomFile).setJavaLib(true);
@@ -481,14 +496,14 @@ public class GenerateDebianFilesMojo
             ListOfPOMs.POMOptions pomOptions = listOfPOMs.getOrCreatePOMOptions(pomFile);
             pomOptions.setArtifact(dirRelPath + "target/" + mavenProject.getArtifactId() + "-*."
                 + extension);
-            if ("jar".equals(extension) && generateJavadoc && "ant".equals(packageType)) {
+            if ("jar".equals(extension) && generateJavadoc && "ant".equals(packageType) && listOfJavadocPOMs != null) {
                 String artifactId = mavenProject.getArtifact().getArtifactId();
                 String docPom = dirRelPath + "target/" + artifactId + ".javadoc.pom";
-                listOfPOMs.getOrCreatePOMOptions(docPom).setIgnorePOM(true);
-                listOfPOMs.getOrCreatePOMOptions(docPom).setArtifact(dirRelPath + "target/" + artifactId + ".javadoc.jar");
-                listOfPOMs.getOrCreatePOMOptions(docPom).setClassifier("javadoc");
-                listOfPOMs.getOrCreatePOMOptions(docPom).setHasPackageVersion(pomOptions.getHasPackageVersion());
-                listOfPOMs.getOrCreatePOMOptions(docPom).setDestPackage(packageName + "-doc");
+                ListOfPOMs.POMOptions javadocPomOptions = listOfJavadocPOMs.getOrCreatePOMOptions(docPom);
+                javadocPomOptions.setIgnorePOM(true);
+                javadocPomOptions.setArtifact(dirRelPath + "target/" + artifactId + ".javadoc.jar");
+                javadocPomOptions.setClassifier("javadoc");
+                javadocPomOptions.setHasPackageVersion(pomOptions.getHasPackageVersion());
             }
             pomOptions.setJavaLib(true);
             if (mavenProject.getArtifactId().matches(packageName + "\\d")) {
@@ -623,7 +638,7 @@ public class GenerateDebianFilesMojo
             library = library.substring(0, library.indexOf("(")).trim();
         }
         System.out.println();
-        System.out.println("Look for shared jars in the package...");
+        System.out.println("Looking for shared jars in package " + library + "...");
         DependenciesSolver.executeProcess(new String[]{"/usr/bin/dpkg", "--listfiles", library},
                 new DependenciesSolver.OutputHandler() {
 
@@ -664,6 +679,41 @@ public class GenerateDebianFilesMojo
 
     private void makeExecutable(String file) {
         DependenciesSolver.executeProcess(new String[]{"chmod", "+x", file}, new DependenciesSolver.NoOutputHandler());
+    }
+
+    public static class WrappedProject {
+        private final MavenProject baseProject;
+        private final MavenProject mavenProject;
+
+        public WrappedProject(MavenProject baseProject, MavenProject mavenProject) {
+            this.baseProject = baseProject;
+            this.mavenProject = mavenProject;
+        }
+
+        public String getBaseDir() {
+            String basedir = baseProject.getBasedir().getAbsolutePath();
+            String dirRelPath = "";
+            if (! mavenProject.getBasedir().equals(baseProject.getBasedir())) {
+                dirRelPath = mavenProject.getBasedir().getAbsolutePath().substring(basedir.length() + 1) + "/";
+            }
+            return dirRelPath;
+        }
+
+        public String getArtifactId() {
+            return mavenProject.getArtifactId();
+        }
+
+        public String getGroupId() {
+            return mavenProject.getGroupId();
+        }
+
+        public String getVersion() {
+            return mavenProject.getVersion();
+        }
+
+        public String getPackaging() {
+            return mavenProject.getPackaging();
+        }
     }
 
     static class LicenseCheckResult implements DependenciesSolver.OutputHandler {

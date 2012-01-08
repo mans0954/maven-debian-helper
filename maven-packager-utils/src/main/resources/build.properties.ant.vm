@@ -6,3 +6,14 @@ javadoc.generate=true
 #if(!$runTests)
 maven.test.skip=true
 #end
+classpath.compile=\
+#foreach ($jar in $buildJars)
+  /usr/share/java/${jar}.jar:\
+#end
+#set( $D = '$' )
+#foreach ($module in $collectedProjects)
+#if($module.packaging != "pom")
+  ${D}{basedir}/${module.baseDir}target/${module.artifactId}-${D}{version}.jar:\
+#end
+#end
+  target/classes
