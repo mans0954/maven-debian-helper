@@ -1,5 +1,6 @@
 maven-debian-helper (1.5) UNRELEASED; urgency=low
 
+  [ Ludovic Claude ]
   * Install jars in /usr/share/java (Closes: #636660)
   * Now requires Java 1.5 or better to compile and run.
   * Remove velocity.log after running mh_make (Closes: #641261)
@@ -12,7 +13,11 @@ maven-debian-helper (1.5) UNRELEASED; urgency=low
   * Run unit tests during the build,
   * d/control: add B-D on libcommons-io-java as it's used by the junit tests.
 
- -- Ludovic Claude <ludovic.claude@laposte.net>  Fri, 28 Oct 2011 16:07:26 +0200
+  [ Damien Raude-Morvan ]
+  * maven-packager-utils/src/main/resources/build.xml.vm: package-module ant
+    macro is always needed (at least for root module).
+
+ -- Damien Raude-Morvan <drazzib@debian.org>  Sun, 08 Jan 2012 13:49:06 +0100
 
 maven-debian-helper (1.4.5) unstable; urgency=low
 

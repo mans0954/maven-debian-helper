@@ -16,7 +16,6 @@
         </sequential>
     </macrodef>
 
-#if ($containsJars)
     <macrodef name="package-module">
         <attribute name="dir"/>
         <sequential>
@@ -28,7 +27,6 @@
         </sequential>
     </macrodef>
 
-#end
 #if ($containsPlugins)
     <macrodef name="package-plugin-module">
         <attribute name="dir"/>
