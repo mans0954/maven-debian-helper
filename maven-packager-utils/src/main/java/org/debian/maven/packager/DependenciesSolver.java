@@ -1134,7 +1134,7 @@ public class DependenciesSolver {
             } else {
                 String pkg = searchPkg(new File("/usr/share/maven-repo/"
                         + dependency.getGroupId().replace('.', '/')
-                        + "/" + dependency.getArtifactId()));
+                        + "/" + dependency.getArtifactId()), ".pom");
                 if (pkg != null) {
                     String installedVersion = getPackageVersion(pkg, true);
                     if (installedVersion != null) {
@@ -1180,6 +1180,8 @@ public class DependenciesSolver {
                     if (!s.startsWith("n")) {
                         System.out.println("Rescanning /usr/share/maven-repo...");
                         pomTransformer.getRepository().scan();
+                        // Clear caches
+                        filesInPackages.clear();
                         return resolveDependency(dependency, sourcePom, buildTime, mavenExtension, management);
                     }
                 }
@@ -1304,17 +1306,27 @@ public class DependenciesSolver {
         return false;
     }
 
+    private String searchPkg(File dir, String extension) {
+        GetFilteredPackageResult packageResult = new GetFilteredPackageResult(extension);
+        File cacheId = new File(dir, "_" + extension);
+        return searchPkg(cacheId, dir, packageResult);
+    }
+
     private String searchPkg(File file) {
-        if (filesInPackages.containsKey(file)) {
-            return filesInPackages.get(file);
+        GetPackageResult packageResult = new GetPackageResult();
+        return searchPkg(file, file, packageResult);
+    }
+
+    private String searchPkg(File cacheId, File fileToSearch, GetPackageResult packageResult) {
+        if (filesInPackages.containsKey(cacheId)) {
+            return filesInPackages.get(cacheId);
         }
 
-        GetPackageResult packageResult = new GetPackageResult();
-        executeProcess(new String[]{"dpkg", "--search", file.getAbsolutePath()}, packageResult);
+        executeProcess(new String[]{"dpkg", "--search", fileToSearch.getAbsolutePath()}, packageResult);
         if (packageResult.getResult() != null) {
             String pkg = packageResult.getResult();
             if (pkg != null) {
-                filesInPackages.put(file, pkg);
+                filesInPackages.put(cacheId, pkg);
             }
             return pkg;
         }
@@ -1327,10 +1339,10 @@ public class DependenciesSolver {
         if (!new File("/usr/bin/apt-file").exists()) {
             return null;
         }
-        executeProcess(new String[]{"apt-file", "search", file.getAbsolutePath()}, packageResult);
+        executeProcess(new String[]{"apt-file", "search", fileToSearch.getAbsolutePath()}, packageResult);
         String pkg = packageResult.getResult();
         if (pkg != null) {
-            filesInPackages.put(file, pkg);
+            filesInPackages.put(cacheId, pkg);
         }
         return pkg;
     }
@@ -1428,15 +1440,38 @@ public class DependenciesSolver {
                 if (!result.equals(result.trim()) || result.startsWith("dpkg")) {
                     result = null;
                 } else {
-                    System.out.println("Found " + result);
+                    result = foundResult(result);
                 }
             }
+        }
+
+        protected String foundResult(String potentialMatch) {
+            System.out.println("Found " + potentialMatch);
+            return potentialMatch;
         }
 
         public String getResult() {
             return result;
         }
 
+    }
+
+    static class GetFilteredPackageResult extends GetPackageResult {
+        private final String extension;
+
+        public GetFilteredPackageResult(String extension) {
+            this.extension = extension;
+        }
+
+        protected String foundResult(String potentialMatch) {
+            if (potentialMatch.endsWith(extension)) {
+              System.out.println("Found " + potentialMatch);
+              return potentialMatch;
+            } else {
+              return null;
+            }
+        }
+        
     }
 
     static class GetPackageVersionResult implements OutputHandler {

@@ -1,0 +1,5 @@
+#List of dependencies for libplexus-compiler-java, generated for use by debian/control
+maven.CompileDepends=
+maven.Depends=libplexus-components-java (>= 1.1.18), libplexus-utils-java (>= 1.5.15)
+maven.OptionalDepends=
+maven.TestDepends=

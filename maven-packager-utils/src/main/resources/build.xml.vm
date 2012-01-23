@@ -42,6 +42,19 @@
     </macrodef>
 
 #end
+#if($generateJavadoc)
+    <macrodef name="package-module-doc">
+        <attribute name="dir"/>
+        <sequential>
+          <ant target="local-install-doc" antfile="${maven.build}" dir="@{dir}">
+            <property name="debian.dir" location="debian" />
+            <property name="project.dir" value="@{dir}" />
+            <property name="keep-cleaned-pom" value="true" />
+          </ant>
+        </sequential>
+    </macrodef>
+
+#end
     <target name="clean">
         <clean-module dir=""/>
 #foreach ($module in $collectedProjects)
@@ -62,13 +75,11 @@
 
 #if ($generateJavadoc)
     <target name="javadoc">
-        <javadoc destdir="${javadoc.dir}">
 #foreach ($module in $collectedProjects)
 #if ($module.packaging != "pom")
-            <packageset dir="${module.baseDir}src/main/java/"/>
+        <package-module-doc dir="${module.baseDir}"/>
 #end
 #end
-        </javadoc>
     </target>
 
     <target name="build-all" depends="package, javadoc" />

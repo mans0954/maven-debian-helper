@@ -271,25 +271,42 @@ public class DependenciesSolverTest extends TestCase {
         assertFileEquals("buildhelper-maven-plugin.rules", "maven.rules");
     }
 
-    // TODO: fix this test
-    public void XXXtestSolvePlexusCompilerDependencies() throws Exception {
+    public void testSolvePlexusCompilerDependencies() throws Exception {
         useFile("plexus-compiler/pom.xml", pomFile);
         DependenciesSolver solver = new DependenciesSolver();
         solver.setMavenRepo(getFileInClasspath("repository/root.dir").getParentFile());
         solver.setOutputDirectory(testDir);
-        solver.setExploreProjects(false);
+        // libplexus-compiler-java.poms already contains some POMs but we want to discover them all 
+        solver.setExploreProjects(true);
         solver.setPackageName("libplexus-compiler-java");
         solver.setPackageType("maven");
-//        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-changelog-plugin * * * *"));
-//        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-changes-plugin * * * *"));
-//        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-checkstyle-plugin * * * *"));
-//        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-enforcer-plugin * * * *"));
-//        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-project-info-reports-plugin * * * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("junit junit jar s/3\\..*/3.x/ * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-compiler-api jar s/1\\..*/1.x/ * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-compiler-aspectj jar s/1\\..*/1.x/ * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-compiler-csharp jar s/1\\..*/1.x/ * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-compiler-eclipse jar s/1\\..*/1.x/ * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-compiler-javac jar s/1\\..*/1.x/ * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-compiler-jikes jar s/1\\..*/1.x/ * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-compiler-manager jar s/1\\..*/1.x/ * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-compiler-test jar s/1\\..*/1.x/ * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-compiler pom s/1\\..*/1.x/ * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-compilers pom s/1\\..*/1.x/ * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-components pom s/1\\..*/1.x/ * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-container-default jar s/1\\.0-alpha.*/1.0-alpha/ * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("s/org.eclipse.jdt/org.eclipse.jdt.core.compiler/ s/core/ecj/ jar s/.*/debian/ * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-gpg-plugin * * * *"));
+        // Ignore those plugins for Ant builds
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-component-metadata * * * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.apache.maven maven-artifact-test * * * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-surefire-plugin * * * *"));
+        solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-compiler-test * * * *"));
+
         File listOfPoms = getFileInClasspath("libplexus-compiler-java.poms");
         solver.setBaseDir(getFileInClasspath("plexus-compiler/pom.xml").getParentFile());
         solver.setListOfPoms(new File(listOfPoms.getParent(), listOfPoms.getName()));
         solver.setInteractive(false);
         solver.setOffline(true);
+        solver.setRunTests(true);
         solver.setVerbose(true);
 
         solver.solveDependencies();

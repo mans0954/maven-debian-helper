@@ -22,15 +22,8 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.TreeSet;
+import java.util.*;
+
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.MavenProject;
 import org.apache.velocity.VelocityContext;
@@ -271,20 +264,22 @@ public class GenerateDebianFilesMojo
             if (substvarsFile.exists()) {
                 Properties substvars = new Properties();
                 substvars.load(new FileReader(substvarsFile));
-                List depends = new ArrayList();
-                depends.addAll(split(substvars.getProperty("maven.CompileDepends")));
-                depends.addAll(split(substvars.getProperty("maven.Depends")));
+                List compileDepends = new ArrayList();
+                compileDepends.addAll(split(substvars.getProperty("maven.CompileDepends")));
+                compileDepends.addAll(split(substvars.getProperty("maven.Depends")));
+                List buildDepends = new ArrayList(compileDepends);
+                List testDepends = new ArrayList(split(substvars.getProperty("maven.TestDepends")));
                 if (runTests) {
-                    depends.addAll(split(substvars.getProperty("maven.TestDepends")));
+                    buildDepends.addAll(testDepends);
                 }
                 if (generateJavadoc) {
-                    depends.addAll(split(substvars.getProperty("maven.DocDepends")));
-                    depends.addAll(split(substvars.getProperty("maven.DocOptionalDepends")));
+                    buildDepends.addAll(split(substvars.getProperty("maven.DocDepends")));
+                    buildDepends.addAll(split(substvars.getProperty("maven.DocOptionalDepends")));
                 }
                 if ("maven".equals(packageType)) {
                     boolean seenJavadocPlugin = false;
                     // Remove dependencies that are implied by maven-debian-helper
-                    for (Iterator i = depends.iterator(); i.hasNext();) {
+                    for (Iterator i = buildDepends.iterator(); i.hasNext();) {
                         String dependency = (String) i.next();
                         if (dependency.startsWith("libmaven-clean-plugin-java") ||
                                 dependency.startsWith("libmaven-resources-plugin-java") ||
@@ -300,11 +295,11 @@ public class GenerateDebianFilesMojo
                         }
                     }
                     if (generateJavadoc && !seenJavadocPlugin) {
-                        depends.add("libmaven-javadoc-plugin-java");
+                        buildDepends.add("libmaven-javadoc-plugin-java");
                     }
                 } else if ("ant".equals(packageType)) {
                     // Remove dependencies that are implied by ant packaging
-                    for (Iterator i = depends.iterator(); i.hasNext(); ) {
+                    for (Iterator i = buildDepends.iterator(); i.hasNext(); ) {
                         String dependency = (String) i.next();
                         if (dependency.equals("ant") ||
                                 dependency.startsWith("ant ") ||
@@ -312,23 +307,29 @@ public class GenerateDebianFilesMojo
                             i.remove();
                         }
                     }
-                    depends.remove("ant");
-                    depends.remove("ant-optional");
+                    buildDepends.remove("ant");
+                    buildDepends.remove("ant-optional");
                 }
-                context.put("compileDependencies", depends);
+                context.put("buildDependencies", buildDepends);
                 context.put("runtimeDependencies", split(substvars.getProperty("maven.Depends")));
+                context.put("testDependencies", split(substvars.getProperty("maven.TestDepends")));
                 context.put("optionalDependencies", split(substvars.getProperty("maven.OptionalDepends")));
                 context.put("javadocDependencies", split(substvars.getProperty("maven.DocDepends")));
                 context.put("javadocOptionalDependencies", split(substvars.getProperty("maven.DocOptionalDepends")));
 
                 if ("ant".equals(packageType)) {
-                    Set buildJars = new TreeSet();
-                    for (Iterator i = depends.iterator(); i.hasNext();) {
+                    Set compileJars = new TreeSet();
+                    for (Iterator i = compileDepends.iterator(); i.hasNext();) {
                         String library = (String) i.next();
-                        buildJars.addAll(listSharedJars(library));
+                        compileJars.addAll(listSharedJars(library));
                     }
-                    buildJars.add("ant-junit");
-                    context.put("buildJars", buildJars);
+                    context.put("compileJars", compileJars);
+                    Set testJars = new TreeSet();
+                    for (Iterator i = testDepends.iterator(); i.hasNext();) {
+                        String library = (String) i.next();
+                        testJars.addAll(listSharedJars(library));
+                    }
+                    context.put("testJars", testJars);
                 }
             } else {
                 System.err.println("Cannot find file " + substvarsFile);
@@ -425,8 +426,13 @@ public class GenerateDebianFilesMojo
             generateFile(context, rulesTemplate, new File("."), ".debianVersion");
 
             if (generateJavadoc) {
-                generateFile(context, "java-doc.doc-base.api.vm", outputDirectory, binPackageName + "-doc.doc-base.api");
-                generateFile(context, "java-doc.install.vm", outputDirectory, binPackageName + "-doc.install");
+                if (project.getPackaging().equals("pom") && collectedProjects.size() > 1) {
+                    generateFile(context, "java-doc.doc-base.api.multi.vm", outputDirectory, binPackageName + "-doc.doc-base.api");
+                    generateFile(context, "java-doc.install.multi.vm", outputDirectory, binPackageName + "-doc.install");
+                } else {
+                  generateFile(context, "java-doc.doc-base.api.vm", outputDirectory, binPackageName + "-doc.doc-base.api");
+                  generateFile(context, "java-doc.install.vm", outputDirectory, binPackageName + "-doc.install");
+                }
             }
 
             if ("ant".equals(packageType)) {
@@ -498,8 +504,7 @@ public class GenerateDebianFilesMojo
                 + extension);
             if ("jar".equals(extension) && generateJavadoc && "ant".equals(packageType) && listOfJavadocPOMs != null) {
                 String artifactId = mavenProject.getArtifact().getArtifactId();
-                String docPom = dirRelPath + "target/" + artifactId + ".javadoc.pom";
-                ListOfPOMs.POMOptions javadocPomOptions = listOfJavadocPOMs.getOrCreatePOMOptions(docPom);
+                ListOfPOMs.POMOptions javadocPomOptions = listOfJavadocPOMs.getOrCreatePOMOptions(pomFile);
                 javadocPomOptions.setIgnorePOM(true);
                 javadocPomOptions.setArtifact(dirRelPath + "target/" + artifactId + ".javadoc.jar");
                 javadocPomOptions.setClassifier("javadoc");
@@ -632,8 +637,13 @@ public class GenerateDebianFilesMojo
         out.close();
     }
 
-    private List listSharedJars(String library) {
-        final List jars = new ArrayList();
+    private Map<String, List<String>> cacheOfSharedJars = new HashMap<String, List<String>>();
+    private List<String> listSharedJars(String library) {
+        if (cacheOfSharedJars.get(library) != null) {
+            return cacheOfSharedJars.get(library);
+        }
+
+        final List<String> jars = new ArrayList<String>();
         if (library.indexOf("(") > 0) {
             library = library.substring(0, library.indexOf("(")).trim();
         }
@@ -653,6 +663,7 @@ public class GenerateDebianFilesMojo
                         }
                     }
                 });
+        cacheOfSharedJars.put(library, jars);
         return jars;
     }
 

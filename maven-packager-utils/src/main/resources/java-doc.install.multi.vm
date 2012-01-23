@@ -1,0 +1,5 @@
+#foreach ($module in $collectedProjects)
+#if ($module.packaging != "pom")
+${module.baseDir}target/apidocs/* usr/share/doc/${binPackage}/${module.baseDir}
+#end
+#end

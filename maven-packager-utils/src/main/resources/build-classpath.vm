@@ -1,1 +1,4 @@
 /usr/share/java/ant-nodeps.jar
+#if($runTests)
+/usr/share/java/ant-junit.jar
+#end

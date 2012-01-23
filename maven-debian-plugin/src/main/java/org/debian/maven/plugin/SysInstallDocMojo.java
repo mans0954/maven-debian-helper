@@ -30,6 +30,10 @@ public class SysInstallDocMojo extends SysInstallMojo {
         setClassifier("javadoc");
     }
 
+    protected String jarName() {
+        return getArtifactId() + "-" + getVersion() + "-javadoc.jar";
+    }
+
     /**
      * do the actual work
      */

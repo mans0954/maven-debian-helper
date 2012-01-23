@@ -314,11 +314,15 @@ public class SysInstallMojo extends AbstractMojo {
     }
 
     protected String jarName() {
-        String jarName = "";
+        String jarName;
         if (finalName != null && finalName.length() > 0) {
-            jarName += finalName;
+            jarName = finalName;
         } else {
-            jarName += artifactId + "-" + version;
+            if (classifier != null) {
+                jarName = artifactId + "-" + version + "-" + classifier;
+            } else {
+                jarName = artifactId + "-" + version;
+            }
         }
         return jarName + ".jar";
     }
@@ -440,6 +444,7 @@ public class SysInstallMojo extends AbstractMojo {
     protected void copyJar() throws IOException {
         File jarFile = new File(fullJarName());
         if (jarFile.exists()) {
+            System.out.println("Install jar file into Maven repo: " + jarFile.getAbsolutePath());
             FileUtils.copyFile(jarFile, new File(jarDestPath()));
             if (debianVersion != null && !debianVersion.equals(version)) {
                 mkdir(debianFullRepoPath());
