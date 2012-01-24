@@ -318,11 +318,10 @@ public class SysInstallMojo extends AbstractMojo {
         if (finalName != null && finalName.length() > 0) {
             jarName = finalName;
         } else {
-            if (classifier != null) {
-                jarName = artifactId + "-" + version + "-" + classifier;
-            } else {
-                jarName = artifactId + "-" + version;
-            }
+            jarName = artifactId + "-" + version;
+        }
+        if (classifier != null) {
+            jarName += "-" + classifier;
         }
         return jarName + ".jar";
     }

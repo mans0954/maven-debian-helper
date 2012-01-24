@@ -1,4 +1,4 @@
-maven-debian-helper (1.5) UNRELEASED; urgency=low
+maven-debian-helper (1.5) unstable; urgency=low
 
   [ Ludovic Claude ]
   * Install jars in /usr/share/java (Closes: #636660)
@@ -20,6 +20,7 @@ maven-debian-helper (1.5) UNRELEASED; urgency=low
   * mh_make: Don't include document packages in the dependency search
     (Closes: #656235)
   * Fix installation of javadoc jar (Closes: #656311)
+  * Fix installation of artifacts using a classifier
 
   [ Damien Raude-Morvan ]
   * maven-packager-utils/src/main/resources/build.xml.vm: package-module ant
@@ -27,7 +28,7 @@ maven-debian-helper (1.5) UNRELEASED; urgency=low
   * Follow-up for #589635: avoid creating a file called mvn-build during
     the build.
 
- -- Ludovic Claude <ludovic.claude@laposte.net>  Tue, 10 Jan 2012 00:20:32 +0100
+ -- Ludovic Claude <ludovic.claude@laposte.net>  Tue, 24 Jan 2012 23:55:22 +0100
 
 maven-debian-helper (1.4.5) unstable; urgency=low
 
