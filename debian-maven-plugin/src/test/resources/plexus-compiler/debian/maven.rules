@@ -1,0 +1,14 @@
+junit junit jar s/3\..*/3.x/ * *
+org.codehaus.plexus plexus-compiler-api jar s/1\..*/1.x/ * *
+org.codehaus.plexus plexus-compiler-aspectj jar s/1\..*/1.x/ * *
+org.codehaus.plexus plexus-compiler-csharp jar s/1\..*/1.x/ * *
+org.codehaus.plexus plexus-compiler-eclipse jar s/1\..*/1.x/ * *
+org.codehaus.plexus plexus-compiler-javac jar s/1\..*/1.x/ * *
+org.codehaus.plexus plexus-compiler-jikes jar s/1\..*/1.x/ * *
+org.codehaus.plexus plexus-compiler-manager jar s/1\..*/1.x/ * *
+org.codehaus.plexus plexus-compiler-test jar s/1\..*/1.x/ * *
+org.codehaus.plexus plexus-compiler pom s/1\..*/1.x/ * *
+org.codehaus.plexus plexus-compilers pom s/1\..*/1.x/ * *
+org.codehaus.plexus plexus-components pom s/1\..*/1.x/ * *
+org.codehaus.plexus plexus-container-default jar s/1\.0-alpha.*/1.0-alpha/ * *
+s/org.eclipse.jdt/org.eclipse.jdt.core.compiler/ s/core/ecj/ jar s/.*/debian/ * *

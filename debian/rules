@@ -56,7 +56,7 @@ clean::
 # Helper target, to use when updating the version of this package
 update-package-version:
 	perl -p -i -e "s/^    <version>([0-9\.]+<)/    <version>${VERSION}</" pom.xml
-	perl -p -i -e "s/^        <version>([0-9\.]+<)/        <version>${VERSION}</" maven-build-nodocs/pom.xml maven-debian-helper/pom.xml maven-debian-plugin/pom.xml
+	perl -p -i -e "s/^        <version>([0-9\.]+<)/        <version>${VERSION}</" maven-build-nodocs/pom.xml maven-debian-helper/pom.xml debian-maven-plugin/pom.xml
 	perl -p -i -e "s/maven-debian-helper \(>= ([0-9\.]+)\)/maven-debian-helper \(>= ${VERSION})/" share/cdbs/1/class/maven-vars.mk maven-packager-utils/src/main/resources/control.vm
 
 

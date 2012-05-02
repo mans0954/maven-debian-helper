@@ -1,0 +1,4 @@
+pom.xml
+plexus-compiler-api/pom.xml
+plexus-compilers/plexus-compiler-aspectj/pom.xml --ignore
+plexus-compiler-test/pom.xml --ignore

@@ -18,7 +18,7 @@ License: ${packagerLicense}
 
 #foreach ($license in $licenses)
 License: $license
-#set ($knownLicenses = ["Apache-2.0", "BSD", "GFDL-1.2", "GPL-2", "LGPL-2.1", "Artistic", "GPL-3", "LGPL-2", "LGPL-3"])
+#set ($knownLicenses = ["Apache-2.0", "GFDL-1.2", "GPL-2", "LGPL-2.1", "Artistic", "GPL-3", "LGPL-2", "LGPL-3"])
 #if ($knownLicenses.contains($license))
   On Debian GNU/Linux system you can find the complete text of the
   $license license in '/usr/share/common-licenses/$license'

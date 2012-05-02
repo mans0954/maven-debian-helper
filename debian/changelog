@@ -1,3 +1,22 @@
+maven-debian-helper (1.5.1) UNRELEASED; urgency=low
+
+  * d/control: update version constraint on maven-repo-helper
+    (Closes: #657889)
+  * Update the build to use junit 4
+  * Refactor code in maven-packager-util and fix reading of output
+    from dpkg and apt-file
+  * Keep improving usability of mh_make (Closes: #638782, #641266)
+  * Remove Michael Koch from the list of uploaders. Thanks for your
+    work! (Closes: #654110)
+  * Remove BSD license from the list of licenses stored in
+    /usr/share/common-licenses (Closes: #641301)
+  * When the jar is installed in /usr/share/java, use symlinks in the
+    repository to avoid duplication of the jar contents (Closes: #665799)
+  * Rename plugin maven-debian-plugin as debian-maven-plugin to adhere to
+    Maven naming conventions.
+
+ -- Ludovic Claude <ludovic.claude@laposte.net>  Mon, 30 Jan 2012 23:46:27 +0100
+
 maven-debian-helper (1.5) unstable; urgency=low
 
   [ Ludovic Claude ]

@@ -28,7 +28,13 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.MavenProject;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.debian.maven.packager.util.LicensesScanner;
+import org.debian.maven.packager.util.NoOutputHandler;
+import org.debian.maven.packager.util.OutputHandler;
+import org.debian.maven.packager.util.PackageScanner;
 import org.debian.maven.repo.ListOfPOMs;
+
+import static org.debian.maven.packager.util.IOUtil.readLine;
 
 /**
  * Generate the Debian files for packaging the current Maven project.
@@ -122,6 +128,9 @@ public class GenerateDebianFilesMojo
      */
     protected boolean generateJavadoc;
 
+    private PackageScanner scanner = new PackageScanner();
+    private LicensesScanner licensesScanner = new LicensesScanner();
+
     public void execute()
             throws MojoExecutionException {
         File f = outputDirectory;
@@ -165,7 +174,7 @@ public class GenerateDebianFilesMojo
                 project.setUrl(readLine());
             }
 
-            Set licenses = discoverLicenses();
+            Set licenses = licensesScanner.discoverLicenses(project.getLicenses());
             context.put("licenses", licenses);
 
             if (licenses.size() == 1) {
@@ -321,13 +330,13 @@ public class GenerateDebianFilesMojo
                     Set compileJars = new TreeSet();
                     for (Iterator i = compileDepends.iterator(); i.hasNext();) {
                         String library = (String) i.next();
-                        compileJars.addAll(listSharedJars(library));
+                        compileJars.addAll(scanner.listSharedJars(library));
                     }
                     context.put("compileJars", compileJars);
                     Set testJars = new TreeSet();
                     for (Iterator i = testDepends.iterator(); i.hasNext();) {
                         String library = (String) i.next();
-                        testJars.addAll(listSharedJars(library));
+                        testJars.addAll(scanner.listSharedJars(library));
                     }
                     context.put("testJars", testJars);
                 }
@@ -396,7 +405,7 @@ public class GenerateDebianFilesMojo
                     generateFile(context, "watch.svn.vm", outputDirectory, "watch");
                     generateFile(context, "orig-tar.svn.vm", outputDirectory, "orig-tar.sh");
 
-                    makeExecutable("debian/orig-tar.sh");
+                    scanner.makeExecutable("debian/orig-tar.sh");
 
                 } else {
                     System.err.println("Cannot locate the version in the download url (" +
@@ -416,7 +425,7 @@ public class GenerateDebianFilesMojo
             generateFile(context, "compat.vm", outputDirectory, "compat");
             generateFile(context, rulesTemplate, outputDirectory, "rules");
 
-            makeExecutable("debian/rules");
+            scanner.makeExecutable("debian/rules");
 
             String debianVersion = projectVersion.replace("-alpha-", "~alpha");
             debianVersion = debianVersion.replace("-beta-", "~beta");
@@ -517,164 +526,12 @@ public class GenerateDebianFilesMojo
         }
     }
 
-    private Set discoverLicenses() {
-        Set licenses = new TreeSet();
-        for (Iterator i = project.getLicenses().iterator(); i.hasNext(); ) {
-            License license = (License) i.next();
-            String licenseName = "";
-            if (license.getName() != null) {
-                licenseName = license.getName() + " ";
-            }
-            String licenseUrl = "";
-            if (license.getUrl() != null) {
-                licenseUrl = license.getUrl();
-            }
-            boolean recognized = recognizeLicense(licenses, licenseName, licenseUrl);
-            if (!recognized) {
-                System.out.println("License " + licenseName + licenseUrl + " was not recognized, please enter a license name preferably in one of:");
-                printAvailableLicenses();
-                System.out.print("> ");
-                String s = readLine();
-                if (s.length() > 0) {
-                    licenses.add(s);
-                }
-            }
-        }
-
-        System.out.println();
-        System.out.println("Checking licenses in the upstream sources...");
-        LicenseCheckResult licenseResult = new LicenseCheckResult();
-        DependenciesSolver.executeProcess(new String[]{"/bin/sh", "-c", "licensecheck `find . -type f`"},
-                licenseResult);
-        for (Iterator i = licenseResult.getLicenses().iterator(); i.hasNext(); ) {
-            String license = (String) i.next();
-            boolean recognized = recognizeLicense(licenses, license, "");
-            if (!recognized) {
-                System.out.println("License " + license + " was not recognized, please enter a license name preferably in one of:");
-                printAvailableLicenses();
-                System.out.print("> ");
-                String s = readLine();
-                if (s.length() > 0) {
-                    licenses.add(s);
-                }
-            }
-        }
-
-        if (licenses.isEmpty()) {
-            System.out.println("License was not found, please enter a license name preferably in one of:");
-            printAvailableLicenses();
-            System.out.print("> ");
-            String s = readLine();
-            if (s.length() > 0) {
-                licenses.add(s);
-            }
-        }
-        return licenses;
-    }
-
-    private void printAvailableLicenses() {
-        System.out.println("Apache-2.0 Artistic BSD FreeBSD ISC CC-BY CC-BY-SA CC-BY-ND CC-BY-NC CC-BY-NC-SA");
-        System.out.println("CC-BY-NC-ND CC0 CDDL CPL Eiffel Expat GPL-2 GPL-3 LGPL-2 LGPL-2.1 LGPL-3");
-        System.out.println("GFDL-1.2 GFDL-1.3 GFDL-NIV LPPL MPL Perl PSF QPL W3C-Software ZLIB Zope");
-    }
-
-    boolean recognizeLicense(Set licenses, String licenseName, String licenseUrl) {
-        boolean recognized = false;
-        licenseName = licenseName.toLowerCase();
-        licenseUrl = licenseUrl.toLowerCase();
-        if (licenseName.indexOf("mit ") >= 0 || licenseUrl.indexOf("mit-license") >= 0) {
-            licenses.add("MIT");
-            recognized = true;
-        } else if (licenseName.indexOf("bsd ") >= 0 || licenseUrl.indexOf("bsd-license") >= 0) {
-            licenses.add("BSD");
-            recognized = true;
-        } else if (licenseName.indexOf("artistic ") >= 0 || licenseUrl.indexOf("artistic-license") >= 0) {
-            licenses.add("Artistic");
-            recognized = true;
-        } else if (licenseName.indexOf("apache ") >= 0 || licenseUrl.indexOf("apache") >= 0) {
-            if (licenseName.indexOf("2.") >= 0 || licenseUrl.indexOf("2.") >= 0) {
-                licenses.add("Apache-2.0");
-                recognized = true;
-            } else if (licenseName.indexOf("1.0") >= 0 || licenseUrl.indexOf("1.0") >= 0) {
-                licenses.add("Apache-1.0");
-                recognized = true;
-            } else if (licenseName.indexOf("1.1") >= 0 || licenseUrl.indexOf("1.1") >= 0) {
-                licenses.add("Apache-1.1");
-                recognized = true;
-            }
-        } else if (licenseName.indexOf("lgpl ") >= 0 || licenseUrl.indexOf("lgpl") >= 0) {
-            if (licenseName.indexOf("2.1") >= 0 || licenseUrl.indexOf("2.1") >= 0) {
-                licenses.add("LGPL-2.1");
-                recognized = true;
-            } else if (licenseName.indexOf("2") >= 0 || licenseUrl.indexOf("2") >= 0) {
-                licenses.add("LGPL-2");
-                recognized = true;
-            } else if (licenseName.indexOf("3") >= 0 || licenseUrl.indexOf("3") >= 0) {
-                licenses.add("LGPL-2");
-                recognized = true;
-            }
-        } else if (licenseName.indexOf("gpl ") >= 0 || licenseUrl.indexOf("gpl") >= 0) {
-            if (licenseName.indexOf("2") >= 0 || licenseUrl.indexOf("2") >= 0) {
-                licenses.add("GPL-2");
-                recognized = true;
-            } else if (licenseName.indexOf("3") >= 0 || licenseUrl.indexOf("3") >= 0) {
-                licenses.add("GPL-3");
-                recognized = true;
-            }
-
-        } else if (licenseUrl.indexOf("http://creativecommons.org/licenses/by-sa/3.0") >= 0) {
-            licenses.add("CC-BY-SA-3.0");
-            recognized = true;
-        }
-        return recognized;
-    }
-
     private void generateFile(VelocityContext context, String templateName, File destDir, String fileName) throws Exception {
         destDir.mkdirs();
         FileWriter out = new FileWriter(new File(destDir, fileName));
         Velocity.mergeTemplate(templateName, "UTF8", context, out);
         out.flush();
         out.close();
-    }
-
-    private Map<String, List<String>> cacheOfSharedJars = new HashMap<String, List<String>>();
-    private List<String> listSharedJars(String library) {
-        if (cacheOfSharedJars.get(library) != null) {
-            return cacheOfSharedJars.get(library);
-        }
-
-        final List<String> jars = new ArrayList<String>();
-        if (library.indexOf("(") > 0) {
-            library = library.substring(0, library.indexOf("(")).trim();
-        }
-        System.out.println();
-        System.out.println("Looking for shared jars in package " + library + "...");
-        DependenciesSolver.executeProcess(new String[]{"/usr/bin/dpkg", "--listfiles", library},
-                new DependenciesSolver.OutputHandler() {
-
-                    public void newLine(String line) {
-                        if (line.startsWith("/usr/share/java/") && line.endsWith(".jar")) {
-                            String jar = line.substring("/usr/share/java/".length());
-                            jar = jar.substring(0, jar.length() - 4);
-                            if (!line.matches(".*/.*-\\d.*")) {
-                                jars.add(jar);
-                                System.out.println("  Add " + jar + " to the classpath");
-                            }
-                        }
-                    }
-                });
-        cacheOfSharedJars.put(library, jars);
-        return jars;
-    }
-
-    private String readLine() {
-        LineNumberReader consoleReader = new LineNumberReader(new InputStreamReader(System.in));
-        try {
-            return consoleReader.readLine().trim();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        }
     }
 
     private List split(String s) {
@@ -686,10 +543,6 @@ public class GenerateDebianFilesMojo
             }
         }
         return l;
-    }
-
-    private void makeExecutable(String file) {
-        DependenciesSolver.executeProcess(new String[]{"chmod", "+x", file}, new DependenciesSolver.NoOutputHandler());
     }
 
     public static class WrappedProject {
@@ -724,34 +577,6 @@ public class GenerateDebianFilesMojo
 
         public String getPackaging() {
             return mavenProject.getPackaging();
-        }
-    }
-
-    static class LicenseCheckResult implements DependenciesSolver.OutputHandler {
-
-        private Set licenses = new TreeSet();
-        private Set copyrightOwners = new TreeSet();
-
-        public void newLine(String line) {
-            if (line.startsWith(".") && line.indexOf(":") > 0) {
-                int col = line.lastIndexOf(":");
-                String license = line.substring(col + 1).trim();
-                if (license.indexOf("UNKNOWN") >= 0) {
-                    return;
-                }
-                if (license.indexOf("*") >= 0) {
-                    license = license.substring(license.lastIndexOf("*") + 1).trim();
-                }
-                licenses.add(license);
-            }
-        }
-
-        public Set getLicenses() {
-            return licenses;
-        }
-
-        public Set getCopyrightOwners() {
-            return copyrightOwners;
         }
     }
 

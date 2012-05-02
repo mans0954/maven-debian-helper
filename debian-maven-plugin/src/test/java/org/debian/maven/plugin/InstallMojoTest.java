@@ -1,0 +1,190 @@
+package org.debian.maven.plugin;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.commons.io.FileUtils;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+
+/*
+ * Copyright 2012 Ludovic Claude.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+public class InstallMojoTest {
+
+    private File testDir = new File("tmp");
+    private InstallMojo mojo;
+
+    private List openedReaders = new ArrayList();
+
+    @Before
+    public void setUp() throws Exception {
+        testDir.mkdirs();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        for (Iterator i = openedReaders.iterator(); i.hasNext(); ) {
+            Reader reader = (Reader) i.next();
+            try {
+                reader.close();
+            } catch (IOException ex) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        openedReaders.clear();
+        FileUtils.deleteDirectory(testDir);
+
+        File debianDir = getFileInClasspath("plexus-compiler/debian/maven.rules").getParentFile();
+        FileUtils.deleteDirectory(new File(debianDir, "libplexus-compiler-java"));
+    }
+
+    @Test
+    public void testInstallJarToRepo() throws Exception {
+        mojo = new InstallMojo();
+        mojo.setBasedir(getFileInClasspath("plexus-compiler/plexus-compiler-test/pom.xml").getParentFile());
+        mojo.setDebianDir(getFileInClasspath("plexus-compiler/debian/maven.rules").getParentFile());
+        mojo.setDestGroupId("org.codehaus.plexus");
+        mojo.setGroupId("org.codehaus.plexus");
+        mojo.setArtifactId("plexus-compiler-test");
+        mojo.setDestArtifactId("plexus-compiler-test");
+        mojo.setInstallToUsj(false);
+        mojo.setJarDir(getFileInClasspath("plexus-compiler/plexus-compiler-test/target/plexus-compiler-test-1.8.2.jar").getParentFile().getAbsolutePath());
+        mojo.setMavenRules("maven.rules");
+        mojo.setNoUsjVersionless(false);
+        mojo.setDebianPackage("libplexus-compiler-java");
+        mojo.setDestPackage("libplexus-compiler-java");
+        mojo.setVersion("1.8.2");
+        mojo.setDebianVersion("1.x");
+
+        mojo.execute();
+
+        File versionedRepoJar = getFileInClasspath("plexus-compiler/debian/libplexus-compiler-java/usr/share/maven-repo/org/codehaus/plexus/plexus-compiler-test/1.8.2/plexus-compiler-test-1.8.2.jar");
+        assertNotNull(versionedRepoJar);
+        File versionedRepoPom = getFileInClasspath("plexus-compiler/debian/libplexus-compiler-java/usr/share/maven-repo/org/codehaus/plexus/plexus-compiler-test/1.8.2/plexus-compiler-test-1.8.2.pom");
+        assertNotNull(versionedRepoPom);
+
+        File debianRepoJar = getFileInClasspath("plexus-compiler/debian/libplexus-compiler-java/usr/share/maven-repo/org/codehaus/plexus/plexus-compiler-test/1.x/plexus-compiler-test-1.x.jar");
+        assertNotNull(debianRepoJar);
+        assertEquals(versionedRepoJar, debianRepoJar.getCanonicalFile());
+        File debianRepoPom = getFileInClasspath("plexus-compiler/debian/libplexus-compiler-java/usr/share/maven-repo/org/codehaus/plexus/plexus-compiler-test/1.x/plexus-compiler-test-1.x.pom");
+        assertNotNull(debianRepoPom);
+    }
+
+    // Bug#665799: maven-debian-helper: jar files installed to /usr/share/java AND /usr/share/maven-repo
+    @Test
+    public void testInstallJarToRepoAndUsj() throws Exception {
+        mojo = new InstallMojo();
+        mojo.setBasedir(getFileInClasspath("plexus-compiler/plexus-compiler-api/pom.xml").getParentFile());
+        mojo.setDebianDir(getFileInClasspath("plexus-compiler/debian/maven.rules").getParentFile());
+        mojo.setDestGroupId("org.codehaus.plexus");
+        mojo.setGroupId("org.codehaus.plexus");
+        mojo.setArtifactId("plexus-compiler-api");
+        mojo.setDestArtifactId("plexus-compiler-api");
+        //mojo.setFinalName("plexus-compiler-api");
+        mojo.setInstallToUsj(true);
+        mojo.setJarDir(getFileInClasspath("plexus-compiler/plexus-compiler-api/target/plexus-compiler-api-1.8.2.jar").getParentFile().getAbsolutePath());
+        mojo.setMavenRules("maven.rules");
+        mojo.setNoUsjVersionless(false);
+        mojo.setDebianPackage("libplexus-compiler-java");
+        mojo.setDestPackage("libplexus-compiler-java");
+        mojo.setVersion("1.8.2");
+        mojo.setDebianVersion("1.x");
+
+        mojo.execute();
+
+        File usjJar = getFileInClasspath("plexus-compiler/debian/libplexus-compiler-java/usr/share/java/plexus-compiler-api.jar");
+        assertNotNull(usjJar);
+        File versionedUsjJar = getFileInClasspath("plexus-compiler/debian/libplexus-compiler-java/usr/share/java/plexus-compiler-api-1.8.2.jar");
+        assertNotNull(versionedUsjJar);
+        assertEquals(usjJar, versionedUsjJar.getCanonicalFile());
+
+        File versionedRepoJar = getFileInClasspath("plexus-compiler/debian/libplexus-compiler-java/usr/share/maven-repo/org/codehaus/plexus/plexus-compiler-api/1.8.2/plexus-compiler-api-1.8.2.jar");
+        assertNotNull(versionedRepoJar);
+        assertEquals(usjJar, versionedRepoJar.getCanonicalFile());
+        File versionedRepoPom = getFileInClasspath("plexus-compiler/debian/libplexus-compiler-java/usr/share/maven-repo/org/codehaus/plexus/plexus-compiler-api/1.8.2/plexus-compiler-api-1.8.2.pom");
+        assertNotNull(versionedRepoPom);
+
+        File debianRepoJar = getFileInClasspath("plexus-compiler/debian/libplexus-compiler-java/usr/share/maven-repo/org/codehaus/plexus/plexus-compiler-api/1.x/plexus-compiler-api-1.x.jar");
+        assertNotNull(debianRepoJar);
+        assertEquals(usjJar, debianRepoJar.getCanonicalFile());
+        File debianRepoPom = getFileInClasspath("plexus-compiler/debian/libplexus-compiler-java/usr/share/maven-repo/org/codehaus/plexus/plexus-compiler-api/1.x/plexus-compiler-api-1.x.pom");
+        assertNotNull(debianRepoPom);
+
+    }
+
+    @Test
+    public void testInstallJarToLocalRepo() throws Exception {
+        mojo = new InstallMojo();
+        mojo.setMavenRepoLocal(new File(testDir, "repo"));
+        mojo.setUseMavenRepoLocal(true);
+        mojo.setBasedir(getFileInClasspath("plexus-compiler/plexus-compiler-test/pom.xml").getParentFile());
+        mojo.setDebianDir(getFileInClasspath("plexus-compiler/debian/maven.rules").getParentFile());
+        mojo.setDestGroupId("org.codehaus.plexus");
+        mojo.setGroupId("org.codehaus.plexus");
+        mojo.setArtifactId("plexus-compiler-test");
+        mojo.setDestArtifactId("plexus-compiler-test");
+        mojo.setInstallToUsj(false);
+        mojo.setJarDir(getFileInClasspath("plexus-compiler/plexus-compiler-test/target/plexus-compiler-test-1.8.2.jar").getParentFile().getAbsolutePath());
+        mojo.setMavenRules("maven.rules");
+        mojo.setNoUsjVersionless(false);
+        mojo.setDebianPackage("libplexus-compiler-java");
+        mojo.setDestPackage("libplexus-compiler-java");
+        mojo.setVersion("1.8.2");
+        mojo.setDebianVersion("1.x");
+
+        mojo.execute();
+
+        File versionedRepoJar = new File(testDir, "repo/org/codehaus/plexus/plexus-compiler-test/1.8.2/plexus-compiler-test-1.8.2.jar");
+        assertNotNull(versionedRepoJar);
+        File versionedRepoPom = new File(testDir, "repo/org/codehaus/plexus/plexus-compiler-test/1.8.2/plexus-compiler-test-1.8.2.pom");
+        assertNotNull(versionedRepoPom);
+
+        File debianRepoJar = new File(testDir, "repo/org/codehaus/plexus/plexus-compiler-test/1.x/plexus-compiler-test-1.x.jar");
+        assertNotNull(debianRepoJar);
+        assertEquals(versionedRepoJar.getAbsoluteFile(), debianRepoJar.getCanonicalFile());
+        File debianRepoPom = new File(testDir, "repo/org/codehaus/plexus/plexus-compiler-test/1.x/plexus-compiler-test-1.x.pom");
+        assertNotNull(debianRepoPom);
+    }
+
+
+    protected File getFileInClasspath(String resource) {
+        if (! resource.startsWith("/")) {
+            resource = "/" + resource;
+        }
+        URL url = this.getClass().getResource(resource);
+        File f;
+        try {
+          f = new File(url.toURI());
+        } catch(URISyntaxException e) {
+          f = new File(url.getPath());
+        }
+        return f;
+    }
+
+}

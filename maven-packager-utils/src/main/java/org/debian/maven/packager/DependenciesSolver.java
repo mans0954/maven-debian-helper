@@ -17,7 +17,6 @@ package org.debian.maven.packager;
  * limitations under the License.
  */
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
@@ -27,10 +26,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -38,6 +33,7 @@ import java.util.regex.Pattern;
 
 import javax.xml.stream.XMLStreamException;
 
+import org.debian.maven.packager.util.*;
 import org.debian.maven.repo.Dependency;
 import org.debian.maven.repo.DependencyNotFoundException;
 import org.debian.maven.repo.DependencyRule;
@@ -48,6 +44,8 @@ import org.debian.maven.repo.POMInfo;
 import org.debian.maven.repo.POMTransformer;
 import org.debian.maven.repo.Repository;
 import org.debian.maven.repo.Rule;
+
+import static org.debian.maven.packager.util.IOUtil.readLine;
 
 /**
  * Analyze the Maven dependencies and extract the Maven rules to use
@@ -170,13 +168,14 @@ public class DependenciesSolver {
     private boolean filterModules = false;
     private boolean verbose = false;
     private Map<String, POMInfo> pomInfoCache = new HashMap<String, POMInfo>();
-    // Keep the previous selected rule for a given version 
+    // Keep the original POMs for reference
+    private Map<String, POMInfo> originalPomInfoCache = new HashMap<String, POMInfo>();
+    // Keep the previous selected rule for a given version
     private Map<String, Rule> versionToRules = new HashMap<String, Rule>();
-    // Keep the list of known files and their package
-    private Map<File, String> filesInPackages = new HashMap<File, String>();
     // Keep the list of packages and dependencies
     private Map<String, Dependency> versionedPackagesAndDependencies = new HashMap<String, Dependency>();
     private List<Rule> defaultRules = new ArrayList<Rule>();
+    private PackageScanner scanner = new PackageScanner();
 
     public DependenciesSolver() {
         pomTransformer.setVerbose(true);
@@ -230,6 +229,7 @@ public class DependenciesSolver {
 
     public void setOffline(boolean offline) {
         this.offline = offline;
+        scanner.setOffline(offline);
     }
 
     public boolean isGenerateJavadoc() {
@@ -351,8 +351,10 @@ public class DependenciesSolver {
         public void resolve() {
             try {
                 resolveDependencies(sourcePom, listType, buildTime, mavenExtension, management);
-            } catch (Exception e) {
+            } catch (DependencyNotFoundException e) {
                 log.log(Level.SEVERE, "Cannot resolve dependencies in " + sourcePom + ": " + e.getMessage());
+            } catch (Exception e) {
+                log.log(Level.SEVERE, "Cannot resolve dependencies in " + sourcePom + ": " + e.getMessage(), e);
             }
         }
     }
@@ -407,7 +409,7 @@ public class DependenciesSolver {
                 if (runtimeDependency != null && "pom".equals(runtimeDependency.getType())) {
                     continue;
                 }
-                String docPkg = searchPkg(new File("/usr/share/doc/" + dependency + "/api/index.html"));
+                String docPkg = scanner.searchPkg(new File("/usr/share/doc/" + dependency + "/api/index.html"));
                 if (docPkg != null) {
                     docRuntimeDepends.add(docPkg);
                 }
@@ -421,7 +423,7 @@ public class DependenciesSolver {
                 if (optionalDependency != null && "pom".equals(optionalDependency.getType())) {
                     continue;
                 }
-                String docPkg = searchPkg(new File("/usr/share/doc/" + dependency + "/api/index.html"));
+                String docPkg = scanner.searchPkg(new File("/usr/share/doc/" + dependency + "/api/index.html"));
                 if (docPkg != null) {
                     docOptionalDepends.add(docPkg);
                 }
@@ -698,6 +700,7 @@ public class DependenciesSolver {
 
             if (interactive && !explicitlyMentionedInRules && !"maven-plugin".equals(pom.getThisPom().getType())) {
                 String version = pom.getThisPom().getVersion();
+                System.out.println();
                 System.out.println("Version of " + pom.getThisPom().getGroupId() + ":"
                     + pom.getThisPom().getArtifactId() + " is " + version);
                 System.out.println("Choose how it will be transformed:");
@@ -836,22 +839,23 @@ public class DependenciesSolver {
         return info;
     }
 
+    private POMInfo getOriginalPOM(File projectPom) throws XMLStreamException, IOException {
+        POMInfo info = originalPomInfoCache.get(projectPom.getAbsolutePath());
+        if (info != null) {
+            return info;
+        }
+
+        info = pomTransformer.readPom(projectPom);
+        originalPomInfoCache.put(projectPom.getAbsolutePath(), info);
+        return info;
+    }
+
     private ListOfPOMs.POMOptions getPOMOptions(File pom) {
         return pomTransformer.getListOfPOMs().getOrCreatePOMOptions(pom);
     }
 
     private void resetPOM(File projectPom) {
          pomInfoCache.remove(projectPom.getAbsolutePath());
-    }
-
-    private String readLine() {
-        LineNumberReader consoleReader = new LineNumberReader(new InputStreamReader(System.in));
-        try {
-            return consoleReader.readLine().trim();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        }
     }
 
     private void resolveDependenciesNow() {
@@ -991,7 +995,8 @@ public class DependenciesSolver {
                 } else {
                     System.out.println("In " + sourcePomLoc + ", cannot find the version for dependency " + dependency + " from this POM or its parent POMs");
                     if (getPOMOptions(sourcePom).isNoParent()) {
-                        System.out.println("[warning] Option --no-parent has been set for POM file " + sourcePomLoc + ", maybe it was not a good idea and you should first package the parent POM " + containerPom.getParent());
+                        Dependency originalParent = getOriginalPOM(sourcePom).getParent();
+                        System.out.println("[warning] Option --no-parent has been set for POM file " + sourcePomLoc + ", maybe it was not a good idea and you should first package the parent POM " + originalParent);
                     }
                 }
             }
@@ -1132,11 +1137,11 @@ public class DependenciesSolver {
                 }
                 return null;
             } else {
-                String pkg = searchPkg(new File("/usr/share/maven-repo/"
+                String pkg = scanner.searchPkg(new File("/usr/share/maven-repo/"
                         + dependency.getGroupId().replace('.', '/')
                         + "/" + dependency.getArtifactId()), ".pom");
                 if (pkg != null) {
-                    String installedVersion = getPackageVersion(pkg, true);
+                    String installedVersion = scanner.getPackageVersion(pkg, true);
                     if (installedVersion != null) {
                         System.out.println("[error] Package " + pkg + " (" + installedVersion + ") is already installed and contains a possible match," );
                         System.out.println("but I cannot resolve library " + dependency + " in it.");
@@ -1148,7 +1153,7 @@ public class DependenciesSolver {
                     }
                 }
                 if (interactive && pkg == null) {
-                    pkg = searchPkg(new File("/usr/share/java/" + dependency.getArtifactId() + ".jar"));
+                    pkg = scanner.searchPkg(new File("/usr/share/java/" + dependency.getArtifactId() + ".jar"));
                     if (pkg != null) {
                         System.out.println("[error] Package " + pkg + " does not contain Maven dependency " + dependency + " but there seem to be a match");
                         System.out.println("If the package contains already Maven artifacts but the names don't match, try to enter a substitution rule");
@@ -1163,13 +1168,24 @@ public class DependenciesSolver {
                         }
                     } else {
                         System.out.println("[error] Cannot resolve Maven dependency " + dependency + ". If you know a package that contains a compatible dependency,");
-                        System.out.println("Try to enter a substitution rule of the form s/groupId/newGroupId/ s/artifactId/newArtifactId/ jar s/version/newVersion/ here:");
+                        System.out.println("try to enter a substitution rule of the form s/groupId/newGroupId/ s/artifactId/newArtifactId/ jar s/version/newVersion/ here:");
                         System.out.print("> ");
                         String newRule = readLine().trim();
-                        if (!newRule.isEmpty()) {
+                        while (!newRule.isEmpty()) {
                             DependencyRule userRule = new DependencyRule(newRule);
-                            pomTransformer.getRules().add(userRule);
-                            return resolveDependency(dependency.applyRules(Arrays.asList(userRule)), sourcePom, buildTime, mavenExtension, management);
+                            Dependency newDependency = dependency.applyRules(Arrays.asList(userRule));
+                            if (newDependency.equals(dependency)) {
+                                System.out.println("Your rule doesn't seem to apply on " + dependency);
+                                System.out.println("Please enter a substitution rule of the form s/groupId/newGroupId/ s/artifactId/newArtifactId/ jar s/version/newVersion/ here,");
+                                System.out.println("or press <Enter> to give up");
+                                System.out.print("> ");
+                                newRule = readLine().trim();
+                            } else {
+                                pomTransformer.getRules().add(userRule);
+                                System.out.println("Rescanning /usr/share/maven-repo...");
+                                pomTransformer.getRepository().scan();
+                                return resolveDependency(dependency.applyRules(Arrays.asList(userRule)), sourcePom, buildTime, mavenExtension, management);
+                            }
                         }
                     }
                 }
@@ -1181,7 +1197,9 @@ public class DependenciesSolver {
                         System.out.println("Rescanning /usr/share/maven-repo...");
                         pomTransformer.getRepository().scan();
                         // Clear caches
-                        filesInPackages.clear();
+                        scanner = new PackageScanner();
+                        scanner.setOffline(offline);
+                        
                         return resolveDependency(dependency, sourcePom, buildTime, mavenExtension, management);
                     }
                 }
@@ -1276,25 +1294,9 @@ public class DependenciesSolver {
             issues.add(sourcePomLoc + ": Dependency is missing the Debian properties in its POM: " + dependency.getGroupId() + ":"
                     + dependency.getArtifactId() + ":" + dependency.getVersion());
             File pomFile = new File(mavenRepo, dependency.getGroupId().replace(".", "/") + "/" + dependency.getArtifactId() + "/" + dependency.getVersion() + "/" + dependency.getArtifactId() + "-" + dependency.getVersion() + ".pom");
-            pkg = searchPkg(pomFile);
+            pkg = scanner.searchPkg(pomFile);
         }
         return pkg;
-    }
-
-    private String getPackageVersion(String pkg, boolean onlyInstalled) {
-        GetPackageVersionResult packageResult = new GetPackageVersionResult();
-        executeProcess(new String[]{"dpkg", "--status", pkg}, packageResult);
-        if (packageResult.getResult() != null) {
-            return packageResult.getResult();
-        }
-        if (!onlyInstalled) {
-            GetChangelogVersionResult versionResult = new GetChangelogVersionResult(pkg);
-            executeProcess(new String[]{"apt-get", "--no-act", "--verbose-versions", "install", pkg}, versionResult);
-            if (versionResult.getResult() != null) {
-                return versionResult.getResult();
-            }
-        }
-        return null;
     }
 
     private boolean containsDependencyIgnoreVersion(Collection<Dependency> dependencies, Dependency dependency) {
@@ -1304,102 +1306,6 @@ public class DependenciesSolver {
             }
         }
         return false;
-    }
-
-    private String searchPkg(File dir, String extension) {
-        GetFilteredPackageResult packageResult = new GetFilteredPackageResult(extension);
-        File cacheId = new File(dir, "_" + extension);
-        return searchPkg(cacheId, dir, packageResult);
-    }
-
-    private String searchPkg(File file) {
-        GetPackageResult packageResult = new GetPackageResult();
-        return searchPkg(file, file, packageResult);
-    }
-
-    private String searchPkg(File cacheId, File fileToSearch, GetPackageResult packageResult) {
-        if (filesInPackages.containsKey(cacheId)) {
-            return filesInPackages.get(cacheId);
-        }
-
-        executeProcess(new String[]{"dpkg", "--search", fileToSearch.getAbsolutePath()}, packageResult);
-        if (packageResult.getResult() != null) {
-            String pkg = packageResult.getResult();
-            if (pkg != null) {
-                filesInPackages.put(cacheId, pkg);
-            }
-            return pkg;
-        }
-
-        // Debian policy prevents the use of apt-file during a build
-        if (offline) {
-            return null;
-        }
-
-        if (!new File("/usr/bin/apt-file").exists()) {
-            return null;
-        }
-        executeProcess(new String[]{"apt-file", "search", fileToSearch.getAbsolutePath()}, packageResult);
-        String pkg = packageResult.getResult();
-        if (pkg != null) {
-            filesInPackages.put(cacheId, pkg);
-        }
-        return pkg;
-    }
-
-    public static void executeProcess(final String[] cmd, final OutputHandler handler) {
-        try {
-            ProcessBuilder pb = new ProcessBuilder(cmd);
-            pb.redirectErrorStream(true);
-            System.out.print("> ");
-            for (String arg : cmd) {
-                System.out.print(arg + " ");
-            }
-            System.out.println();
-            final Process process = pb.start();
-            try {
-                ThreadFactory threadFactory = new ThreadFactory() {
-
-                    public Thread newThread(Runnable r) {
-                        Thread t = new Thread(r, "Run command " + cmd[0]);
-                        t.setDaemon(true);
-                        return t;
-                    }
-                };
-
-                ExecutorService executor = Executors.newSingleThreadExecutor(threadFactory);
-                executor.execute(new Runnable() {
-
-                    public void run() {
-                        try {
-                            InputStreamReader isr = new InputStreamReader(process.getInputStream());
-                            BufferedReader br = new BufferedReader(isr);
-                            LineNumberReader aptIn = new LineNumberReader(br);
-                            String line;
-                            while ((line = aptIn.readLine()) != null) {
-                                handler.newLine(line);
-                            }
-                            aptIn.close();
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                });
-
-                process.waitFor();
-                executor.awaitTermination(5, TimeUnit.SECONDS);
-                if (process.exitValue() == 0) {
-                } else {
-                    System.out.println(cmd[0] + " failed to execute successfully");
-                }
-                process.destroy();
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
-                Thread.interrupted();
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
     }
 
     private String toString(Set<String> s) {
@@ -1412,111 +1318,6 @@ public class DependenciesSolver {
             }
         }
         return sb.toString();
-    }
-
-    public static interface OutputHandler {
-
-        void newLine(String line);
-    }
-
-    public static class NoOutputHandler implements OutputHandler {
-
-        public void newLine(String line) {
-        }
-    }
-
-    static class GetPackageResult implements OutputHandler {
-
-        private String result;
-
-        public void newLine(String line) {
-            if (result != null) {
-                return;
-            }
-            int colon = line.indexOf(':');
-            if (colon > 0 && line.indexOf(' ') > colon) {
-                result = line.substring(0, colon);
-                // Ignore lines such as 'dpkg : xxx'
-                if (!result.equals(result.trim()) || result.startsWith("dpkg")) {
-                    result = null;
-                } else {
-                    result = foundResult(result);
-                }
-            }
-        }
-
-        protected String foundResult(String potentialMatch) {
-            System.out.println("Found " + potentialMatch);
-            return potentialMatch;
-        }
-
-        public String getResult() {
-            return result;
-        }
-
-    }
-
-    static class GetFilteredPackageResult extends GetPackageResult {
-        private final String extension;
-
-        public GetFilteredPackageResult(String extension) {
-            this.extension = extension;
-        }
-
-        protected String foundResult(String potentialMatch) {
-            if (potentialMatch.endsWith(extension)) {
-              System.out.println("Found " + potentialMatch);
-              return potentialMatch;
-            } else {
-              return null;
-            }
-        }
-        
-    }
-
-    static class GetPackageVersionResult implements OutputHandler {
-
-        private String result;
-
-        public void newLine(String line) {
-            if (result != null) {
-                return;
-            }
-            if (line.startsWith("Version:")) {
-                int space = line.indexOf(' ');
-                result = line.substring(space + 1, line.length()).trim();
-            }
-        }
-
-        public String getResult() {
-            return result;
-        }
-
-    }
-
-    static class GetChangelogVersionResult implements OutputHandler {
-
-        private String result;
-        private final Pattern pattern;
-
-        public GetChangelogVersionResult(String pkg) {
-            this.pattern = Pattern.compile(pkg + "\\s\\(.*\\)");
-        }
-
-        public void newLine(String line) {
-            if (result != null) {
-                return;
-            }
-            Matcher match = pattern.matcher(line);
-            if (match.find()) {
-                result = match.group(1);
-            }
-        }
-
-        public String getResult() {
-            return result;
-        }
-
     }
 
     public static void main(String[] args) {
@@ -1626,6 +1427,7 @@ public class DependenciesSolver {
         solver.saveSubstvars();
 
         if (!solver.getIssues().isEmpty()) {
+            System.err.println("Some problems where found in this project, exiting...");
             System.exit(1);
         }
     }
