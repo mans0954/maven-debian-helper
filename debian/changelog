@@ -1,4 +1,4 @@
-maven-debian-helper (1.5.1) UNRELEASED; urgency=low
+maven-debian-helper (1.5.1) unstable; urgency=low
 
   * d/control: update version constraint on maven-repo-helper
     (Closes: #657889)
@@ -15,7 +15,7 @@ maven-debian-helper (1.5.1) UNRELEASED; urgency=low
   * Rename plugin maven-debian-plugin as debian-maven-plugin to adhere to
     Maven naming conventions.
 
- -- Ludovic Claude <ludovic.claude@laposte.net>  Mon, 30 Jan 2012 23:46:27 +0100
+ -- Ludovic Claude <ludovic.claude@laposte.net>  Fri, 04 May 2012 00:51:14 +0200
 
 maven-debian-helper (1.5) unstable; urgency=low
 
