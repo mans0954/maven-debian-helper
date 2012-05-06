@@ -1,5 +1,7 @@
 maven-debian-helper (1.5.2) UNRELEASED; urgency=low
 
+  * d/control:
+    - Update Standards-Version to 3.9.2, no changes
   * d/rules: move 'unpatch all POM files' to
     cleanbuilddir target to restore all files to their pristine
     state after building.
