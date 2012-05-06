@@ -48,9 +48,11 @@ install/$(PACKAGE)::
 	  man/mvn-debian.pod > man/mvn-debian.1
 	dh_installman $(MAN_PAGES) man/mvn-debian.1
 
+cleanbuilddir::
+	mh_unpatchpoms -p$(PACKAGE)
+
 clean::
 	-$(RM) man/mvn-debian.1
-	mh_unpatchpoms -p$(PACKAGE)
 	mh_clean
 
 # Helper target, to use when updating the version of this package

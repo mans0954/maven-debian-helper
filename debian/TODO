@@ -1,0 +1,3 @@
+o mh_make: When ignoring a module, update orig-tar.sh and git-import-orig to filter out the module directory
+o mh_make: support ignore module, ignored module must be removed from the parent pom before launching Maven to generate the project files
+o Create watch for Github - Cannot recognize the download url (scm:git:git@github.com:sonatype/plexus-compiler.git).
