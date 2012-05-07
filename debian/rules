@@ -47,6 +47,7 @@ install/$(PACKAGE)::
 	  -r maven-debian-helper-$(DEB_UPSTREAM_VERSION) \
 	  man/mvn-debian.pod > man/mvn-debian.1
 	dh_installman $(MAN_PAGES) man/mvn-debian.1
+	install -D share/perl/maven.pm debian/tmp/$$(perl -MConfig -e 'print $$Config{vendorlib}')/Debian/Debhelper/Buildsystem/maven.pm
 
 cleanbuilddir::
 	mh_unpatchpoms -p$(PACKAGE)
