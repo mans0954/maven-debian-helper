@@ -28,10 +28,10 @@ import static org.debian.maven.packager.util.IOUtil.readLine;
 
 public class LicensesScanner {
 
-    public Set discoverLicenses(List projectLicenses) {
-        Set licenses = new TreeSet();
-        for (Iterator i = projectLicenses.iterator(); i.hasNext(); ) {
-            License license = (License) i.next();
+    public Set<String> discoverLicenses(List<License> projectLicenses) {
+        Set<String> licenses = new TreeSet<String>();
+        for (Iterator<License> i = projectLicenses.iterator(); i.hasNext(); ) {
+            License license =  i.next();
             String licenseName = "";
             if (license.getName() != null) {
                 licenseName = license.getName() + " ";
@@ -57,8 +57,8 @@ public class LicensesScanner {
         LicenseCheckResult licenseResult = new LicenseCheckResult();
         IOUtil.executeProcess(new String[]{"/bin/sh", "-c", "licensecheck `find . -type f`"},
                 licenseResult);
-        for (Iterator i = licenseResult.getLicenses().iterator(); i.hasNext(); ) {
-            String license = (String) i.next();
+        for (Iterator<String> i = licenseResult.getLicenses().iterator(); i.hasNext(); ) {
+            String license = i.next();
             boolean recognized = recognizeLicense(licenses, license, "");
             if (!recognized) {
                 System.out.println("License " + license + " was not recognized, please enter a license name preferably in one of:");
@@ -89,7 +89,7 @@ public class LicensesScanner {
         System.out.println("GFDL-1.2 GFDL-1.3 GFDL-NIV LPPL MPL Perl PSF QPL W3C-Software ZLIB Zope");
     }
 
-    boolean recognizeLicense(Set licenses, String licenseName, String licenseUrl) {
+    boolean recognizeLicense(Set<String> licenses, String licenseName, String licenseUrl) {
         boolean recognized = false;
         licenseName = licenseName.toLowerCase();
         licenseUrl = licenseUrl.toLowerCase();

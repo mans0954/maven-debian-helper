@@ -62,6 +62,6 @@ public class GetPackageContainingPatternResult implements OutputHandler {
     }
 
     public Set<String> getPackages() {
-        return new HashSet(result.values());
+        return new HashSet<String>(result.values());
     }
 }

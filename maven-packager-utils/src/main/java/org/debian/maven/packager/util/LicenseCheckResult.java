@@ -22,8 +22,8 @@ import java.util.TreeSet;
 
 public class LicenseCheckResult implements OutputHandler {
 
-    private final Set licenses = new TreeSet();
-    private final Set copyrightOwners = new TreeSet();
+    private final Set<String> licenses = new TreeSet<String>();
+    private final Set<String> copyrightOwners = new TreeSet<String>();
 
     public void newLine(String line) {
         if (line.startsWith(".") && line.indexOf(":") > 0) {
@@ -42,11 +42,11 @@ public class LicenseCheckResult implements OutputHandler {
     public void failure() {
     }
     
-    public Set getLicenses() {
+    public Set<String> getLicenses() {
         return licenses;
     }
 
-    public Set getCopyrightOwners() {
+    public Set<String> getCopyrightOwners() {
         return copyrightOwners;
     }
 }

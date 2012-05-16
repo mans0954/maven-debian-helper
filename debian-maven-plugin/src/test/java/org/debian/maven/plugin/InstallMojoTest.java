@@ -40,7 +40,7 @@ public class InstallMojoTest {
     private File testDir = new File("tmp");
     private InstallMojo mojo;
 
-    private List openedReaders = new ArrayList();
+    private List<Reader> openedReaders = new ArrayList<Reader>();
 
     @Before
     public void setUp() throws Exception {
@@ -49,7 +49,7 @@ public class InstallMojoTest {
 
     @After
     public void tearDown() throws Exception {
-        for (Iterator i = openedReaders.iterator(); i.hasNext(); ) {
+        for (Iterator<Reader> i = openedReaders.iterator(); i.hasNext(); ) {
             Reader reader = (Reader) i.next();
             try {
                 reader.close();

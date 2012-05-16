@@ -17,7 +17,6 @@ package org.debian.maven.packager;
  */
 
 import org.apache.maven.model.Developer;
-import org.apache.maven.model.License;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
@@ -29,8 +28,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.debian.maven.packager.util.LicensesScanner;
-import org.debian.maven.packager.util.NoOutputHandler;
-import org.debian.maven.packager.util.OutputHandler;
 import org.debian.maven.packager.util.PackageScanner;
 import org.debian.maven.repo.ListOfPOMs;
 
@@ -61,7 +58,7 @@ public class GenerateDebianFilesMojo
      * A list of every project in this reactor; provided by Maven
      * @parameter expression="${project.collectedProjects}"
      */
-    protected List collectedProjects;
+    protected List<MavenProject> collectedProjects;
     /**
      * @parameter expression="${localRepository}"
      * @required
@@ -174,7 +171,7 @@ public class GenerateDebianFilesMojo
                 project.setUrl(readLine());
             }
 
-            Set licenses = licensesScanner.discoverLicenses(project.getLicenses());
+            Set<String> licenses = licensesScanner.discoverLicenses(project.getLicenses());
             context.put("licenses", licenses);
 
             if (licenses.size() == 1) {
@@ -198,9 +195,9 @@ public class GenerateDebianFilesMojo
                 projectTeam = project.getOrganization().getName() + " developers";
             }
             if (copyrightOwner == null || copyrightOwner.isEmpty()) {
-                Iterator devs = project.getDevelopers().iterator();
+                Iterator<Developer> devs = project.getDevelopers().iterator();
                 if (devs.hasNext()) {
-                    Developer dev = (Developer) devs.next();
+                    Developer dev = devs.next();
                     copyrightOwner = dev.getName();
                     if (dev.getEmail() != null && !dev.getEmail().isEmpty()) {
                         copyrightOwner += " <" + dev.getEmail() + ">";
@@ -231,7 +228,7 @@ public class GenerateDebianFilesMojo
             context.put("copyrightYear", copyrightYear);
             context.put("currentYear", new Integer(currentYear));
 
-            List description = new ArrayList();
+            List<String> description = new ArrayList<String>();
             if (project.getDescription() == null || project.getDescription().trim().isEmpty()) {
                 System.out.println("Please enter a short description of the project, press Enter twice to stop.");
                 StringBuffer sb = new StringBuffer();
@@ -273,11 +270,11 @@ public class GenerateDebianFilesMojo
             if (substvarsFile.exists()) {
                 Properties substvars = new Properties();
                 substvars.load(new FileReader(substvarsFile));
-                List compileDepends = new ArrayList();
+                List<String> compileDepends = new ArrayList<String>();
                 compileDepends.addAll(split(substvars.getProperty("maven.CompileDepends")));
                 compileDepends.addAll(split(substvars.getProperty("maven.Depends")));
-                List buildDepends = new ArrayList(compileDepends);
-                List testDepends = new ArrayList(split(substvars.getProperty("maven.TestDepends")));
+                List<String> buildDepends = new ArrayList<String>(compileDepends);
+                List<String> testDepends = new ArrayList<String>(split(substvars.getProperty("maven.TestDepends")));
                 if (runTests) {
                     buildDepends.addAll(testDepends);
                 }
@@ -288,8 +285,8 @@ public class GenerateDebianFilesMojo
                 if ("maven".equals(packageType)) {
                     boolean seenJavadocPlugin = false;
                     // Remove dependencies that are implied by maven-debian-helper
-                    for (Iterator i = buildDepends.iterator(); i.hasNext();) {
-                        String dependency = (String) i.next();
+                    for (Iterator<String> i = buildDepends.iterator(); i.hasNext();) {
+                        String dependency = i.next();
                         if (dependency.startsWith("libmaven-clean-plugin-java") ||
                                 dependency.startsWith("libmaven-resources-plugin-java") ||
                                 dependency.startsWith("libmaven-compiler-plugin-java") ||
@@ -308,8 +305,8 @@ public class GenerateDebianFilesMojo
                     }
                 } else if ("ant".equals(packageType)) {
                     // Remove dependencies that are implied by ant packaging
-                    for (Iterator i = buildDepends.iterator(); i.hasNext(); ) {
-                        String dependency = (String) i.next();
+                    for (Iterator<String> i = buildDepends.iterator(); i.hasNext(); ) {
+                        String dependency = i.next();
                         if (dependency.equals("ant") ||
                                 dependency.startsWith("ant ") ||
                                 dependency.startsWith("ant-optional")) {
@@ -327,14 +324,14 @@ public class GenerateDebianFilesMojo
                 context.put("javadocOptionalDependencies", split(substvars.getProperty("maven.DocOptionalDepends")));
 
                 if ("ant".equals(packageType)) {
-                    Set compileJars = new TreeSet();
-                    for (Iterator i = compileDepends.iterator(); i.hasNext();) {
-                        String library = (String) i.next();
+                    Set<String> compileJars = new TreeSet<String>();
+                    for (Iterator<String> i = compileDepends.iterator(); i.hasNext();) {
+                        String library = i.next();
                         compileJars.addAll(scanner.listSharedJars(library));
                     }
                     context.put("compileJars", compileJars);
-                    Set testJars = new TreeSet();
-                    for (Iterator i = testDepends.iterator(); i.hasNext();) {
+                    Set<String> testJars = new TreeSet<String>();
+                    for (Iterator<String> i = testDepends.iterator(); i.hasNext();) {
                         String library = (String) i.next();
                         testJars.addAll(scanner.listSharedJars(library));
                     }
@@ -351,8 +348,8 @@ public class GenerateDebianFilesMojo
                     listOfJavadocPOMs =  new ListOfPOMs(new File(outputDirectory, binPackageName + "-doc.poms"));
                 }
                 setupArtifactLocation(listOfPOMs, listOfJavadocPOMs, project);
-                for (Iterator i = collectedProjects.iterator(); i.hasNext();) {
-                    MavenProject mavenProject = (MavenProject) i.next();
+                for (Iterator<MavenProject> i = collectedProjects.iterator(); i.hasNext();) {
+                    MavenProject mavenProject = i.next();
                     setupArtifactLocation(listOfPOMs, listOfJavadocPOMs, mavenProject);
                 }
                 listOfPOMs.save();
@@ -448,8 +445,8 @@ public class GenerateDebianFilesMojo
                 boolean containsJars = false;
                 boolean containsPlugins = false;
                 if (project.getPackaging().equals("pom") && project.getModules().size() > 0) {
-                    for (Iterator i = collectedProjects.iterator(); i.hasNext(); ) {
-                        MavenProject module = (MavenProject) i.next();
+                    for (Iterator<MavenProject> i = collectedProjects.iterator(); i.hasNext(); ) {
+                        MavenProject module = i.next();
                         if (module.getPackaging().equals("maven-plugin")) {
                             containsPlugins = true;
                         } else if (!module.getPackaging().equals("pom")) {
@@ -483,7 +480,7 @@ public class GenerateDebianFilesMojo
         }
     }
 
-    private List wrapMavenProjects(List<MavenProject> projects) {
+    private List<WrappedProject> wrapMavenProjects(List<MavenProject> projects) {
         List<WrappedProject> wrappedProjects = new ArrayList<WrappedProject>();
         for (MavenProject aProject: projects) {
             wrappedProjects.add(new WrappedProject(this.project, aProject));
@@ -534,8 +531,8 @@ public class GenerateDebianFilesMojo
         out.close();
     }
 
-    private List split(String s) {
-        List l = new ArrayList();
+    private List<String> split(String s) {
+        List<String> l = new ArrayList<String>();
         if (s != null) {
             StringTokenizer st = new StringTokenizer(s, ",");
             while (st.hasMoreTokens()) {

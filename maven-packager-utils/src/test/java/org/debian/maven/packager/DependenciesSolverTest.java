@@ -34,14 +34,12 @@ import junit.framework.TestCase;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.debian.maven.repo.DependencyRule;
-import org.debian.maven.repo.ListOfPOMs;
-import org.debian.maven.repo.Repository;
 
 public class DependenciesSolverTest extends TestCase {
 
     private File testDir = new File("tmp");
     private File pomFile = new File(testDir, "pom.xml");
-    private List openedReaders = new ArrayList();
+    private List<Reader> openedReaders = new ArrayList<Reader>();
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -50,8 +48,8 @@ public class DependenciesSolverTest extends TestCase {
 
     protected void tearDown() throws Exception {
         super.tearDown();
-        for (Iterator i = openedReaders.iterator(); i.hasNext(); ) {
-            Reader reader = (Reader) i.next();
+        for (Iterator<Reader> i = openedReaders.iterator(); i.hasNext(); ) {
+            Reader reader = i.next();
             try {
                 reader.close();
             } catch (IOException ex) {

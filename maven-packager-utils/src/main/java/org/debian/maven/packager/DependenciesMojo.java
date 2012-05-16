@@ -52,7 +52,7 @@ public class DependenciesMojo
      * A list of every project in this reactor; provided by Maven
      * @parameter expression="${project.collectedProjects}"
      */
-    protected List collectedProjects;
+    protected List<MavenProject> collectedProjects;
     /**
      * Location of the file.
      * @parameter expression="${debian.directory}"
@@ -114,10 +114,10 @@ public class DependenciesMojo
 
         File basedir = project.getBasedir();
         // TODO: use the list of project defined here for some initialisation step, I've forgotten what to do...
-        List projects = new ArrayList();
+        List<File> projects = new ArrayList<File>();
         projects.add(project.getFile());
         if (collectedProjects != null) {
-            for (Iterator i = collectedProjects.iterator(); i.hasNext();) {
+            for (Iterator<MavenProject> i = collectedProjects.iterator(); i.hasNext();) {
                 MavenProject subProject = (MavenProject) i.next();
                 projects.add(subProject.getFile());
             }
@@ -135,8 +135,8 @@ public class DependenciesMojo
         solver.setVerbose(verbose);
 
         if (solver.getListOfPOMs().getFirstPOM() == null && collectedProjects != null) {
-            for (Iterator i = collectedProjects.iterator(); i.hasNext();) {
-                MavenProject subProject = (MavenProject) i.next();
+            for (Iterator<MavenProject> i = collectedProjects.iterator(); i.hasNext();) {
+                MavenProject subProject = i.next();
                 solver.getListOfPOMs().addPOM(subProject.getFile());
             }
         }

@@ -18,7 +18,6 @@ package org.debian.maven.packager.util;
 
 
 import junit.framework.TestCase;
-import org.debian.maven.packager.GenerateDebianFilesMojo;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -28,7 +27,7 @@ public class LicensesScannerTest extends TestCase {
     public void testRecognizeLicense() throws Exception {
         LicensesScanner scanner = new LicensesScanner();
 
-        Set licenses = new HashSet();
+        Set<String> licenses = new HashSet<String>();
         assertTrue(scanner.recognizeLicense(licenses, "Apache (v2.0)", ""));
         assertEquals("Apache-2.0", licenses.iterator().next());
         licenses.clear();

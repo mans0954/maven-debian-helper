@@ -661,7 +661,7 @@ public class SysInstallMojo extends AbstractMojo {
             installToUsj = pomOption.isJavaLib();
         }
 
-        List params = new ArrayList();
+        List<String> params = new ArrayList<String>();
         params.add("--keep-pom-version");
 
         params.add("--package=" + destPackage);
