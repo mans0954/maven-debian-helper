@@ -45,8 +45,6 @@ import org.debian.maven.repo.POMTransformer;
 import org.debian.maven.repo.Repository;
 import org.debian.maven.repo.Rule;
 
-import static org.debian.maven.packager.util.IOUtil.readLine;
-
 /**
  * Analyze the Maven dependencies and extract the Maven rules to use
  * as well as the list of dependent packages.
@@ -56,7 +54,7 @@ import static org.debian.maven.packager.util.IOUtil.readLine;
 public class DependenciesSolver {
 
     private static final Logger log = Logger.getLogger(DependenciesSolver.class.getName());
-
+    private static final UserInteraction userInteraction = new UserInteraction();
     // Plugins not useful for the build or whose use is against the
     // Debian policy
     private static final String[][] PLUGINS_TO_IGNORE = {
@@ -299,17 +297,10 @@ public class DependenciesSolver {
         if (!interactive || notIgnoredDependencies.contains(dependency)) {
             return false;
         }
-        System.out.println();
-        System.out.println("In " + sourcePomLoc + ":");
-        System.out.println(message);
-        System.out.println("  " + dependency);
-        if (defaultToIgnore) {
-            System.out.print("[y]/n > ");
-        } else {
-            System.out.print("y/[n] > ");
-        }
-        String s = readLine().toLowerCase();
-        boolean ignore = defaultToIgnore ? !s.startsWith("n") : s.startsWith("y");
+        String q = "\n" + "In " + sourcePomLoc + ":"
+                 + message
+                 + "  " + dependency;
+        boolean ignore = userInteraction.askYesNo(q, defaultToIgnore);
         if (!ignore) {
             notIgnoredDependencies.add(dependency);
         }
@@ -653,9 +644,8 @@ public class DependenciesSolver {
             knownProjectDependencies.add(pom.getThisPom());
 
             if (interactive && packageVersion == null) {
-                System.out.println("Enter the upstream version for the package. If you press <Enter> it will default to " + pom.getOriginalVersion());
-                System.out.print("> ");
-                String v = readLine();
+                String q = "Enter the upstream version for the package. If you press <Enter> it will default to " + pom.getOriginalVersion();
+                String v = userInteraction.ask(q);
                 if (v.isEmpty()) {
                     v = pom.getOriginalVersion();
                 }
@@ -668,10 +658,7 @@ public class DependenciesSolver {
             }
 
             if (filterModules) {
-                System.out.println("Include the module " + pomRelPath + " ?");
-                System.out.print("[y]/n > ");
-                String s = readLine().toLowerCase();
-                boolean includeModule = !s.startsWith("n");
+                boolean includeModule = userInteraction.askYesNo("Include the module " + pomRelPath + " ?", true);
                 if (!includeModule) {
                     getPOMOptions(projectPom).setIgnore(true);
                     String type = "*";
@@ -700,10 +687,11 @@ public class DependenciesSolver {
 
             if (interactive && !explicitlyMentionedInRules && !"maven-plugin".equals(pom.getThisPom().getType())) {
                 String version = pom.getThisPom().getVersion();
-                System.out.println();
-                System.out.println("Version of " + pom.getThisPom().getGroupId() + ":"
-                    + pom.getThisPom().getArtifactId() + " is " + version);
-                System.out.println("Choose how it will be transformed:");
+                String question = "\n"
+                    + "Version of " + pom.getThisPom().getGroupId() + ":"
+                    + pom.getThisPom().getArtifactId() + " is " + version
+                    + "Choose how it will be transformed:";
+
                 List<Rule> choices = new ArrayList<Rule>();
 
                 if (versionToRules.containsKey(version)) {
@@ -728,30 +716,16 @@ public class DependenciesSolver {
                     }
                 }
 
-                int count = 1;
-                for (Iterator<Rule> i = choices.iterator(); i.hasNext(); count++) {
-                    Rule rule = i.next();
-                    if (count == 1) {
-                        System.out.print("[1]");
-                    } else {
-                        System.out.print(" " + count + " ");
-                    }
-                    System.out.println(" - " + rule.getDescription());
+                List<String> choicesDescriptions = new ArrayList<String>();
+                for(Rule choice : choices) {
+                    choicesDescriptions.add(choice.getDescription());
                 }
-                System.out.print("> ");
-                String s = readLine().toLowerCase();
-                int choice = 1;
-                try {
-                    choice = Integer.parseInt(s);
-                } catch (Exception ignore) {
-                }
-
+                int choice = userInteraction.askChoices(question, 0, choicesDescriptions);
                 Rule selectedRule = choices.get(choice - 1);
                 versionToRules.put(version, selectedRule);
                 if (selectedRule.getPattern().equals("CUSTOM")) {
-                    System.out.println("Enter the pattern for your custom rule (in the form s/regex/replace/)");
-                    System.out.print("> ");
-                    s = readLine().toLowerCase();
+                    String s = userInteraction.ask("Enter the pattern for your custom rule (in the form s/regex/replace/)")
+                               .toLowerCase();
                     selectedRule = new Rule(s);
                     selectedRule.setDescription("My custom rule " + s);
                     defaultRules.add(selectedRule);
@@ -764,14 +738,13 @@ public class DependenciesSolver {
                 getRepository().registerPom(projectPom, transformedPom);
                 projectPoms.add(transformedPom.getThisPom());
 
-
                 if ("bundle".equals(pom.getThisPom().getType())) {
-                    System.out.println(pom.getThisPom().getGroupId() + ":" + pom.getThisPom().getArtifactId() +
-                            " is a bundle.");
-                    System.out.println("Inform mh_make that dependencies of type jar which may match this library should be transformed into bundles automatically?");
-                    System.out.print("[y]/n > ");
-                    s = readLine().toLowerCase();
-                    boolean transformJarsIntoBundle = !s.startsWith("n");
+                    String question2 = pom.getThisPom().getGroupId() + ":" + pom.getThisPom().getArtifactId() +
+                            " is a bundle.\n"
+                            + "Inform mh_make that dependencies of type jar which may match this library should be transformed into bundles automatically?";
+
+                    boolean transformJarsIntoBundle = userInteraction.askYesNo(question2, true);
+
                     if (transformJarsIntoBundle) {
                         String transformBundleRule = pom.getThisPom().getGroupId() + " " + pom.getThisPom().getArtifactId()
                                 + " s/jar/bundle/ " + selectedRule.toString();
@@ -801,10 +774,7 @@ public class DependenciesSolver {
 
             if (exploreProjects && !pom.getModules().isEmpty()) {
                 if (interactive && !askedToFilterModules) {
-                    System.out.println("This project contains modules. Include all modules?");
-                    System.out.print("[y]/n > ");
-                    String s = readLine().toLowerCase();
-                    filterModules = s.startsWith("n");
+                    filterModules = !userInteraction.askYesNo("This project contains modules. Include all modules?", true);
                     askedToFilterModules = true;
                 }
                 for (String module : pom.getModules()) {
@@ -1155,11 +1125,10 @@ public class DependenciesSolver {
                 if (interactive && pkg == null) {
                     pkg = scanner.searchPkg(new File("/usr/share/java/" + dependency.getArtifactId() + ".jar"));
                     if (pkg != null) {
-                        System.out.println("[error] Package " + pkg + " does not contain Maven dependency " + dependency + " but there seem to be a match");
-                        System.out.println("If the package contains already Maven artifacts but the names don't match, try to enter a substitution rule");
-                        System.out.println("of the form s/groupId/newGroupId/ s/artifactId/newArtifactId/ jar s/version/newVersion/ here:");
-                        System.out.print("> ");
-                        String newRule = readLine().trim();
+                        String q = "[error] Package " + pkg + " does not contain Maven dependency " + dependency + " but there seem to be a match\n"
+                         + "If the package contains already Maven artifacts but the names don't match, try to enter a substitution rule\n"
+                         + "of the form s/groupId/newGroupId/ s/artifactId/newArtifactId/ jar s/version/newVersion/ here:";
+                        String newRule = userInteraction.ask(q);
                         if (!newRule.isEmpty()) {
                             DependencyRule userRule = new DependencyRule(newRule);
                             pomTransformer.getRules().add(userRule);
@@ -1167,19 +1136,16 @@ public class DependenciesSolver {
                             return resolveDependency(dependency.applyRules(Arrays.asList(userRule)), sourcePom, buildTime, mavenExtension, management);
                         }
                     } else {
-                        System.out.println("[error] Cannot resolve Maven dependency " + dependency + ". If you know a package that contains a compatible dependency,");
-                        System.out.println("try to enter a substitution rule of the form s/groupId/newGroupId/ s/artifactId/newArtifactId/ jar s/version/newVersion/ here:");
-                        System.out.print("> ");
-                        String newRule = readLine().trim();
+                        String newRule = userInteraction.ask(
+                                "[error] Cannot resolve Maven dependency " + dependency + ". If you know a package that contains a compatible dependency,\n"
+                              + "try to enter a substitution rule of the form s/groupId/newGroupId/ s/artifactId/newArtifactId/ jar s/version/newVersion/ here:\n");
                         while (!newRule.isEmpty()) {
                             DependencyRule userRule = new DependencyRule(newRule);
                             Dependency newDependency = dependency.applyRules(Arrays.asList(userRule));
                             if (newDependency.equals(dependency)) {
-                                System.out.println("Your rule doesn't seem to apply on " + dependency);
-                                System.out.println("Please enter a substitution rule of the form s/groupId/newGroupId/ s/artifactId/newArtifactId/ jar s/version/newVersion/ here,");
-                                System.out.println("or press <Enter> to give up");
-                                System.out.print("> ");
-                                newRule = readLine().trim();
+                                newRule = userInteraction.ask("Your rule doesn't seem to apply on " + dependency
+                                 + "Please enter a substitution rule of the form s/groupId/newGroupId/ s/artifactId/newArtifactId/ jar s/version/newVersion/ here,"
+                                 + "or press <Enter> to give up");
                             } else {
                                 pomTransformer.getRules().add(userRule);
                                 System.out.println("Rescanning /usr/share/maven-repo...");
@@ -1190,10 +1156,8 @@ public class DependenciesSolver {
                     }
                 }
                 if (interactive) {
-                    System.out.println("Try again to resolve the dependency?");
-                    System.out.print("[y]/n > ");
-                    String s = readLine().trim().toLowerCase();
-                    if (!s.startsWith("n")) {
+                    boolean tryAgain = userInteraction.askYesNo("Try again to resolve the dependency?", true);
+                    if (tryAgain) {
                         System.out.println("Rescanning /usr/share/maven-repo...");
                         pomTransformer.getRepository().scan();
                         // Clear caches

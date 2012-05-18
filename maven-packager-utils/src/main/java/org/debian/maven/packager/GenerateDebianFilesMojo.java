@@ -29,9 +29,8 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.debian.maven.packager.util.LicensesScanner;
 import org.debian.maven.packager.util.PackageScanner;
+import org.debian.maven.packager.util.UserInteraction;
 import org.debian.maven.repo.ListOfPOMs;
-
-import static org.debian.maven.packager.util.IOUtil.readLine;
 
 /**
  * Generate the Debian files for packaging the current Maven project.
@@ -43,8 +42,7 @@ import static org.debian.maven.packager.util.IOUtil.readLine;
  * 
  * @author Ludovic Claude
  */
-public class GenerateDebianFilesMojo
-        extends AbstractMojo {
+public class GenerateDebianFilesMojo extends AbstractMojo {
 
     /**
      * The Maven Project Object
@@ -127,6 +125,7 @@ public class GenerateDebianFilesMojo
 
     private PackageScanner scanner = new PackageScanner();
     private LicensesScanner licensesScanner = new LicensesScanner();
+    private UserInteraction userInteraction = new UserInteraction();
 
     public void execute()
             throws MojoExecutionException {
@@ -163,12 +162,10 @@ public class GenerateDebianFilesMojo
             context.put("generateJavadoc", Boolean.valueOf(generateJavadoc));
 
             if (project.getName() == null || project.getName().isEmpty()) {
-                System.out.println("POM does not contain the project name. Please enter the name of the project:");
-                project.setName(readLine());
+                project.setName(userInteraction.ask("POM does not contain the project name. Please enter the name of the project:"));
             }
             if (project.getUrl() == null || project.getUrl().isEmpty()) {
-                System.out.println("POM does not contain the project URL. Please enter the URL of the project:");
-                project.setUrl(readLine());
+                project.setUrl(userInteraction.ask("POM does not contain the project URL. Please enter the URL of the project:"));
             }
 
             Set<String> licenses = licensesScanner.discoverLicenses(project.getLicenses());
@@ -178,10 +175,10 @@ public class GenerateDebianFilesMojo
                 packagerLicense = (String) licenses.iterator().next();
             }
             if (packagerLicense == null) {
-                System.out.println("Packager license for the debian/ filse was not found, please enter a license name preferably in one of:");
-                System.out.println("Apache Artistic BSD FreeBSD ISC CC-BY CC-BY-SA CC-BY-ND CC-BY-NC CC-BY-NC-SA CC-BY-NC-ND CC0 CDDL CPL Eiffel");
-                System.out.println("Expat GPL LGPL GFDL GFDL-NIV LPPL MPL Perl PSF QPL W3C-Software ZLIB Zope");
-                String s = readLine();
+                String q = "Packager license for the debian/ files was not found, please enter a license name preferably in one of:\n"
+                 + "Apache Artistic BSD FreeBSD ISC CC-BY CC-BY-SA CC-BY-ND CC-BY-NC CC-BY-NC-SA CC-BY-NC-ND CC0 CDDL CPL Eiffel"
+                 + "Expat GPL LGPL GFDL GFDL-NIV LPPL MPL Perl PSF QPL W3C-Software ZLIB Zope";
+                String s = userInteraction.ask(q);
                 if (s.length() > 0) {
                     packagerLicense = s;
                 }
@@ -205,8 +202,7 @@ public class GenerateDebianFilesMojo
                 }
             }
             if (copyrightOwner == null || copyrightOwner.isEmpty()) {
-                System.out.println("Could not find who owns the copyright for the upstream sources, please enter his name:");
-                copyrightOwner = readLine();
+                copyrightOwner = userInteraction.ask("Could not find who owns the copyright for the upstream sources, please enter his name:");
             }
             context.put("copyrightOwner", copyrightOwner);
 
@@ -230,23 +226,7 @@ public class GenerateDebianFilesMojo
 
             List<String> description = new ArrayList<String>();
             if (project.getDescription() == null || project.getDescription().trim().isEmpty()) {
-                System.out.println("Please enter a short description of the project, press Enter twice to stop.");
-                StringBuffer sb = new StringBuffer();
-                int emptyEnterCount = 0;
-                while (emptyEnterCount < 2) {
-                    String s = readLine();
-                    if (s.isEmpty()) {
-                        emptyEnterCount++;
-                    } else {
-                        if (emptyEnterCount > 0) {
-                            emptyEnterCount = 0;
-                            sb.append("\n");
-                        }
-                        sb.append(s);
-                        sb.append("\n");
-                    }
-                }
-                project.setDescription(sb.toString());
+                project.setDescription(userInteraction.askMultiLine("Please enter a short description of the project, press Enter twice to stop."));
             }
             if (project.getDescription() != null) {
                 StringTokenizer st = new StringTokenizer(project.getDescription().trim(), "\n\t ");

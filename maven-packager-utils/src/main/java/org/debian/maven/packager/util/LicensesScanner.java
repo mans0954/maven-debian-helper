@@ -24,9 +24,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static org.debian.maven.packager.util.IOUtil.readLine;
-
 public class LicensesScanner {
+	private final UserInteraction userInteraction = new UserInteraction();
 
     public Set<String> discoverLicenses(List<License> projectLicenses) {
         Set<String> licenses = new TreeSet<String>();
@@ -42,10 +41,9 @@ public class LicensesScanner {
             }
             boolean recognized = recognizeLicense(licenses, licenseName, licenseUrl);
             if (!recognized) {
-                System.out.println("License " + licenseName + licenseUrl + " was not recognized, please enter a license name preferably in one of:");
-                printAvailableLicenses();
-                System.out.print("> ");
-                String s = readLine();
+                String question = "License " + licenseName + licenseUrl + " was not recognized, please enter a license name preferably in one of:"
+                 + getAvailableLicenses();
+                String s = userInteraction.ask(question);
                 if (s.length() > 0) {
                     licenses.add(s);
                 }
@@ -61,10 +59,9 @@ public class LicensesScanner {
             String license = i.next();
             boolean recognized = recognizeLicense(licenses, license, "");
             if (!recognized) {
-                System.out.println("License " + license + " was not recognized, please enter a license name preferably in one of:");
-                printAvailableLicenses();
-                System.out.print("> ");
-                String s = readLine();
+                String question = "License " + license + " was not recognized, please enter a license name preferably in one of:"
+                 + getAvailableLicenses();
+                String s = userInteraction.ask(question);
                 if (s.length() > 0) {
                     licenses.add(s);
                 }
@@ -72,10 +69,9 @@ public class LicensesScanner {
         }
 
         if (licenses.isEmpty()) {
-            System.out.println("License was not found, please enter a license name preferably in one of:");
-            printAvailableLicenses();
-            System.out.print("> ");
-            String s = readLine();
+            String question = "License was not found, please enter a license name preferably in one of:"
+             + getAvailableLicenses();
+            String s = userInteraction.ask(question);
             if (s.length() > 0) {
                 licenses.add(s);
             }
@@ -83,10 +79,10 @@ public class LicensesScanner {
         return licenses;
     }
 
-    private void printAvailableLicenses() {
-        System.out.println("Apache-2.0 Artistic BSD FreeBSD ISC CC-BY CC-BY-SA CC-BY-ND CC-BY-NC CC-BY-NC-SA");
-        System.out.println("CC-BY-NC-ND CC0 CDDL CPL Eiffel Expat GPL-2 GPL-3 LGPL-2 LGPL-2.1 LGPL-3");
-        System.out.println("GFDL-1.2 GFDL-1.3 GFDL-NIV LPPL MPL Perl PSF QPL W3C-Software ZLIB Zope");
+    private String getAvailableLicenses() {
+        return "Apache-2.0 Artistic BSD FreeBSD ISC CC-BY CC-BY-SA CC-BY-ND CC-BY-NC CC-BY-NC-SA\n"
+         + "CC-BY-NC-ND CC0 CDDL CPL Eiffel Expat GPL-2 GPL-3 LGPL-2 LGPL-2.1 LGPL-3"
+         + "GFDL-1.2 GFDL-1.3 GFDL-NIV LPPL MPL Perl PSF QPL W3C-Software ZLIB Zope";
     }
 
     boolean recognizeLicense(Set<String> licenses, String licenseName, String licenseUrl) {

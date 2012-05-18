@@ -28,16 +28,6 @@ import java.util.concurrent.TimeUnit;
 
 public class IOUtil {
 
-    public static String readLine() {
-        LineNumberReader consoleReader = new LineNumberReader(new InputStreamReader(System.in));
-        try {
-            return consoleReader.readLine().trim();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        }
-    }
-
     public static void executeProcess(final String[] cmd, final OutputHandler handler) {
         try {
             ProcessBuilder pb = new ProcessBuilder(cmd);
