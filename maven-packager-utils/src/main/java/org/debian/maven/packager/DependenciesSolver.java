@@ -41,6 +41,7 @@ import org.debian.maven.repo.DependencyRuleSet;
 import org.debian.maven.repo.ListOfPOMs;
 import org.debian.maven.repo.POMHandler;
 import org.debian.maven.repo.POMInfo;
+import org.debian.maven.repo.POMInfo.DependencyType;
 import org.debian.maven.repo.POMTransformer;
 import org.debian.maven.repo.Repository;
 import org.debian.maven.repo.Rule;
@@ -268,7 +269,7 @@ public class DependenciesSolver {
 
     private boolean isDefaultMavenPlugin(Dependency dependency) {
         if (getRepository() != null && getRepository().getSuperPOM() != null) {
-            for (Dependency defaultPlugin : getRepository().getSuperPOM().getPluginManagement()) {
+            for (Dependency defaultPlugin : getRepository().getSuperPOM().getDependencies().get(DependencyType.PLUGIN_MANAGEMENT)) {
                 if (defaultPlugin.equalsIgnoreVersion(dependency)) {
                     return true;
                 }
@@ -326,12 +327,12 @@ public class DependenciesSolver {
     private class ToResolve {
 
         private final File sourcePom;
-        private final String listType;
+        private final DependencyType listType;
         private final boolean buildTime;
         private final boolean mavenExtension;
         private final boolean management;
 
-        private ToResolve(File sourcePom, String listType, boolean buildTime, boolean mavenExtension, boolean management) {
+        private ToResolve(File sourcePom, DependencyType listType, boolean buildTime, boolean mavenExtension, boolean management) {
             this.sourcePom = sourcePom;
             this.listType = listType;
             this.buildTime = buildTime;
@@ -764,13 +765,13 @@ public class DependenciesSolver {
                 }
             }
 
-            resolveDependenciesLater(projectPom, POMInfo.DEPENDENCIES, false, false, false);
-            resolveDependenciesLater(projectPom, POMInfo.DEPENDENCY_MANAGEMENT_LIST, false, false, true);
-            resolveDependenciesLater(projectPom, POMInfo.PLUGINS, true, true, false);
-            resolveDependenciesLater(projectPom, POMInfo.PLUGIN_DEPENDENCIES, true, true, false);
-            resolveDependenciesLater(projectPom, POMInfo.PLUGIN_MANAGEMENT, true, true, true);
-            resolveDependenciesLater(projectPom, POMInfo.REPORTING_PLUGINS, true, true, false);
-            resolveDependenciesLater(projectPom, POMInfo.EXTENSIONS, true, true, false);
+            resolveDependenciesLater(projectPom, DependencyType.DEPENDENCIES, false, false, false);
+            resolveDependenciesLater(projectPom, DependencyType.DEPENDENCY_MANAGEMENT_LIST, false, false, true);
+            resolveDependenciesLater(projectPom, DependencyType.PLUGINS, true, true, false);
+            resolveDependenciesLater(projectPom, DependencyType.PLUGIN_DEPENDENCIES, true, true, false);
+            resolveDependenciesLater(projectPom, DependencyType.PLUGIN_MANAGEMENT, true, true, true);
+            resolveDependenciesLater(projectPom, DependencyType.REPORTING_PLUGINS, true, true, false);
+            resolveDependenciesLater(projectPom, DependencyType.EXTENSIONS, true, true, false);
 
             if (exploreProjects && !pom.getModules().isEmpty()) {
                 if (interactive && !askedToFilterModules) {
@@ -836,13 +837,13 @@ public class DependenciesSolver {
         }
     }
 
-    private void resolveDependenciesLater(File sourcePom, String listType, boolean buildTime, boolean mavenExtension, boolean management) {
+    private void resolveDependenciesLater(File sourcePom, DependencyType listType, boolean buildTime, boolean mavenExtension, boolean management) {
         toResolve.add(new ToResolve(sourcePom, listType, buildTime, mavenExtension, management));
     }
 
-    private void resolveDependencies(File sourcePom, String listType, boolean buildTime, boolean mavenExtension, boolean management) throws Exception {
+    private void resolveDependencies(File sourcePom, DependencyType listType, boolean buildTime, boolean mavenExtension, boolean management) throws Exception {
         POMInfo pom = getPOM(sourcePom);
-        List<Dependency> dependenciesByType = pom.getAllDependencies(listType);
+        List<Dependency> dependenciesByType = pom.getDependencies().get(listType);
 
         for (Dependency dependency : dependenciesByType) {
             resolveDependency(dependency, sourcePom, buildTime, mavenExtension, management);
