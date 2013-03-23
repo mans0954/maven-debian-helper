@@ -19,7 +19,6 @@ package org.debian.maven.packager.util;
 
 import org.apache.maven.model.License;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -29,8 +28,7 @@ public class LicensesScanner {
 
     public Set<String> discoverLicenses(List<License> projectLicenses) {
         Set<String> licenses = new TreeSet<String>();
-        for (Iterator<License> i = projectLicenses.iterator(); i.hasNext(); ) {
-            License license =  i.next();
+        for (License license : projectLicenses) {
             String licenseName = "";
             if (license.getName() != null) {
                 licenseName = license.getName() + " ";
@@ -55,8 +53,7 @@ public class LicensesScanner {
         LicenseCheckResult licenseResult = new LicenseCheckResult();
         IOUtil.executeProcess(new String[]{"/bin/sh", "-c", "licensecheck `find . -type f`"},
                 licenseResult);
-        for (Iterator<String> i = licenseResult.getLicenses().iterator(); i.hasNext(); ) {
-            String license = i.next();
+        for (String license : licenseResult.getLicenses()) {
             boolean recognized = recognizeLicense(licenses, license, "");
             if (!recognized) {
                 String question = "License " + license + " was not recognized, please enter a license name preferably in one of:"
@@ -89,13 +86,13 @@ public class LicensesScanner {
         boolean recognized = false;
         licenseName = licenseName.toLowerCase();
         licenseUrl = licenseUrl.toLowerCase();
-        if (licenseName.indexOf("mit ") >= 0 || licenseUrl.indexOf("mit-license") >= 0) {
+        if (licenseName.contains("mit ") || licenseUrl.contains("mit-license")) {
             licenses.add("MIT");
             recognized = true;
-        } else if (licenseName.indexOf("bsd ") >= 0 || licenseUrl.indexOf("bsd-license") >= 0) {
+        } else if (licenseName.contains("bsd ") || licenseUrl.contains("bsd-license")) {
             licenses.add("BSD");
             recognized = true;
-        } else if (licenseName.indexOf("artistic ") >= 0 || licenseUrl.indexOf("artistic-license") >= 0) {
+        } else if (licenseName.contains("artistic ") || licenseUrl.contains("artistic-license")) {
             licenses.add("Artistic");
             recognized = true;
         } else if (licenseName.indexOf("apache ") >= 0 || licenseUrl.indexOf("apache") >= 0) {
@@ -129,7 +126,7 @@ public class LicensesScanner {
                 recognized = true;
             }
 
-        } else if (licenseUrl.indexOf("http://creativecommons.org/licenses/by-sa/3.0") >= 0) {
+        } else if (licenseUrl.contains("http://creativecommons.org/licenses/by-sa/3.0")) {
             licenses.add("CC-BY-SA-3.0");
             recognized = true;
         }
