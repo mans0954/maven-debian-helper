@@ -45,6 +45,7 @@ import org.debian.maven.repo.POMInfo.DependencyType;
 import org.debian.maven.repo.POMTransformer;
 import org.debian.maven.repo.Repository;
 import org.debian.maven.repo.Rule;
+import org.debian.maven.util.Strings;
 
 /**
  * Analyze the Maven dependencies and extract the Maven rules to use
@@ -385,10 +386,10 @@ public class DependenciesSolver {
                 log.log(Level.SEVERE, "Error while reading file " + dependencies, ex);
             }
         }
-        depVars.put("maven.CompileDepends", toString(compileDepends));
-        depVars.put("maven.TestDepends", toString(testDepends));
-        depVars.put("maven.Depends", toString(runtimeDepends));
-        depVars.put("maven.OptionalDepends", toString(optionalDepends));
+        depVars.put("maven.CompileDepends", Strings.join(compileDepends, ", "));
+        depVars.put("maven.TestDepends", Strings.join(testDepends, ", "));
+        depVars.put("maven.Depends", Strings.join(runtimeDepends, ", "));
+        depVars.put("maven.OptionalDepends", Strings.join(optionalDepends, ", "));
         if (generateJavadoc) {
             System.out.println("Checking dependencies for documentation packages...");
             Set<String> docRuntimeDepends = new TreeSet<String>();
@@ -420,8 +421,8 @@ public class DependenciesSolver {
                     docOptionalDepends.add(docPkg);
                 }
             }
-            depVars.put("maven.DocDepends", toString(docRuntimeDepends));
-            depVars.put("maven.DocOptionalDepends", toString(docOptionalDepends));
+            depVars.put("maven.DocDepends", Strings.join(docRuntimeDepends, ", "));
+            depVars.put("maven.DocOptionalDepends", Strings.join(docOptionalDepends, ", "));
         }
         if (packageVersion != null) {
             depVars.put("maven.UpstreamPackageVersion", packageVersion);
@@ -1269,18 +1270,6 @@ public class DependenciesSolver {
             }
         }
         return false;
-    }
-
-    private String toString(Set<String> s) {
-        StringBuffer sb = new StringBuffer();
-        for (Iterator<String> i = s.iterator(); i.hasNext();) {
-            String st = i.next();
-            sb.append(st);
-            if (i.hasNext()) {
-                sb.append(", ");
-            }
-        }
-        return sb.toString();
     }
 
     public static void main(String[] args) {
