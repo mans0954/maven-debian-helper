@@ -678,9 +678,7 @@ public class DependenciesSolver {
             // Previous rule from another run
             boolean explicitlyMentionedInRules = false;
             for (DependencyRule previousRule : pomTransformer.getRules().findMatchingRules(pom.getThisPom())) {
-                if (!previousRule.equals(DependencyRule.TO_DEBIAN_VERSION_RULE) &&
-                        !previousRule.equals(DependencyRule.MAVEN_PLUGINS_KEEP_VERSION_RULE) &&
-                        previousRule.matches(pom.getThisPom())) {
+                if (!previousRule.explicitlyMentions(pom.getThisPom())) {
                     explicitlyMentionedInRules = true;
                     break;
                 }
