@@ -139,13 +139,13 @@ public class DependenciesSolver {
         {"org.jvnet.wagon-svn", "wagon-svn"},
     };
 
-    protected File baseDir;
-    protected POMTransformer pomTransformer = new POMTransformer();
-    protected File outputDirectory;
-    protected String packageName;
-    protected String packageType;
+    private File baseDir;
+    final POMTransformer pomTransformer = new POMTransformer();
+    private File outputDirectory;
+    String packageName;
+    String packageType;
     private String packageVersion;
-    protected File mavenRepo = new File("/usr/share/maven-repo");
+    File mavenRepo = new File("/usr/share/maven-repo");
     // explore (search) for additional pom files or look only for those defined in debian/*.poms?
     boolean exploreProjects;
     private Repository repository;
