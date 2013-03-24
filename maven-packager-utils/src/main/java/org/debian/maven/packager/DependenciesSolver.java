@@ -891,13 +891,11 @@ public class DependenciesSolver {
         }
 
         // Automatically skip some dependencies when ant packaging is used
-        boolean skipDependency = false;
         String skipReason = "";
         if (packageType.equals("ant")) {
             if ("maven-plugin".equals(dependency.getType())) {
                 try {
                     if (!getPOM(sourcePom).getThisPom().getType().equals("pom")) {
-                        skipDependency = true;
                         skipReason = "Maven plugins are not used during a build with Ant";
                     }
                 } catch (Exception e) {
@@ -905,11 +903,10 @@ public class DependenciesSolver {
                 }
             }
             if (!runTests && "test".equals(dependency.getScope())) {
-                skipDependency = true;
                 skipReason = "Tests are not executed during the build";
             }
         }
-        if (skipDependency) {
+        if (!skipReason.isEmpty()) {
             // Even if we skip the dependency, try to locate its associated maven rules,
             // as this may be useful later - but never fail if the dependency is not found.
             POMInfo pom = getRepository().searchMatchingPOM(dependency);
