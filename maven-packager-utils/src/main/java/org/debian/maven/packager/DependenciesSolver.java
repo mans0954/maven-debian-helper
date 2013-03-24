@@ -149,7 +149,7 @@ public class DependenciesSolver {
     // explore (search) for additional pom files or look only for those defined in debian/*.poms?
     boolean exploreProjects;
     private Repository repository;
-    private List<String> issues = new ArrayList<String>();
+    List<String> issues = new ArrayList<String>();
     private List<Dependency> projectPoms = new ArrayList<Dependency>();
     private List<ToResolve> toResolve = new ArrayList<ToResolve>();
     private Set<Dependency> knownProjectDependencies = new TreeSet<Dependency>();
@@ -162,12 +162,12 @@ public class DependenciesSolver {
     private DependencyRuleSet cleanIgnoreRules = new DependencyRuleSet("Ignore rules to be applied during the Maven clean phase",
             new File("debian/maven.cleanIgnoreRules"));
     private boolean offline;
-    private boolean runTests;
-    private boolean generateJavadoc;
-    private boolean interactive = true;
+    boolean runTests;
+    boolean generateJavadoc;
+    boolean interactive = true;
     private boolean askedToFilterModules = false;
     private boolean filterModules = false;
-    private boolean verbose = false;
+    boolean verbose = false;
     private Map<String, POMInfo> pomInfoCache = new HashMap<String, POMInfo>();
     // Keep the original POMs for reference
     private Map<String, POMInfo> originalPomInfoCache = new HashMap<String, POMInfo>();
@@ -217,33 +217,9 @@ public class DependenciesSolver {
         return sb.toString();
     }
 
-    public boolean isRunTests() {
-        return runTests;
-    }
-
-    public void setRunTests(boolean b) {
-        this.runTests = b;
-    }
-
     public void setOffline(boolean offline) {
         this.offline = offline;
         scanner.setOffline(offline);
-    }
-
-    public boolean isGenerateJavadoc() {
-        return generateJavadoc;
-    }
-
-    public void setGenerateJavadoc(boolean b) {
-        this.generateJavadoc = b;
-    }
-
-    public boolean isVerbose() {
-        return verbose;
-    }
-
-    public void setVerbose(boolean verbose) {
-        this.verbose = verbose;
     }
 
     private boolean containsPlugin(String[][] pluginDefinitions, Dependency plugin) {
@@ -256,14 +232,6 @@ public class DependenciesSolver {
             }
         }
         return false;
-    }
-
-    private boolean isDocumentationOrReportPlugin(Dependency dependency) {
-        return containsPlugin(DOC_PLUGINS, dependency);
-    }
-
-    private boolean isTestPlugin(Dependency dependency) {
-        return containsPlugin(TEST_PLUGINS, dependency);
     }
 
     private boolean isDefaultMavenPlugin(Dependency dependency) {
@@ -295,22 +263,6 @@ public class DependenciesSolver {
         return ignore;
     }
 
-    public boolean isInteractive() {
-        return interactive;
-    }
-
-    public void setInteractive(boolean interactive) {
-        this.interactive = interactive;
-    }
-
-    POMTransformer getPomTransformer() {
-        return pomTransformer;
-    }
-
-    public ListOfPOMs getListOfPOMs() {
-        return pomTransformer.getListOfPOMs();
-    }
-    
     private class ToResolve {
 
         private final File sourcePom;
@@ -336,10 +288,6 @@ public class DependenciesSolver {
                 log.log(Level.SEVERE, "Cannot resolve dependencies in " + sourcePom + ": " + e.getMessage(), e);
             }
         }
-    }
-
-    public File getBaseDir() {
-        return baseDir;
     }
 
     public void saveSubstvars() {
@@ -432,18 +380,6 @@ public class DependenciesSolver {
         pomTransformer.getListOfPOMs().setBaseDir(baseDir);
     }
 
-    public File getMavenRepo() {
-        return mavenRepo;
-    }
-
-    public void setMavenRepo(File mavenRepo) {
-        this.mavenRepo = mavenRepo;
-    }
-
-    public File getOutputDirectory() {
-        return outputDirectory;
-    }
-
     public void setOutputDirectory(File outputDirectory) {
         this.outputDirectory = outputDirectory;
         File rulesFile = new File(outputDirectory, "maven.rules");
@@ -476,26 +412,6 @@ public class DependenciesSolver {
         if (verbose) {
             System.out.println();
         }
-    }
-
-    public String getPackageName() {
-        return packageName;
-    }
-
-    public void setPackageName(String packageName) {
-        this.packageName = packageName;
-    }
-
-    public String getPackageType() {
-        return packageType;
-    }
-
-    public void setPackageType(String packageType) {
-        this.packageType = packageType;
-    }
-
-    public List<String> getIssues() {
-        return issues;
     }
 
     private Repository getRepository() {
@@ -546,7 +462,9 @@ public class DependenciesSolver {
             });
         }
 
-        resolveDependenciesNow();
+        for (ToResolve tr : toResolve) {
+            tr.resolve();
+        }
 
         if (!issues.isEmpty()) {
             System.err.println("ERROR:");
@@ -559,7 +477,7 @@ public class DependenciesSolver {
 
     private void resolveDependencies(File projectPom) {
 
-        if (getPOMOptions(projectPom) != null && getPOMOptions(projectPom).isIgnore()) {
+        if (pomTransformer.getListOfPOMs().getOrCreatePOMOptions(projectPom) != null && pomTransformer.getListOfPOMs().getOrCreatePOMOptions(projectPom).isIgnore()) {
             return;
         }
 
@@ -569,19 +487,19 @@ public class DependenciesSolver {
         try {
             POMInfo pom = getPOM(projectPom);
             pom.setProperties(new HashMap<String, String>());
-            pom.getProperties().put("debian.package", getPackageName());
+            pom.getProperties().put("debian.package", packageName);
 
-            if (getPOMOptions(projectPom).isNoParent()) {
+            if (pomTransformer.getListOfPOMs().getOrCreatePOMOptions(projectPom).isNoParent()) {
                 pom.setParent(null);
             } else if (pom.getParent() != null && !pom.getParent().isSuperPom()) {
-                boolean oldNoParent = getPOMOptions(projectPom).isNoParent();
+                boolean oldNoParent = pomTransformer.getListOfPOMs().getOrCreatePOMOptions(projectPom).isNoParent();
                 // Don't mark the parent dependency as 'build time' dependency because once installed,
                 // the POM for this project will always need the parent POM to be available
                 Dependency parent = resolveDependency(pom.getParent(), projectPom, false, false, false, true);
                 // The user may have set or unset the --no-parent option, if so we update the POM to include or not the
                 // parent according to the user's choice
-                if (getPOMOptions(projectPom).isNoParent() != oldNoParent) {
-                    resetPOM(projectPom);
+                if (pomTransformer.getListOfPOMs().getOrCreatePOMOptions(projectPom).isNoParent() != oldNoParent) {
+                    pomInfoCache.remove(projectPom.getAbsolutePath());
                     pom = getPOM(projectPom);
                 }
                 pom.setParent(parent);
@@ -614,13 +532,13 @@ public class DependenciesSolver {
 
             if (pom.getOriginalVersion().equals(packageVersion)) {
                 pom.getProperties().put("debian.hasPackageVersion", "true");
-                getPOMOptions(projectPom).setHasPackageVersion(true);
+                pomTransformer.getListOfPOMs().getOrCreatePOMOptions(projectPom).setHasPackageVersion(true);
             }
 
             if (filterModules) {
                 boolean includeModule = userInteraction.askYesNo("Include the module " + pomRelPath + " ?", true);
                 if (!includeModule) {
-                    getPOMOptions(projectPom).setIgnore(true);
+                    pomTransformer.getListOfPOMs().getOrCreatePOMOptions(projectPom).setIgnore(true);
                     String type = "*";
                     if (pom.getThisPom().getType() != null) {
                         type = pom.getThisPom().getType();
@@ -711,7 +629,7 @@ public class DependenciesSolver {
             if (pom.getParent() != null && !pom.getParent().isSuperPom()) {
                 POMInfo parentPom = getRepository().searchMatchingPOM(pom.getParent());
                 if (parentPom == null || parentPom.equals(getRepository().getSuperPOM())) {
-                    getPOMOptions(projectPom).setNoParent(true);
+                    pomTransformer.getListOfPOMs().getOrCreatePOMOptions(projectPom).setNoParent(true);
                 }
                 if (!baseDir.equals(projectPom.getParentFile())) {
                     System.out.println("Checking the parent dependency in the sub project " + pomRelPath);
@@ -751,7 +669,7 @@ public class DependenciesSolver {
         }
         File tmpDest = File.createTempFile("pom", ".tmp", baseDir);
         tmpDest.deleteOnExit();
-        ListOfPOMs.POMOptions options = getPOMOptions(projectPom);
+        ListOfPOMs.POMOptions options = pomTransformer.getListOfPOMs().getOrCreatePOMOptions(projectPom);
         boolean noParent = false;
         boolean hasPackageVersion = false;
         if (options != null) {
@@ -773,22 +691,6 @@ public class DependenciesSolver {
         info = pomTransformer.readPom(projectPom);
         originalPomInfoCache.put(projectPom.getAbsolutePath(), info);
         return info;
-    }
-
-    private ListOfPOMs.POMOptions getPOMOptions(File pom) {
-        return pomTransformer.getListOfPOMs().getOrCreatePOMOptions(pom);
-    }
-
-    private void resetPOM(File projectPom) {
-         pomInfoCache.remove(projectPom.getAbsolutePath());
-    }
-
-    private void resolveDependenciesNow() {
-        for (Iterator<ToResolve> i = toResolve.iterator(); i.hasNext();) {
-            ToResolve tr = i.next();
-            tr.resolve();
-            i.remove();
-        }
     }
 
     private void resolveDependenciesLater(File sourcePom, DependencyType listType, boolean buildTime, boolean mavenExtension, boolean management) {
@@ -846,11 +748,12 @@ public class DependenciesSolver {
         if (!ignoreDependency && !runTests) {
             if ("test".equals(dependency.getScope())) {
                 ignoreDependency = askIgnoreDependency(sourcePomLoc, dependency, "Tests are turned off. Ignore this test dependency?");
-            } else if (isTestPlugin(dependency)) {
+            } else if (containsPlugin(TEST_PLUGINS, dependency)) {
                 ignoreDependency = askIgnoreDependency(sourcePomLoc, dependency, "Tests are turned off. Ignore this test plugin?");
             }
         }
-        if (!ignoreDependency && !generateJavadoc && isDocumentationOrReportPlugin(dependency)) {
+        // is Documentation Or Report Plugin?
+        if (!ignoreDependency && !generateJavadoc && containsPlugin(DOC_PLUGINS, dependency)) {
             ignoreDependency = askIgnoreDependency(sourcePomLoc, dependency, "Documentation is turned off. Ignore this documentation plugin?");
         }
 
@@ -914,7 +817,7 @@ public class DependenciesSolver {
                     pom = getRepository().searchMatchingPOM(dependency);
                 } else {
                     System.out.println("In " + sourcePomLoc + ", cannot find the version for dependency " + dependency + " from this POM or its parent POMs");
-                    if (getPOMOptions(sourcePom).isNoParent()) {
+                    if (pomTransformer.getListOfPOMs().getOrCreatePOMOptions(sourcePom).isNoParent()) {
                         Dependency originalParent = getOriginalPOM(sourcePom).getParent();
                         System.out.println("[warning] Option --no-parent has been set for POM file " + sourcePomLoc + ", maybe it was not a good idea and you should first package the parent POM " + originalParent);
                     }
@@ -1023,14 +926,14 @@ public class DependenciesSolver {
                 if (resolvingParent) {
                     boolean noParent = askIgnoreDependency(sourcePomLoc, dependency,
                             "The parent POM cannot be found in the Maven repository for Debian. Ignore it?");
-                    getPOMOptions(sourcePom).setNoParent(noParent);
+                    pomTransformer.getListOfPOMs().getOrCreatePOMOptions(sourcePom).setNoParent(noParent);
                     if (noParent) {
                         if (verbose) {
                             System.out.println("[no-parent]");
                         }
                         return null;
                     }
-                } else if (isDocumentationOrReportPlugin(dependency)) {
+                } else if (containsPlugin(DOC_PLUGINS, dependency)) {
                     ignoreDependency = askIgnoreDependency(sourcePomLoc, dependency,
                             "This documentation or report plugin cannot be found in the Maven repository for Debian. Ignore this plugin?");
                 } else if ("maven-plugin".equals(dependency.getType())) {
@@ -1134,7 +1037,7 @@ public class DependenciesSolver {
         // Discover the library to import for the dependency
         String pkg = getPackage(pom, sourcePomLoc);
 
-        if (pkg != null && !pkg.equals(getPackageName())) {
+        if (pkg != null && !pkg.equals(packageName)) {
             String libraryWithVersionConstraint = pkg;
             String version = dependency.getVersion();
             if (version == null || (pom.getOriginalVersion() != null && version.compareTo(pom.getOriginalVersion()) > 0)) {
@@ -1272,11 +1175,11 @@ public class DependenciesSolver {
             } else if (arg.equals("--ant")) {
                 packageType = "ant";
             } else if (arg.equals("--run-tests")) {
-                solver.setRunTests(true);
+                solver.runTests = true;
             } else if (arg.equals("--generate-javadoc")) {
-                solver.setGenerateJavadoc(true);
+                solver.generateJavadoc = true;
             } else if (arg.equals("--non-interactive")) {
-                solver.setInteractive(false);
+                solver.interactive = false;
             } else if (arg.equals("--offline")) {
                 solver.setOffline(true);
             } else if (arg.startsWith("-m")) {
@@ -1295,27 +1198,27 @@ public class DependenciesSolver {
 
         solver.setBaseDir(baseDirectory);
         solver.setOutputDirectory(new File(baseDirectory, "debian"));
-        solver.setPackageName(debianPackage);
-        solver.setPackageType(packageType);
-        File poms = new File(solver.getOutputDirectory(), debianPackage + ".poms");
+        solver.packageName = debianPackage;
+        solver.packageType = packageType;
+        File poms = new File(solver.outputDirectory, debianPackage + ".poms");
         solver.setListOfPoms(poms);
 
         if (mavenRepo != null) {
             Repository repository = new Repository(mavenRepo);
-            solver.getPomTransformer().setRepository(repository);
-            solver.getPomTransformer().usePluginVersionsFromRepository();
+            solver.pomTransformer.setRepository(repository);
+            solver.pomTransformer.usePluginVersionsFromRepository();
         }
 
         if (verbose) {
             String msg = "Solving dependencies for package " + debianPackage;
-            if (solver.isRunTests()) {
+            if (solver.runTests) {
                 msg += " (tests are included)";
             }
-            if (solver.isGenerateJavadoc()) {
+            if (solver.generateJavadoc) {
                 msg += " (documentation is included)";
             }
             System.out.println(msg);
-            solver.setVerbose(true);
+            solver.verbose = true;
         }
 
         solver.solveDependencies();
@@ -1327,7 +1230,7 @@ public class DependenciesSolver {
         solver.pomTransformer.getPublishedRules().save();
         solver.saveSubstvars();
 
-        if (!solver.getIssues().isEmpty()) {
+        if (!solver.issues.isEmpty()) {
             System.err.println("Some problems where found in this project, exiting...");
             System.exit(1);
         }

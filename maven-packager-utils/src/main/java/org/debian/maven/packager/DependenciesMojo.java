@@ -124,20 +124,20 @@ public class DependenciesMojo
         }
 
         solver.setBaseDir(basedir);
-        solver.setMavenRepo(mavenRepo);
+        solver.mavenRepo = mavenRepo;
         solver.setOutputDirectory(outputDirectory);
-        solver.setPackageName(packageName);
-        solver.setPackageType(packageType);
-        solver.setGenerateJavadoc(resolveJavadoc);
-        solver.setInteractive(interactive);
+        solver.packageName = packageName;
+        solver.packageType = packageType;
+        solver.generateJavadoc = resolveJavadoc;
+        solver.interactive = interactive;
         solver.setOffline(offline);
         solver.setListOfPoms(listOfPoms);
-        solver.setVerbose(verbose);
+        solver.verbose = verbose;
 
-        if (solver.getListOfPOMs().getFirstPOM() == null && collectedProjects != null) {
+        if (solver.pomTransformer.getListOfPOMs().getFirstPOM() == null && collectedProjects != null) {
             for (Iterator<MavenProject> i = collectedProjects.iterator(); i.hasNext();) {
                 MavenProject subProject = i.next();
-                solver.getListOfPOMs().addPOM(subProject.getFile());
+                solver.pomTransformer.getListOfPOMs().addPOM(subProject.getFile());
             }
         }
 
