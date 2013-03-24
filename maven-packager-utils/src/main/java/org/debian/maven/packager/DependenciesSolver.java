@@ -146,7 +146,8 @@ public class DependenciesSolver {
     protected String packageType;
     private String packageVersion;
     protected File mavenRepo = new File("/usr/share/maven-repo");
-    protected boolean exploreProjects;
+    // explore (search) for additional pom files or look only for those defined in debian/*.poms?
+    boolean exploreProjects;
     private Repository repository;
     private List<String> issues = new ArrayList<String>();
     private List<Dependency> projectPoms = new ArrayList<Dependency>();
@@ -464,14 +465,6 @@ public class DependenciesSolver {
             pomTransformer.getListOfPOMs().setListOfPOMsFile(listOfPoms);
         }
         pomTransformer.getListOfPOMs().setBaseDir(baseDir);
-    }
-
-    public boolean isExploreProjects() {
-        return exploreProjects;
-    }
-
-    public void setExploreProjects(boolean exploreProjects) {
-        this.exploreProjects = exploreProjects;
     }
 
     public File getMavenRepo() {
@@ -1304,7 +1297,7 @@ public class DependenciesSolver {
         File baseDirectory = new File(".");
         
         DependenciesSolver solver = new DependenciesSolver();
-        solver.setExploreProjects(true); // can be overriden by args
+        solver.exploreProjects = true; // can be overriden by args
         
         // Parse parameters
         int i = inc(-1, args);
@@ -1337,7 +1330,7 @@ public class DependenciesSolver {
             } else if (arg.startsWith("--base-directory=")) {
             	baseDirectory = new File(arg.substring("--base-directory=".length()));
             } else if (arg.equals("--non-explore")) {
-            	solver.setExploreProjects(false);
+            	solver.exploreProjects = false;
             }
             i = inc(i, args);
         }

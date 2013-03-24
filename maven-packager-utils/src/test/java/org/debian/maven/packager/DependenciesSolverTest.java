@@ -68,7 +68,7 @@ public class DependenciesSolverTest extends TestCase {
         DependenciesSolver solver = new DependenciesSolver();
         solver.setMavenRepo(getFileInClasspath("repository/root.dir").getParentFile());
         solver.setOutputDirectory(testDir);
-        solver.setExploreProjects(true);
+        solver.exploreProjects = true;
         solver.setPackageName("libplexus-active-collections-java");
         solver.setPackageType("maven");
         File listOfPoms = getFileInClasspath("libplexus-active-collections-java.poms");
@@ -101,7 +101,7 @@ public class DependenciesSolverTest extends TestCase {
         DependenciesSolver solver = new DependenciesSolver();
         solver.setMavenRepo(getFileInClasspath("repository/root.dir").getParentFile());
         solver.setOutputDirectory(testDir);
-        solver.setExploreProjects(true);
+        solver.exploreProjects = true;
         solver.setPackageName("libplexus-utils2-java");
         solver.setPackageType("maven");
         solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-release-plugin * *"));
@@ -135,7 +135,7 @@ public class DependenciesSolverTest extends TestCase {
         DependenciesSolver solver = new DependenciesSolver();
         solver.setMavenRepo(getFileInClasspath("repository/root.dir").getParentFile());
         solver.setOutputDirectory(testDir);
-        solver.setExploreProjects(false);
+        solver.exploreProjects = false;
         solver.setPackageName("openmrs");
         solver.setPackageType("maven");
         //solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-release-plugin * *"));
@@ -156,7 +156,7 @@ public class DependenciesSolverTest extends TestCase {
         DependenciesSolver solver = new DependenciesSolver();
         solver.setMavenRepo(getFileInClasspath("repository/root.dir").getParentFile());
         solver.setOutputDirectory(testDir);
-        solver.setExploreProjects(false);
+        solver.exploreProjects = false;
         solver.setPackageName("openmrs");
         solver.setPackageType("maven");
         solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.openmrs.codehaus.mojo buildnumber-maven-plugin * *"));
@@ -189,7 +189,7 @@ public class DependenciesSolverTest extends TestCase {
         DependenciesSolver solver = new DependenciesSolver();
         solver.setMavenRepo(getFileInClasspath("repository/root.dir").getParentFile());
         solver.setOutputDirectory(testDir);
-        solver.setExploreProjects(false);
+        solver.exploreProjects = false;
         solver.setPackageName("openmrs");
         solver.setPackageType("maven");
         solver.setVerbose(true);
@@ -238,7 +238,7 @@ public class DependenciesSolverTest extends TestCase {
         DependenciesSolver solver = new DependenciesSolver();
         solver.setMavenRepo(getFileInClasspath("repository/root.dir").getParentFile());
         solver.setOutputDirectory(testDir);
-        solver.setExploreProjects(false);
+        solver.exploreProjects =  false;
         solver.setPackageName("buildhelper-maven-plugin");
         solver.setPackageType("maven");
         solver.getPomTransformer().addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-changelog-plugin * * * *"));
@@ -275,7 +275,7 @@ public class DependenciesSolverTest extends TestCase {
         solver.setMavenRepo(getFileInClasspath("repository/root.dir").getParentFile());
         solver.setOutputDirectory(testDir);
         // libplexus-compiler-java.poms already contains some POMs but we want to discover them all 
-        solver.setExploreProjects(true);
+        solver.exploreProjects = true;
         solver.setPackageName("libplexus-compiler-java");
         solver.setPackageType("maven");
         solver.getPomTransformer().addIgnoreRule(new DependencyRule("junit junit jar s/3\\..*/3.x/ * *"));
