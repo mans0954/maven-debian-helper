@@ -192,12 +192,9 @@ public class DependenciesSolver {
         cleanIgnoreRules.setVerbose(true);
         cleanIgnoreRules.setDontDuplicate(pomTransformer.getIgnoreRules());        
 
-        Rule toDebianRule = new Rule("s/.*/debian/");
-        toDebianRule.setDescription("Change the version to the symbolic 'debian' version");
-        Rule keepVersionRule = new Rule("*");
-        keepVersionRule.setDescription("Keep the version");
-        Rule customRule = new Rule("CUSTOM");
-        customRule.setDescription("Custom rule");
+        Rule toDebianRule = new Rule("s/.*/debian/", "Change the version to the symbolic 'debian' version");
+        Rule keepVersionRule = new Rule("*", "Keep the version");
+        Rule customRule = new Rule("CUSTOM", "Custom rule");
         defaultRules.add(toDebianRule);
         defaultRules.add(keepVersionRule);
         defaultRules.add(customRule);
@@ -683,10 +680,8 @@ public class DependenciesSolver {
                 Matcher matcher = p.matcher(version);
                 if (matcher.matches()) {
                     String mainVersion = matcher.group(1);
-                    Rule mainVersionRule = new Rule("s/" + mainVersion + "\\..*/" +
-                        mainVersion + ".x/");
-                    mainVersionRule.setDescription("Replace all versions starting by "
-                        + mainVersion + ". with " + mainVersion + ".x");
+                    Rule mainVersionRule = new Rule("s/" + mainVersion + "\\..*/" + mainVersion + ".x/",
+                        "Replace all versions starting by " + mainVersion + ". with " + mainVersion + ".x");
                     if (!choices.contains(mainVersionRule)) {
                         choices.add(mainVersionRule);
                     }
@@ -707,8 +702,7 @@ public class DependenciesSolver {
                 if (selectedRule.getPattern().equals("CUSTOM")) {
                     String s = userInteraction.ask("Enter the pattern for your custom rule (in the form s/regex/replace/)")
                                .toLowerCase();
-                    selectedRule = new Rule(s);
-                    selectedRule.setDescription("My custom rule " + s);
+                    selectedRule = new Rule(s, "My custom rule " + s);
                     defaultRules.add(selectedRule);
                 }
 
