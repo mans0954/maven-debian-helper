@@ -999,8 +999,7 @@ public class DependenciesSolver {
             if (verbose) {
                 System.out.println("[check dependency with bundle type]");
             }
-            Dependency bundleDependency = new Dependency(dependency);
-            bundleDependency.setType("bundle");
+            Dependency bundleDependency = dependency.builder().setType("bundle").build();
             pom = getRepository().searchMatchingPOM(bundleDependency);
             if (pom != null) {
                 dependency = bundleDependency;
