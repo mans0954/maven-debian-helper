@@ -637,13 +637,13 @@ public class DependenciesSolver {
                 }
             }
 
-            resolveDependenciesLater(projectPom, DependencyType.DEPENDENCIES, false, false, false);
-            resolveDependenciesLater(projectPom, DependencyType.DEPENDENCY_MANAGEMENT_LIST, false, false, true);
-            resolveDependenciesLater(projectPom, DependencyType.PLUGINS, true, true, false);
-            resolveDependenciesLater(projectPom, DependencyType.PLUGIN_DEPENDENCIES, true, true, false);
-            resolveDependenciesLater(projectPom, DependencyType.PLUGIN_MANAGEMENT, true, true, true);
-            resolveDependenciesLater(projectPom, DependencyType.REPORTING_PLUGINS, true, true, false);
-            resolveDependenciesLater(projectPom, DependencyType.EXTENSIONS, true, true, false);
+            toResolve.add(new ToResolve(projectPom, DependencyType.DEPENDENCIES, false, false, false));
+            toResolve.add(new ToResolve(projectPom, DependencyType.DEPENDENCY_MANAGEMENT_LIST, false, false, true));
+            toResolve.add(new ToResolve(projectPom, DependencyType.PLUGINS, true, true, false));
+            toResolve.add(new ToResolve(projectPom, DependencyType.PLUGIN_DEPENDENCIES, true, true, false));
+            toResolve.add(new ToResolve(projectPom, DependencyType.PLUGIN_MANAGEMENT, true, true, true));
+            toResolve.add(new ToResolve(projectPom, DependencyType.REPORTING_PLUGINS, true, true, false));
+            toResolve.add(new ToResolve(projectPom, DependencyType.EXTENSIONS, true, true, false));
 
             if (exploreProjects && !pom.getModules().isEmpty()) {
                 if (interactive && !askedToFilterModules) {
@@ -691,10 +691,6 @@ public class DependenciesSolver {
         info = pomTransformer.readPom(projectPom);
         originalPomInfoCache.put(projectPom.getAbsolutePath(), info);
         return info;
-    }
-
-    private void resolveDependenciesLater(File sourcePom, DependencyType listType, boolean buildTime, boolean mavenExtension, boolean management) {
-        toResolve.add(new ToResolve(sourcePom, listType, buildTime, mavenExtension, management));
     }
 
     private void resolveDependencies(File sourcePom, DependencyType listType, boolean buildTime, boolean mavenExtension, boolean management) throws Exception {
