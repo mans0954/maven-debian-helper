@@ -342,26 +342,6 @@ public class DependenciesSolver {
         return baseDir;
     }
 
-    public void saveListOfPoms() {
-        pomTransformer.getListOfPOMs().save();
-    }
-
-    public void saveMavenRules() {
-        pomTransformer.getRules().save();
-    }
-
-    public void saveMavenPublishedRules() {
-        pomTransformer.getPublishedRules().save();
-    }
-
-    public void saveMavenIgnoreRules() {
-        pomTransformer.getIgnoreRules().save();
-    }
-
-    public void saveMavenCleanIgnoreRules() {
-        cleanIgnoreRules.save();
-    }
-
     public void saveSubstvars() {
         File dependencies = new File(outputDirectory, packageName + ".substvars");
         Properties depVars = new Properties();
@@ -1341,11 +1321,11 @@ public class DependenciesSolver {
 
         solver.solveDependencies();
 
-        solver.saveListOfPoms();
-        solver.saveMavenRules();
-        solver.saveMavenIgnoreRules();
-        solver.saveMavenCleanIgnoreRules();
-        solver.saveMavenPublishedRules();
+        solver.pomTransformer.getListOfPOMs().save();
+        solver.pomTransformer.getRules().save();
+        solver.pomTransformer.getIgnoreRules().save();
+        solver.cleanIgnoreRules.save();
+        solver.pomTransformer.getPublishedRules().save();
         solver.saveSubstvars();
 
         if (!solver.getIssues().isEmpty()) {

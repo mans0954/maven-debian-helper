@@ -84,8 +84,8 @@ public class DependenciesSolverTest extends TestCase {
         solver.setBaseDir(testDir);
         solver.setListOfPoms(new File(testDir, "libplexus-active-collections-java.poms"));
 
-        solver.saveListOfPoms();
-        solver.saveMavenRules();
+        solver.pomTransformer.getListOfPOMs().save();
+        solver.pomTransformer.getRules().save();
         solver.saveSubstvars();
 
         assertFileEquals("libplexus-active-collections-java.poms", "libplexus-active-collections-java.poms");
@@ -118,8 +118,8 @@ public class DependenciesSolverTest extends TestCase {
         solver.setBaseDir(testDir);
         solver.setListOfPoms(new File(testDir, "libplexus-utils2-java.poms"));
 
-        solver.saveListOfPoms();
-        solver.saveMavenRules();
+        solver.pomTransformer.getListOfPOMs().save();
+        solver.pomTransformer.getRules().save();
         solver.saveSubstvars();
 
         assertFileEquals("libplexus-utils2-java.poms", "libplexus-utils2-java.poms");
@@ -175,8 +175,8 @@ public class DependenciesSolverTest extends TestCase {
         solver.setBaseDir(testDir);
         solver.setListOfPoms(new File(testDir, "openmrs.poms"));
 
-        solver.saveListOfPoms();
-        solver.saveMavenRules();
+        solver.pomTransformer.getListOfPOMs().save();
+        solver.pomTransformer.getRules().save();
         solver.saveSubstvars();
 
         assertFileEquals("openmrs.poms", "openmrs.poms");
@@ -224,8 +224,8 @@ public class DependenciesSolverTest extends TestCase {
         solver.setBaseDir(testDir);
         solver.setListOfPoms(new File(testDir, "openmrs-api.poms"));
 
-        solver.saveListOfPoms();
-        solver.saveMavenRules();
+        solver.pomTransformer.getListOfPOMs().save();
+        solver.pomTransformer.getRules().save();
         solver.saveSubstvars();
 
         assertFileEquals("openmrs-api.poms", "openmrs-api.poms");
@@ -260,8 +260,8 @@ public class DependenciesSolverTest extends TestCase {
         solver.setBaseDir(testDir);
         solver.setListOfPoms(new File(testDir, "buildhelper-maven-plugin.poms"));
 
-        solver.saveListOfPoms();
-        solver.saveMavenRules();
+        solver.pomTransformer.getListOfPOMs().save();
+        solver.pomTransformer.getRules().save();
         solver.saveSubstvars();
 
         assertFileEquals("buildhelper-maven-plugin.poms", "buildhelper-maven-plugin.poms");
@@ -314,8 +314,8 @@ public class DependenciesSolverTest extends TestCase {
         solver.setBaseDir(testDir);
         solver.setListOfPoms(new File(testDir, "libplexus-compiler-java.poms"));
 
-        solver.saveListOfPoms();
-        solver.saveMavenRules();
+        solver.pomTransformer.getListOfPOMs().save();
+        solver.pomTransformer.getRules().save();
         solver.saveSubstvars();
 
         assertFileEquals("libplexus-compiler-java.poms", "libplexus-compiler-java.poms");

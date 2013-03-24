@@ -143,8 +143,8 @@ public class DependenciesMojo
 
         solver.solveDependencies();
 
-        solver.saveListOfPoms();
-        solver.saveMavenRules();
+        solver.pomTransformer.getListOfPOMs().save();
+        solver.pomTransformer.getRules().save();
         solver.saveSubstvars();
     }
 
