@@ -698,12 +698,8 @@ public class DependenciesSolver {
         List<Dependency> dependenciesByType = pom.getDependencies().get(listType);
 
         for (Dependency dependency : dependenciesByType) {
-            resolveDependency(dependency, sourcePom, buildTime, mavenExtension, management);
+            resolveDependency(dependency, sourcePom, buildTime, mavenExtension, management, false);
         }
-    }
-
-    public Dependency resolveDependency(Dependency dependency, File sourcePom, boolean buildTime, boolean mavenExtension, boolean management) throws DependencyNotFoundException {
-        return resolveDependency(dependency, sourcePom, buildTime, mavenExtension, management, false);
     }
 
     private Dependency resolveDependency(Dependency dependency, File sourcePom, boolean buildTime, boolean mavenExtension, boolean management, boolean resolvingParent) throws DependencyNotFoundException {
@@ -981,7 +977,7 @@ public class DependenciesSolver {
                             DependencyRule userRule = new DependencyRule(newRule);
                             pomTransformer.getRules().add(userRule);
                             System.out.println("Please suggest the maintainer of package " + pkg + " to add this rule to debian/maven.publishedRules");
-                            return resolveDependency(dependency.applyRules(Arrays.asList(userRule)), sourcePom, buildTime, mavenExtension, management);
+                            return resolveDependency(dependency.applyRules(Arrays.asList(userRule)), sourcePom, buildTime, mavenExtension, management, false);
                         }
                     } else {
                         String newRule = userInteraction.ask(
@@ -998,7 +994,7 @@ public class DependenciesSolver {
                                 pomTransformer.getRules().add(userRule);
                                 System.out.println("Rescanning /usr/share/maven-repo...");
                                 pomTransformer.getRepository().scan();
-                                return resolveDependency(dependency.applyRules(Arrays.asList(userRule)), sourcePom, buildTime, mavenExtension, management);
+                                return resolveDependency(dependency.applyRules(Arrays.asList(userRule)), sourcePom, buildTime, mavenExtension, management, false);
                             }
                         }
                     }
@@ -1012,7 +1008,7 @@ public class DependenciesSolver {
                         scanner = new PackageScanner();
                         scanner.setOffline(offline);
                         
-                        return resolveDependency(dependency, sourcePom, buildTime, mavenExtension, management);
+                        return resolveDependency(dependency, sourcePom, buildTime, mavenExtension, management, false);
                     }
                 }
                 if (verbose) {
