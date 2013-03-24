@@ -868,9 +868,7 @@ public class DependenciesSolver {
             return dependency;
         }
 
-        String sourcePomLoc = sourcePom.getAbsolutePath();
-        String baseDirPath = baseDir.getAbsolutePath();
-        sourcePomLoc = sourcePomLoc.substring(baseDirPath.length() + 1, sourcePomLoc.length());
+        String sourcePomLoc = sourcePom.getName();
         if (verbose) {
             String msg = "Resolving " + dependency;
             if (dependency.getScope() != null) {
