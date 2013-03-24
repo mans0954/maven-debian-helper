@@ -280,18 +280,6 @@ public class DependenciesSolver {
         return false;
     }
 
-    private boolean canIgnorePlugin(Dependency dependency) {
-        return containsPlugin(PLUGINS_TO_IGNORE, dependency);
-    }
-
-    private boolean canIgnoreExtension(Dependency dependency) {
-        return containsPlugin(EXTENSIONS_TO_IGNORE, dependency);
-    }
-
-    private boolean canBeIgnoredPlugin(Dependency dependency) {
-        return containsPlugin(PLUGINS_THAT_CAN_BE_IGNORED, dependency);
-    }
-
     private boolean askIgnoreDependency(String sourcePomLoc, Dependency dependency, String message) {
         return askIgnoreDependency(sourcePomLoc, dependency, message, true);
     }
@@ -872,13 +860,13 @@ public class DependenciesSolver {
 
         // First let the packager mark as ignored those dependencies which should be ignored
         boolean ignoreDependency = false;
-        if (!ignoreDependency && canIgnorePlugin(dependency)) {
+        if (!ignoreDependency && containsPlugin(PLUGINS_TO_IGNORE, dependency)) {
             ignoreDependency = askIgnoreDependency(sourcePomLoc, dependency, "This plugin is not useful for the build or its use is against Debian policies. Ignore this plugin?");
         }
-        if (!ignoreDependency && canIgnoreExtension(dependency)) {
+        if (!ignoreDependency && containsPlugin(EXTENSIONS_TO_IGNORE, dependency)) {
             ignoreDependency = askIgnoreDependency(sourcePomLoc, dependency, "This extension is not useful for the build or its use is against Debian policies. Ignore this extension?");
         }
-        if (!ignoreDependency && canBeIgnoredPlugin(dependency)) {
+        if (!ignoreDependency && containsPlugin(PLUGINS_THAT_CAN_BE_IGNORED, dependency)) {
             ignoreDependency = askIgnoreDependency(sourcePomLoc, dependency, "This plugin may be ignored in some cases. Ignore this plugin?");
         }
         if (!ignoreDependency && !runTests) {
