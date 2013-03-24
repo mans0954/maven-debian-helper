@@ -335,7 +335,7 @@ public class DependenciesSolverTest extends TestCase {
             if (!skipReadTest) {
                 test = fileReader.readLine();
 
-                if (test != null && (test.startsWith("#") || test.trim().isEmpty())) {
+                if (test != null && isEmptyOrCommentLine(test)) {
                     continue;
                 }
             }
@@ -345,13 +345,19 @@ public class DependenciesSolverTest extends TestCase {
             if (ref == null) {
                 return;
             }
-            if (ref.startsWith("#") || ref.trim().isEmpty()) {
+            if (isEmptyOrCommentLine(ref)) {
                 skipReadTest = true;
                 continue;
             }
             assertNotNull("Error in " + fileName + ": expected " + ref.trim() + " but found nothing", test);
-            assertEquals("Error in " + fileName, ref.trim(), test.trim());
+            assertEquals("File " + fileName + "\ndifferent from resource " + resource +"\nexpected:\n"
+                + ref.trim() + "\nfound:\n" + test.trim() + "\n",
+                ref.trim(), test.trim());
         }
+    }
+
+    private boolean isEmptyOrCommentLine(String line) {
+        return line.startsWith("#") || line.trim().isEmpty();
     }
 
     protected void useFile(String resource, File file) throws IOException {
