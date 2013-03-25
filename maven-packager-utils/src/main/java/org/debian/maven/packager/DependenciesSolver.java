@@ -355,12 +355,7 @@ public class DependenciesSolver {
             Set<String> propertiesNames = depVars.stringPropertyNames();
             if (propertiesNames != null) {
                 for (String propName : propertiesNames) {
-                    StringBuffer sb = new StringBuffer();
-                    sb.append(propName);
-                    sb.append("=");
-                    sb.append(depVars.get(propName));
-                    sb.append("\n");
-                    out.write(sb.toString());
+                    out.write(Strings.propertyLine(propName, depVars.get(propName).toString()));
                 }
             }
             out.close();
