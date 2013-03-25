@@ -10,12 +10,16 @@ maven-debian-helper (1.5.2) UNRELEASED; urgency=low
     Patch made by Steve Langasek <vorlon@debian.org>
 
   [Thomas Koch]
-  * code refactorings and cleanup
+  * Massive code refactorings and cleanup.
 
   [Hilko Bengen]
   * mh_make: Do not use sudo (Closes: #703382)
 
- -- Ludovic Claude <ludovic.claude@laposte.net>  Sun, 06 May 2012 23:54:00 +0200
+  [James Page]
+  * Make intelligent decisions about whether to install to /usr/share/java.
+    (Closes: #688043) (LP: #1052533)
+
+  -- Ludovic Claude <ludovic.claude@laposte.net>  Sun, 06 May 2012 23:54:00 +0200
 
 maven-debian-helper (1.5.1) unstable; urgency=low
 

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -176,6 +177,17 @@ public class SysInstallMojo extends AbstractMojo {
     private boolean noUsjVersionless;
 
     private String classifier;
+
+    /**
+     * Regex for detecting that package is a libXXX-java package
+     */
+    private static final Pattern javaLibRegex = Pattern.compile("lib.*-java");
+
+    /**
+     * Regex for detecting that package is a maven plugin package
+     */
+    private static final Pattern pluginRegex =
+        Pattern.compile("lib.*-maven-plugin-java|libmaven-.*-plugin-java");
 
     // ----------------------------------------------------------------------
     // Public methods
@@ -658,7 +670,19 @@ public class SysInstallMojo extends AbstractMojo {
                 classifier = pomOption.getClassifier();
             }
 
-            installToUsj = pomOption.isJavaLib();
+            // If package is a java libary (lib.*-java)and is not a maven plugin
+            // (lib.*-plugin-java) potentially install to /usr/share/java
+            boolean packageIsJavaLib =
+                    javaLibRegex.matcher(destPackage).matches() &&
+                   !pluginRegex.matcher(destPackage).matches();
+
+            // Its also possible to configure USJ install using
+            // DEB_MAVEN_INSTALL_TO_USJ which we should honour
+            // over auto-detection if its set to 'false'.
+            // This is stored in 'installToUsj' on class instance
+            // creation
+            installToUsj = pomOption.isJavaLib() ||
+                           (packageIsJavaLib && installToUsj);
         }
 
         List<String> params = new ArrayList<String>();
