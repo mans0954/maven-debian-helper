@@ -281,7 +281,12 @@ public class DependenciesSolver {
 
         public void resolve() {
             try {
-                resolveDependencies(sourcePom, listType, buildTime, mavenExtension, management);
+                POMInfo pom = getPOM(sourcePom);
+                List<Dependency> dependenciesByType = pom.getDependencies().get(listType);
+
+                for (Dependency dependency : dependenciesByType) {
+                    resolveDependency(dependency, sourcePom, buildTime, mavenExtension, management, false);
+                }
             } catch (DependencyNotFoundException e) {
                 log.log(Level.SEVERE, "Cannot resolve dependencies in " + sourcePom + ": " + e.getMessage());
             } catch (Exception e) {
@@ -691,15 +696,6 @@ public class DependenciesSolver {
         info = pomTransformer.readPom(projectPom);
         originalPomInfoCache.put(projectPom.getAbsolutePath(), info);
         return info;
-    }
-
-    private void resolveDependencies(File sourcePom, DependencyType listType, boolean buildTime, boolean mavenExtension, boolean management) throws Exception {
-        POMInfo pom = getPOM(sourcePom);
-        List<Dependency> dependenciesByType = pom.getDependencies().get(listType);
-
-        for (Dependency dependency : dependenciesByType) {
-            resolveDependency(dependency, sourcePom, buildTime, mavenExtension, management, false);
-        }
     }
 
     private Dependency resolveDependency(Dependency dependency, File sourcePom, boolean buildTime, boolean mavenExtension, boolean management, boolean resolvingParent) throws DependencyNotFoundException {
