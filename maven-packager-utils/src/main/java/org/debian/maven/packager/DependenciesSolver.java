@@ -41,6 +41,7 @@ import org.debian.maven.repo.DependencyRuleSet;
 import org.debian.maven.repo.ListOfPOMs;
 import org.debian.maven.repo.POMHandler;
 import org.debian.maven.repo.POMInfo;
+import org.debian.maven.repo.Substvars;
 import org.debian.maven.repo.POMInfo.DependencyType;
 import org.debian.maven.repo.POMTransformer;
 import org.debian.maven.repo.Repository;
@@ -296,19 +297,8 @@ public class DependenciesSolver {
     }
 
     public void saveSubstvars() {
-        File dependencies = new File(outputDirectory, packageName + ".substvars");
-        Properties depVars = new Properties();
-        if (dependencies.exists()) {
-            try {
-                depVars.load(new FileReader(dependencies));
-            } catch (IOException ex) {
-                log.log(Level.SEVERE, "Error while reading file " + dependencies, ex);
-            }
-        }
-        depVars.put("maven.CompileDepends", Strings.join(compileDepends, ", "));
-        depVars.put("maven.TestDepends", Strings.join(testDepends, ", "));
-        depVars.put("maven.Depends", Strings.join(runtimeDepends, ", "));
-        depVars.put("maven.OptionalDepends", Strings.join(optionalDepends, ", "));
+        Properties depVars = Substvars.loadSubstvars(outputDirectory, packageName);
+
         if (generateJavadoc) {
             System.out.println("Checking dependencies for documentation packages...");
             Set<String> docRuntimeDepends = new TreeSet<String>();
@@ -340,6 +330,11 @@ public class DependenciesSolver {
                     docOptionalDepends.add(docPkg);
                 }
             }
+
+            depVars.put("maven.CompileDepends", Strings.join(compileDepends, ", "));
+            depVars.put("maven.TestDepends", Strings.join(testDepends, ", "));
+            depVars.put("maven.Depends", Strings.join(runtimeDepends, ", "));
+            depVars.put("maven.OptionalDepends", Strings.join(optionalDepends, ", "));
             depVars.put("maven.DocDepends", Strings.join(docRuntimeDepends, ", "));
             depVars.put("maven.DocOptionalDepends", Strings.join(docOptionalDepends, ", "));
         }
@@ -347,21 +342,7 @@ public class DependenciesSolver {
             depVars.put("maven.UpstreamPackageVersion", packageVersion);
         }
         // Write everything to debian/substvars
-        try {
-            FileWriter fstream = new FileWriter(dependencies);
-            BufferedWriter out = new BufferedWriter(fstream);
-            out.write("#List of dependencies for " + packageName + ", generated for use by debian/control");
-            out.write("\n");
-            Set<String> propertiesNames = depVars.stringPropertyNames();
-            if (propertiesNames != null) {
-                for (String propName : propertiesNames) {
-                    out.write(Strings.propertyLine(propName, depVars.get(propName).toString()));
-                }
-            }
-            out.close();
-        } catch (IOException ex) {
-            log.log(Level.SEVERE, "Error while saving file " + dependencies, ex);
-        }
+        Substvars.write(outputDirectory, packageName, depVars);
     }
 
     public void setBaseDir(File baseDir) {
