@@ -126,30 +126,27 @@ fi
 
 echo
 echo "Checking that apt-file is installed and has been configured..."
-if [ -f /usr/bin/apt-file ]; then
+if [ ! -x /usr/bin/apt-file ]; then
+    echo "Error: apt-file is not available." >&2
+    echo "Please install the 'apt-file' package and try again." >&2
+    exit 1
+else
     res="ok"
     apt-file search /usr/bin/mvnDebug | grep maven > /dev/null || res="failed"
     if [ $? != 0 ] || [ "$res" == "failed" ]; then
         echo "Warning: apt-file doesn't seem to be configured"
-        echo "Running sudo apt-file update... (this operation may require that you"
-        echo "enter your password)"
-        sudo apt-file update
+        apt-file update
     else
         echo '[ok]'
     fi
-else
-    echo "Warning: apt-file doesn't seem to be installed"
-    echo "Installing apt-file using sudo apt-get install apt-file"
-    sudo apt-get install apt-file
-    sudo apt-file update
 fi
 
 echo
 echo "Checking that licensecheck is installed..."
-if [ ! -f /usr/bin/licensecheck ]; then
-    echo "Warning: licensecheck doesn't seem to be installed"
-    echo "Installing licensecheck using sudo apt-get install devscripts"
-    sudo apt-get install devscripts
+if [ ! -x /usr/bin/licensecheck ]; then
+    echo "Error: licensecheck is not available." >&2
+    echo "Please install the 'devscripts' package and try again." >&2
+    exit 1
 else
     echo '[ok]'
 fi
