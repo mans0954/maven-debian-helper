@@ -17,10 +17,7 @@ package org.debian.maven.packager;
  * limitations under the License.
  */
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -48,6 +45,7 @@ import org.debian.maven.repo.Repository;
 import org.debian.maven.repo.Rule;
 import org.debian.maven.util.Strings;
 
+import static org.debian.maven.packager.DebianDependencies.Type.*;
 /**
  * Analyze the Maven dependencies and extract the Maven rules to use
  * as well as the list of dependent packages.
@@ -156,10 +154,7 @@ public class DependenciesSolver {
     private Set<Dependency> knownProjectDependencies = new TreeSet<Dependency>();
     private Set<Dependency> ignoredDependencies = new TreeSet<Dependency>();
     private Set<Dependency> notIgnoredDependencies = new TreeSet<Dependency>();
-    private Set<String> compileDepends = new TreeSet<String>();
-    private Set<String> testDepends = new TreeSet<String>();
-    private Set<String> runtimeDepends = new TreeSet<String>();
-    private Set<String> optionalDepends = new TreeSet<String>();
+    private DebianDependencies debianDeps = new DebianDependencies();
     private DependencyRuleSet cleanIgnoreRules = new DependencyRuleSet("Ignore rules to be applied during the Maven clean phase",
             new File("debian/maven.cleanIgnoreRules"));
     private boolean offline;
@@ -175,7 +170,7 @@ public class DependenciesSolver {
     // Keep the previous selected rule for a given version
     private Map<String, Rule> versionToRules = new HashMap<String, Rule>();
     // Keep the list of packages and dependencies
-    private Map<String, Dependency> versionedPackagesAndDependencies = new HashMap<String, Dependency>();
+    private Map<DebianDependency, Dependency> versionedPackagesAndDependencies = new HashMap<DebianDependency, Dependency>();
     private List<Rule> defaultRules = new ArrayList<Rule>();
     private PackageScanner scanner = new PackageScanner();
 
@@ -301,42 +296,12 @@ public class DependenciesSolver {
 
         if (generateJavadoc) {
             System.out.println("Checking dependencies for documentation packages...");
-            Set<String> docRuntimeDepends = new TreeSet<String>();
-            docRuntimeDepends.add("default-jdk-doc");
-            for (String dependency : runtimeDepends) {
-                Dependency runtimeDependency = versionedPackagesAndDependencies.get(dependency);
-                if (dependency.indexOf(' ') > 0) {
-                    dependency = dependency.substring(0, dependency.indexOf(' '));
-                }
-                if (runtimeDependency != null && "pom".equals(runtimeDependency.getType())) {
-                    continue;
-                }
-                String docPkg = scanner.searchPkg(new File("/usr/share/doc/" + dependency + "/api/index.html"));
-                if (docPkg != null) {
-                    docRuntimeDepends.add(docPkg);
-                }
-            }
-            Set<String> docOptionalDepends = new TreeSet<String>();
-            for (String dependency : optionalDepends) {
-                Dependency optionalDependency = versionedPackagesAndDependencies.get(dependency);
-                if (dependency.indexOf(' ') > 0) {
-                    dependency = dependency.substring(0, dependency.indexOf(' '));
-                }
-                if (optionalDependency != null && "pom".equals(optionalDependency.getType())) {
-                    continue;
-                }
-                String docPkg = scanner.searchPkg(new File("/usr/share/doc/" + dependency + "/api/index.html"));
-                if (docPkg != null) {
-                    docOptionalDepends.add(docPkg);
-                }
-            }
 
-            depVars.put("maven.CompileDepends", Strings.join(compileDepends, ", "));
-            depVars.put("maven.TestDepends", Strings.join(testDepends, ", "));
-            depVars.put("maven.Depends", Strings.join(runtimeDepends, ", "));
-            depVars.put("maven.OptionalDepends", Strings.join(optionalDepends, ", "));
-            depVars.put("maven.DocDepends", Strings.join(docRuntimeDepends, ", "));
-            depVars.put("maven.DocOptionalDepends", Strings.join(docOptionalDepends, ", "));
+            debianDeps.add(DOC_RUNTIME, new DebianDependency("default-jdk-doc"));
+            debianDeps.add(DOC_RUNTIME, scanner.addDocDependencies(debianDeps.get(RUNTIME), versionedPackagesAndDependencies));
+            debianDeps.add(DOC_OPTIONAL, scanner.addDocDependencies(debianDeps.get(OPTIONAL), versionedPackagesAndDependencies));
+
+            debianDeps.putInProperties(depVars);
         }
         if (packageVersion != null) {
             depVars.put("maven.UpstreamPackageVersion", packageVersion);
@@ -923,7 +888,7 @@ public class DependenciesSolver {
                 }
                 return null;
             } else {
-                String pkg = scanner.searchPkg(new File("/usr/share/maven-repo/"
+                DebianDependency pkg = scanner.searchPkg(new File("/usr/share/maven-repo/"
                         + dependency.getGroupId().replace('.', '/')
                         + "/" + dependency.getArtifactId()), ".pom");
                 if (pkg != null) {
@@ -999,39 +964,41 @@ public class DependenciesSolver {
         }
 
         // Discover the library to import for the dependency
-        String pkg = getPackage(pom, sourcePomLoc);
+        DebianDependency pkg = getPackage(pom, sourcePomLoc);
 
         if (pkg != null && !pkg.equals(packageName)) {
-            String libraryWithVersionConstraint = pkg;
-            String version = dependency.getVersion();
-            if (version == null || (pom.getOriginalVersion() != null && version.compareTo(pom.getOriginalVersion()) > 0)) {
-                version = pom.getOriginalVersion();
-            }
+            DebianDependency libraryWithVersionConstraint;
             if (pom.getOriginalVersion() != null && (pom.getProperties().containsKey("debian.hasPackageVersion"))) {
-                libraryWithVersionConstraint += " (>= " + version + ")";
+                String version = dependency.getVersion();
+                if (version == null || (pom.getOriginalVersion() != null && version.compareTo(pom.getOriginalVersion()) > 0)) {
+                    version = pom.getOriginalVersion();
+                }
+                libraryWithVersionConstraint = new DebianDependency(pkg.getPackageName(), version);
+            } else {
+                libraryWithVersionConstraint = pkg;
             }
             if (!management) {
                 if (buildTime) {
                     if ("test".equals(dependency.getScope())) {
-                        testDepends.add(libraryWithVersionConstraint);
+                        debianDeps.add(TEST, libraryWithVersionConstraint);
                     } else if ("maven-plugin".equals(dependency.getType())) {
                         if (!packageType.equals("ant")) {
-                            compileDepends.add(libraryWithVersionConstraint);
+                            debianDeps.add(COMPILE, libraryWithVersionConstraint);
                         }
                     } else if (mavenExtension) {
                         if (!packageType.equals("ant")) {
-                            compileDepends.add(libraryWithVersionConstraint);
+                            debianDeps.add(COMPILE, libraryWithVersionConstraint);
                         }
                     } else {
-                        compileDepends.add(libraryWithVersionConstraint);
+                        debianDeps.add(COMPILE, libraryWithVersionConstraint);
                     }
                 } else {
                     if (dependency.isOptional()) {
-                        optionalDepends.add(libraryWithVersionConstraint);
+                        debianDeps.add(OPTIONAL, libraryWithVersionConstraint);
                     } else if ("test".equals(dependency.getScope())) {
-                        testDepends.add(libraryWithVersionConstraint);
+                        debianDeps.add(TEST, libraryWithVersionConstraint);
                     } else {
-                        runtimeDepends.add(libraryWithVersionConstraint);
+                        debianDeps.add(RUNTIME, libraryWithVersionConstraint);
                     }
                 }
             }
@@ -1064,10 +1031,10 @@ public class DependenciesSolver {
         return pom.getThisPom();
     }
 
-    private String getPackage(POMInfo pom, String sourcePomLoc) {
-        String pkg = null;
+    private DebianDependency getPackage(POMInfo pom, String sourcePomLoc) {
+        DebianDependency pkg = null;
         if (pom.getProperties() != null) {
-            pkg = pom.getProperties().get("debian.package");
+            pkg = new DebianDependency(pom.getProperties().get("debian.package"));
         }
         if (pkg == null) {
             Dependency dependency = pom.getThisPom();

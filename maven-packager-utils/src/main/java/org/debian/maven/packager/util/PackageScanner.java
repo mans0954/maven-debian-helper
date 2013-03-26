@@ -19,9 +19,13 @@ package org.debian.maven.packager.util;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.debian.maven.packager.DebianDependency;
+import org.debian.maven.repo.Dependency;
 
 public class PackageScanner {
 
@@ -34,12 +38,12 @@ public class PackageScanner {
         this.offline = offline;
     }
 
-    public String searchPkg(File dir, String extension) {
+    public DebianDependency searchPkg(File dir, String extension) {
         GetPackageContainingPatternResult packageResult = new GetPackageContainingPatternResult(extension);
         File cacheId = new File(dir, "<ANY>" + extension);
 
         if (filesInPackages.containsKey(cacheId)) {
-            return filesInPackages.get(cacheId);
+            return new DebianDependency(filesInPackages.get(cacheId));
         }
 
         IOUtil.executeProcess(new String[]{"dpkg", "--search", dir.getAbsolutePath() + "/*/*"}, packageResult);
@@ -48,7 +52,7 @@ public class PackageScanner {
         if (!packageResult.getPackages().isEmpty()) {
             pkg = packageResult.getPackages().iterator().next();
             filesInPackages.put(cacheId, pkg);
-            return pkg;
+            return new DebianDependency(pkg);
         }
 
         // Debian policy prevents the use of apt-file during a build
@@ -66,15 +70,19 @@ public class PackageScanner {
             pkg = packageResult.getPackages().iterator().next();
             filesInPackages.put(cacheId, pkg);
         }
-        return pkg;
+        return new DebianDependency(pkg);
 
     }
 
-    public String searchPkg(File fileToSearch) {
+    public DebianDependency searchJavaDocPkg(DebianDependency dependency) {
+        return searchPkg(new File("/usr/share/doc/" + dependency.getPackageName() + "/api/index.html"));
+    }
+
+    public DebianDependency searchPkg(File fileToSearch) {
         GetPackageResult packageResult = new GetPackageResult();
 
         if (filesInPackages.containsKey(fileToSearch)) {
-            return filesInPackages.get(fileToSearch);
+            return new DebianDependency(filesInPackages.get(fileToSearch));
         }
 
         String pkg = null;
@@ -82,7 +90,7 @@ public class PackageScanner {
         if (!packageResult.getResult().isEmpty()) {
             pkg = packageResult.getResult().iterator().next();
             filesInPackages.put(fileToSearch, pkg);
-            return pkg;
+            return new DebianDependency(pkg);
         }
 
         // Debian policy prevents the use of apt-file during a build
@@ -100,18 +108,18 @@ public class PackageScanner {
             pkg = packageResult.getResult().iterator().next();
             filesInPackages.put(fileToSearch, pkg);
         }
-        return pkg;
+        return new DebianDependency(pkg);
     }
 
-    public String getPackageVersion(String pkg, boolean onlyInstalled) {
+    public String getPackageVersion(DebianDependency pkg, boolean onlyInstalled) {
         GetPackageVersionResult packageResult = new GetPackageVersionResult();
-        IOUtil.executeProcess(new String[]{"dpkg", "--status", pkg}, packageResult);
+        IOUtil.executeProcess(new String[]{"dpkg", "--status", pkg.getPackageName()}, packageResult);
         if (packageResult.getResult() != null) {
             return packageResult.getResult();
         }
         if (!onlyInstalled) {
-            GetChangelogVersionResult versionResult = new GetChangelogVersionResult(pkg);
-            IOUtil.executeProcess(new String[]{"apt-get", "--no-act", "--verbose-versions", "install", pkg}, versionResult);
+            GetChangelogVersionResult versionResult = new GetChangelogVersionResult(pkg.getPackageName());
+            IOUtil.executeProcess(new String[]{"apt-get", "--no-act", "--verbose-versions", "install", pkg.getPackageName()}, versionResult);
             if (versionResult.getResult() != null) {
                 return versionResult.getResult();
             }
@@ -138,6 +146,22 @@ public class PackageScanner {
 
     public void makeExecutable(String file) {
         IOUtil.executeProcess(new String[]{"chmod", "+x", file}, new NoOutputHandler());
+    }
+
+    public ArrayList<DebianDependency> addDocDependencies(Collection<DebianDependency> debianDeps, Map<DebianDependency,
+        Dependency> versionedPackagesAndDependencies) {
+        ArrayList<DebianDependency> docDeps = new ArrayList<DebianDependency>();
+        for (DebianDependency dependency : debianDeps) {
+            Dependency runtimeDependency = versionedPackagesAndDependencies.get(dependency);
+            if (runtimeDependency != null && "pom".equals(runtimeDependency.getType())) {
+                continue;
+            }
+            DebianDependency docPkg = searchJavaDocPkg(dependency);
+            if (docPkg != null) {
+                docDeps.add(docPkg);
+            }
+        }
+        return docDeps;
     }
 
 }
