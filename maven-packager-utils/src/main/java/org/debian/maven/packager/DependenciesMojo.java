@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import org.apache.maven.project.MavenProject;
+import org.debian.maven.repo.DependencyRuleSetFiles.RulesType;
 
 /**
  * Analyze the Maven dependencies and extract the list of dependent packages,
@@ -110,7 +111,7 @@ public class DependenciesMojo
             f.mkdirs();
         }
 
-        DependenciesSolver solver = new DependenciesSolver();
+        DependenciesSolver solver = new DependenciesSolver(outputDirectory);
 
         File basedir = project.getBasedir();
         // TODO: use the list of project defined here for some initialisation step, I've forgotten what to do...
@@ -125,7 +126,6 @@ public class DependenciesMojo
 
         solver.setBaseDir(basedir);
         solver.mavenRepo = mavenRepo;
-        solver.setOutputDirectory(outputDirectory);
         solver.packageName = packageName;
         solver.packageType = packageType;
         solver.generateJavadoc = resolveJavadoc;
@@ -144,7 +144,7 @@ public class DependenciesMojo
         solver.solveDependencies();
 
         solver.pomTransformer.getListOfPOMs().save();
-        solver.pomTransformer.getRules().save();
+        solver.pomTransformer.getRulesFiles().save(outputDirectory, RulesType.RULES);
         solver.saveSubstvars();
     }
 

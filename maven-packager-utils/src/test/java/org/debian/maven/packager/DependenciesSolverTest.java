@@ -35,6 +35,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.debian.maven.repo.DependencyRule;
 
+import static org.debian.maven.repo.DependencyRuleSetFiles.RulesType.*;
+
 public class DependenciesSolverTest extends TestCase {
 
     private File testDir = new File("tmp");
@@ -65,9 +67,8 @@ public class DependenciesSolverTest extends TestCase {
      */
     public void testSolvePlexusActiveCollectionsDependencies() throws Exception {
         useFile("plexus-active-collections/pom.xml", pomFile);
-        DependenciesSolver solver = new DependenciesSolver();
+        DependenciesSolver solver = new DependenciesSolver(testDir);
         solver.mavenRepo = getFileInClasspath("repository/root.dir").getParentFile();
-        solver.setOutputDirectory(testDir);
         solver.exploreProjects = true;
         solver.packageName = "libplexus-active-collections-java";
         solver.packageType = "maven";
@@ -85,7 +86,7 @@ public class DependenciesSolverTest extends TestCase {
         solver.setListOfPoms(new File(testDir, "libplexus-active-collections-java.poms"));
 
         solver.pomTransformer.getListOfPOMs().save();
-        solver.pomTransformer.getRules().save();
+        solver.pomTransformer.getRulesFiles().save(testDir, RULES);
         solver.saveSubstvars();
 
         assertFileEquals("libplexus-active-collections-java.poms", "libplexus-active-collections-java.poms");
@@ -98,13 +99,12 @@ public class DependenciesSolverTest extends TestCase {
      */
     public void testSolvePlexusUtils2Dependencies() throws Exception {
         useFile("plexus-utils2/pom.xml", pomFile);
-        DependenciesSolver solver = new DependenciesSolver();
+        DependenciesSolver solver = new DependenciesSolver(testDir);
         solver.mavenRepo = getFileInClasspath("repository/root.dir").getParentFile();
-        solver.setOutputDirectory(testDir);
         solver.exploreProjects = true;
         solver.packageName = "libplexus-utils2-java";
         solver.packageType = "maven";
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-release-plugin * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.apache.maven.plugins maven-release-plugin * *"));
         File listOfPoms = getFileInClasspath("libplexus-utils2-java.poms");
         solver.setBaseDir(getFileInClasspath("plexus-utils2/pom.xml").getParentFile());
         solver.setListOfPoms(new File(listOfPoms.getParent(), listOfPoms.getName()));
@@ -119,7 +119,7 @@ public class DependenciesSolverTest extends TestCase {
         solver.setListOfPoms(new File(testDir, "libplexus-utils2-java.poms"));
 
         solver.pomTransformer.getListOfPOMs().save();
-        solver.pomTransformer.getRules().save();
+        solver.pomTransformer.getRulesFiles().save(testDir, RULES);
         solver.saveSubstvars();
 
         assertFileEquals("libplexus-utils2-java.poms", "libplexus-utils2-java.poms");
@@ -132,9 +132,8 @@ public class DependenciesSolverTest extends TestCase {
      */
     public void testSolveOpenMRSDependenciesWithErrors() throws Exception {
         useFile("openmrs/pom.xml", pomFile);
-        DependenciesSolver solver = new DependenciesSolver();
+        DependenciesSolver solver = new DependenciesSolver(testDir);
         solver.mavenRepo = getFileInClasspath("repository/root.dir").getParentFile();
-        solver.setOutputDirectory(testDir);
         solver.exploreProjects = false;
         solver.packageName = "openmrs";
         solver.packageType = "maven";
@@ -153,15 +152,14 @@ public class DependenciesSolverTest extends TestCase {
 
     public void testSolveOpenMRSDependencies() throws Exception {
         useFile("openmrs/pom.xml", pomFile);
-        DependenciesSolver solver = new DependenciesSolver();
+        DependenciesSolver solver = new DependenciesSolver(testDir);
         solver.mavenRepo = getFileInClasspath("repository/root.dir").getParentFile();
-        solver.setOutputDirectory(testDir);
         solver.exploreProjects = false;
         solver.packageName = "openmrs";
         solver.packageType = "maven";
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.openmrs.codehaus.mojo buildnumber-maven-plugin * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.codehaus.mojo build-helper-maven-plugin * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-assembly-plugin * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.openmrs.codehaus.mojo buildnumber-maven-plugin * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.codehaus.mojo build-helper-maven-plugin * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.apache.maven.plugins maven-assembly-plugin * *"));
         File listOfPoms = getFileInClasspath("openmrs.poms");
         solver.setBaseDir(getFileInClasspath("openmrs/pom.xml").getParentFile());
         solver.setListOfPoms(new File(listOfPoms.getParent(), listOfPoms.getName()));
@@ -176,7 +174,7 @@ public class DependenciesSolverTest extends TestCase {
         solver.setListOfPoms(new File(testDir, "openmrs.poms"));
 
         solver.pomTransformer.getListOfPOMs().save();
-        solver.pomTransformer.getRules().save();
+        solver.pomTransformer.getRulesFiles().save(testDir, RULES);
         solver.saveSubstvars();
 
         assertFileEquals("openmrs.poms", "openmrs.poms");
@@ -186,31 +184,30 @@ public class DependenciesSolverTest extends TestCase {
 
     public void testSolveOpenMRSApiDependencies() throws Exception {
         useFile("openmrs/api/pom.xml", pomFile);
-        DependenciesSolver solver = new DependenciesSolver();
+        DependenciesSolver solver = new DependenciesSolver(testDir);
         solver.mavenRepo = getFileInClasspath("repository/root.dir").getParentFile();
-        solver.setOutputDirectory(testDir);
         solver.exploreProjects = false;
         solver.packageName = "openmrs";
         solver.packageType = "maven";
         solver.verbose = true;
-        solver.pomTransformer.addRule(new DependencyRule("cglib s/cglib-nodep/cglib jar s/.*/debian/ * *"));
+        solver.pomTransformer.getRulesFiles().get(RULES).add(new DependencyRule("cglib s/cglib-nodep/cglib jar s/.*/debian/ * *"));
         // Some dependencies are ignored here because there's a long list of libraries not packaged yet in Debian
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.openmrs.test openmrs-test * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.openmrs.codehaus.mojo buildnumber-maven-plugin * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.codehaus.mojo build-helper-maven-plugin * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-assembly-plugin * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.springframework * * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("ca.uhn.hapi hapi * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.openmrs.simpleframework simple-xml * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.openmrs.hibernate * * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("stax stax* * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("dom4j dom4j * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("c3p0 c3p0 * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("net.sf.ehcache * * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("javax.mail mail * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("javax.mail mail * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.openmrs.liquibase * * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("xml-resolver xml-resolver * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.openmrs.test openmrs-test * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.openmrs.codehaus.mojo buildnumber-maven-plugin * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.codehaus.mojo build-helper-maven-plugin * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.apache.maven.plugins maven-assembly-plugin * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.springframework * * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("ca.uhn.hapi hapi * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.openmrs.simpleframework simple-xml * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.openmrs.hibernate * * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("stax stax* * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("dom4j dom4j * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("c3p0 c3p0 * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("net.sf.ehcache * * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("javax.mail mail * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("javax.mail mail * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.openmrs.liquibase * * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("xml-resolver xml-resolver * *"));
         File listOfPoms = getFileInClasspath("openmrs-api.poms");
         solver.setBaseDir(getFileInClasspath("openmrs/pom.xml").getParentFile());
         solver.setListOfPoms(new File(listOfPoms.getParent(), listOfPoms.getName()));
@@ -225,7 +222,7 @@ public class DependenciesSolverTest extends TestCase {
         solver.setListOfPoms(new File(testDir, "openmrs-api.poms"));
 
         solver.pomTransformer.getListOfPOMs().save();
-        solver.pomTransformer.getRules().save();
+        solver.pomTransformer.getRulesFiles().save(testDir, RULES);
         solver.saveSubstvars();
 
         assertFileEquals("openmrs-api.poms", "openmrs-api.poms");
@@ -235,17 +232,16 @@ public class DependenciesSolverTest extends TestCase {
 
     public void testSolveBuildhelperPluginDependencies() throws Exception {
         useFile("buildhelper-maven-plugin/pom.xml", pomFile);
-        DependenciesSolver solver = new DependenciesSolver();
+        DependenciesSolver solver = new DependenciesSolver(testDir);
         solver.mavenRepo = getFileInClasspath("repository/root.dir").getParentFile();
-        solver.setOutputDirectory(testDir);
         solver.exploreProjects =  false;
         solver.packageName = "buildhelper-maven-plugin";
         solver.packageType = "maven";
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-changelog-plugin * * * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-changes-plugin * * * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-checkstyle-plugin * * * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-enforcer-plugin * * * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-project-info-reports-plugin * * * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.apache.maven.plugins maven-changelog-plugin * * * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.apache.maven.plugins maven-changes-plugin * * * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.apache.maven.plugins maven-checkstyle-plugin * * * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.apache.maven.plugins maven-enforcer-plugin * * * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.apache.maven.plugins maven-project-info-reports-plugin * * * *"));
         File listOfPoms = getFileInClasspath("buildhelper-maven-plugin.poms");
         solver.setBaseDir(getFileInClasspath("buildhelper-maven-plugin/pom.xml").getParentFile());
         solver.setListOfPoms(new File(listOfPoms.getParent(), listOfPoms.getName()));
@@ -261,7 +257,7 @@ public class DependenciesSolverTest extends TestCase {
         solver.setListOfPoms(new File(testDir, "buildhelper-maven-plugin.poms"));
 
         solver.pomTransformer.getListOfPOMs().save();
-        solver.pomTransformer.getRules().save();
+        solver.pomTransformer.getRulesFiles().save(testDir, RULES);
         solver.saveSubstvars();
 
         assertFileEquals("buildhelper-maven-plugin.poms", "buildhelper-maven-plugin.poms");
@@ -271,33 +267,32 @@ public class DependenciesSolverTest extends TestCase {
 
     public void testSolvePlexusCompilerDependencies() throws Exception {
         useFile("plexus-compiler/pom.xml", pomFile);
-        DependenciesSolver solver = new DependenciesSolver();
+        DependenciesSolver solver = new DependenciesSolver(testDir);
         solver.mavenRepo = getFileInClasspath("repository/root.dir").getParentFile();
-        solver.setOutputDirectory(testDir);
         // libplexus-compiler-java.poms already contains some POMs but we want to discover them all 
         solver.exploreProjects = true;
         solver.packageName = "libplexus-compiler-java";
         solver.packageType = "maven";
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("junit junit jar s/3\\..*/3.x/ * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-compiler-api jar s/1\\..*/1.x/ * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-compiler-aspectj jar s/1\\..*/1.x/ * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-compiler-csharp jar s/1\\..*/1.x/ * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-compiler-eclipse jar s/1\\..*/1.x/ * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-compiler-javac jar s/1\\..*/1.x/ * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-compiler-jikes jar s/1\\..*/1.x/ * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-compiler-manager jar s/1\\..*/1.x/ * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-compiler-test jar s/1\\..*/1.x/ * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-compiler pom s/1\\..*/1.x/ * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-compilers pom s/1\\..*/1.x/ * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-components pom s/1\\..*/1.x/ * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-container-default jar s/1\\.0-alpha.*/1.0-alpha/ * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("s/org.eclipse.jdt/org.eclipse.jdt.core.compiler/ s/core/ecj/ jar s/.*/debian/ * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-gpg-plugin * * * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("junit junit jar s/3\\..*/3.x/ * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.codehaus.plexus plexus-compiler-api jar s/1\\..*/1.x/ * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.codehaus.plexus plexus-compiler-aspectj jar s/1\\..*/1.x/ * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.codehaus.plexus plexus-compiler-csharp jar s/1\\..*/1.x/ * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.codehaus.plexus plexus-compiler-eclipse jar s/1\\..*/1.x/ * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.codehaus.plexus plexus-compiler-javac jar s/1\\..*/1.x/ * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.codehaus.plexus plexus-compiler-jikes jar s/1\\..*/1.x/ * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.codehaus.plexus plexus-compiler-manager jar s/1\\..*/1.x/ * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.codehaus.plexus plexus-compiler-test jar s/1\\..*/1.x/ * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.codehaus.plexus plexus-compiler pom s/1\\..*/1.x/ * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.codehaus.plexus plexus-compilers pom s/1\\..*/1.x/ * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.codehaus.plexus plexus-components pom s/1\\..*/1.x/ * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.codehaus.plexus plexus-container-default jar s/1\\.0-alpha.*/1.0-alpha/ * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("s/org.eclipse.jdt/org.eclipse.jdt.core.compiler/ s/core/ecj/ jar s/.*/debian/ * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.apache.maven.plugins maven-gpg-plugin * * * *"));
         // Ignore those plugins for Ant builds
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-component-metadata * * * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.apache.maven maven-artifact-test * * * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.apache.maven.plugins maven-surefire-plugin * * * *"));
-        solver.pomTransformer.addIgnoreRule(new DependencyRule("org.codehaus.plexus plexus-compiler-test * * * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.codehaus.plexus plexus-component-metadata * * * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.apache.maven maven-artifact-test * * * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.apache.maven.plugins maven-surefire-plugin * * * *"));
+        solver.pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule("org.codehaus.plexus plexus-compiler-test * * * *"));
 
         File listOfPoms = getFileInClasspath("libplexus-compiler-java.poms");
         solver.setBaseDir(getFileInClasspath("plexus-compiler/pom.xml").getParentFile());
@@ -315,7 +310,7 @@ public class DependenciesSolverTest extends TestCase {
         solver.setListOfPoms(new File(testDir, "libplexus-compiler-java.poms"));
 
         solver.pomTransformer.getListOfPOMs().save();
-        solver.pomTransformer.getRules().save();
+        solver.pomTransformer.getRulesFiles().save(testDir, RULES);
         solver.saveSubstvars();
 
         assertFileEquals("libplexus-compiler-java.poms", "libplexus-compiler-java.poms");
