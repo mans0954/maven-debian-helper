@@ -562,8 +562,7 @@ public class DependenciesSolver {
                     askedToFilterModules = true;
                 }
                 for (String module : pom.getModules()) {
-                    File modulePom = new File(projectPom.getParent(), module + "/pom.xml");
-                    resolveDependencies(modulePom);
+                    resolveDependencies(new File(projectPom.getParent(), module + "/pom.xml"));
                 }
             }
         } catch (Exception ex) {
