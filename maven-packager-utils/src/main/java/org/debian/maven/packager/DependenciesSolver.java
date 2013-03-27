@@ -450,13 +450,7 @@ public class DependenciesSolver {
                 boolean includeModule = userInteraction.askYesNo("Include the module " + IOUtil.relativePath(baseDir, projectPom) + " ?", true);
                 if (!includeModule) {
                     pomTransformer.getListOfPOMs().getOrCreatePOMOptions(projectPom).setIgnore(true);
-                    String type = "*";
-                    if (pom.getThisPom().getType() != null) {
-                        type = pom.getThisPom().getType();
-                    }
-                    String rule = pom.getThisPom().getGroupId() + " " + pom.getThisPom().getArtifactId()
-                            + " " + type + " *";
-                    pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule(rule));
+                    pomTransformer.getRulesFiles().get(IGNORE).add(DependencyRule.newToMatch(pom.getThisPom()));
                     return;
                 }
             }
