@@ -472,7 +472,7 @@ public class DependenciesSolver {
     private Dependency resolveDependency(Dependency dependency, File sourcePom, boolean buildTime, boolean mavenExtension, boolean management, boolean resolvingParent) throws DependencyNotFoundException {
 
         if (containsDependencyIgnoreVersion(knownProjectDependencies, dependency)) {
-            return dependency;                 
+            return dependency;
         }
 
         if (containsDependencyIgnoreVersion(ignoredDependencies, dependency) ||
@@ -503,14 +503,7 @@ public class DependenciesSolver {
                 // as this may be useful later - but never fail if the dependency is not found.
                 POMInfo pom = getRepository().searchMatchingPOM(dependency);
                 if (pom != null) {
-                    String mavenRules = pom.getProperties().get("debian.mavenRules");
-                    if (mavenRules != null) {
-                        StringTokenizer st = new StringTokenizer(mavenRules, ",");
-                        while (st.hasMoreTokens()) {
-                            String ruleDef = st.nextToken().trim();
-                            pomTransformer.getRulesFiles().get(RULES).add(new DependencyRule(ruleDef));
-                        }
-                    }
+                    pomTransformer.getRulesFiles().get(RULES).addAll(pom.getPublishedRules());
                 }
 
                 return null;
@@ -540,16 +533,10 @@ public class DependenciesSolver {
         if (pom == null && dependency.getVersion() != null) {
             List<POMInfo> poms = getRepository().searchMatchingPOMsIgnoreVersion(dependency);
             for (POMInfo potentialPom : poms) {
-                String mavenRules = potentialPom.getProperties().get("debian.mavenRules");
-                if (mavenRules != null) {
-                    StringTokenizer st = new StringTokenizer(mavenRules, ",");
-                    while (st.hasMoreTokens()) {
-                        String ruleDef = st.nextToken().trim();
-                        DependencyRule rule = new DependencyRule(ruleDef);
-                        if (rule.matches(dependency) && rule.apply(dependency).equals(potentialPom.getThisPom())) {
-                            pom = potentialPom;
-                            pomTransformer.getRulesFiles().get(RULES).add(rule);
-                        }
+                for(DependencyRule rule : potentialPom.getPublishedRules()) {
+                    if (rule.matches(dependency) && rule.apply(dependency).equals(potentialPom.getThisPom())) {
+                        pom = potentialPom;
+                        pomTransformer.getRulesFiles().get(RULES).add(rule);
                     }
                 }
             }
@@ -759,14 +746,8 @@ public class DependenciesSolver {
             versionedPackagesAndDependencies.put(libraryWithVersionConstraint, dependency);
         }
 
-        String mavenRules = pom.getProperties().get("debian.mavenRules");
-        if (mavenRules != null) {
-            StringTokenizer st = new StringTokenizer(mavenRules, ",");
-            while (st.hasMoreTokens()) {
-                String ruleDef = st.nextToken().trim();
-                pomTransformer.getRulesFiles().get(RULES).add(new DependencyRule(ruleDef));
-            }
-        }
+        pomTransformer.getRulesFiles().get(RULES).addAll(pom.getPublishedRules());
+
         if (verbose) {
             System.out.println("Dependency " + dependency + " found in package " + pkg);
             System.out.println("[ok]");
@@ -777,7 +758,7 @@ public class DependenciesSolver {
             try {
                 POMInfo containerPom = getPOM(sourcePom);
                 containerPom.setParentPOM(pom);
-                
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
