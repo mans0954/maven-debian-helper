@@ -21,7 +21,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import org.apache.maven.project.MavenProject;
 import org.debian.maven.repo.DependencyRuleSetFiles.RulesType;
@@ -118,8 +117,7 @@ public class DependenciesMojo
         List<File> projects = new ArrayList<File>();
         projects.add(project.getFile());
         if (collectedProjects != null) {
-            for (Iterator<MavenProject> i = collectedProjects.iterator(); i.hasNext();) {
-                MavenProject subProject = (MavenProject) i.next();
+            for (MavenProject subProject : collectedProjects) {
                 projects.add(subProject.getFile());
             }
         }
@@ -135,8 +133,7 @@ public class DependenciesMojo
         solver.verbose = verbose;
 
         if (solver.pomTransformer.getListOfPOMs().getFirstPOM() == null && collectedProjects != null) {
-            for (Iterator<MavenProject> i = collectedProjects.iterator(); i.hasNext();) {
-                MavenProject subProject = i.next();
+            for (MavenProject subProject : collectedProjects) {
                 solver.pomTransformer.getListOfPOMs().addPOM(subProject.getFile());
             }
         }
