@@ -1,6 +1,6 @@
 package org.debian.maven.packager;
 
-public class DebianDependency {
+public class DebianDependency implements Comparable<DebianDependency> {
 
     private final String packageName;
     private final String minimumVersion;
@@ -49,5 +49,12 @@ public class DebianDependency {
             if (other.packageName != null) return false;
         } else if (!packageName.equals(other.packageName)) return false;
         return true;
+    }
+
+    @Override
+    public int compareTo(DebianDependency other) {
+        if(equals(other)) return 0;
+
+        return toString().compareTo(other.toString());
     }
 }

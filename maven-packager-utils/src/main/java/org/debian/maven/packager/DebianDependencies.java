@@ -2,9 +2,9 @@ package org.debian.maven.packager;
 
 import java.util.Collection;
 import java.util.EnumMap;
-import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.debian.maven.util.Strings;
 
@@ -14,7 +14,7 @@ public class DebianDependencies {
 
     public DebianDependencies() {
         for(Type type : Type.values()) {
-            deps.put(type, new HashSet<DebianDependency>());
+            deps.put(type, new TreeSet<DebianDependency>());
         }
     }
 
