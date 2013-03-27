@@ -453,6 +453,22 @@ public class DependenciesSolver {
         return info;
     }
 
+    private static boolean canBeSkippedBecauseAntIsUsedForPackaging(Dependency thisPom, String packageType, Dependency dependency, boolean runTests, boolean verbose) {
+        if (!packageType.equals("ant")) return false;
+
+        if ("maven-plugin".equals(dependency.getType()) && !thisPom.getType().equals("pom")) {
+            if(verbose) System.out.println("[skipped - Maven plugins are not used during a build with Ant]");
+            return true;
+        }
+
+        if (!runTests && "test".equals(dependency.getScope())) {
+            if(verbose) System.out.println("[skipped - Tests are not executed during the build]");
+            return true;
+        }
+
+        return false;
+    }
+
     private Dependency resolveDependency(Dependency dependency, File sourcePom, boolean buildTime, boolean mavenExtension, boolean management, boolean resolvingParent) throws DependencyNotFoundException {
 
         if (containsDependencyIgnoreVersion(knownProjectDependencies, dependency)) {
@@ -480,44 +496,27 @@ public class DependenciesSolver {
         }
 
         // Automatically skip some dependencies when ant packaging is used
-        String skipReason = "";
-        if (packageType.equals("ant")) {
-            if ("maven-plugin".equals(dependency.getType())) {
-                try {
-                    if (!getPOM(sourcePom).getThisPom().getType().equals("pom")) {
-                        skipReason = "Maven plugins are not used during a build with Ant";
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            if (!runTests && "test".equals(dependency.getScope())) {
-                skipReason = "Tests are not executed during the build";
-            }
-        }
-        if (!skipReason.isEmpty()) {
-            // Even if we skip the dependency, try to locate its associated maven rules,
-            // as this may be useful later - but never fail if the dependency is not found.
-            POMInfo pom = getRepository().searchMatchingPOM(dependency);
-            if (pom != null) {
-                String mavenRules = pom.getProperties().get("debian.mavenRules");
-                if (mavenRules != null) {
-                    StringTokenizer st = new StringTokenizer(mavenRules, ",");
-                    while (st.hasMoreTokens()) {
-                        String ruleDef = st.nextToken().trim();
-                        pomTransformer.getRulesFiles().get(RULES).add(new DependencyRule(ruleDef));
+
+        try {
+            if (canBeSkippedBecauseAntIsUsedForPackaging(getPOM(sourcePom).getThisPom(), packageType, dependency, runTests, verbose)) {
+                // Even if we skip the dependency, try to locate its associated maven rules,
+                // as this may be useful later - but never fail if the dependency is not found.
+                POMInfo pom = getRepository().searchMatchingPOM(dependency);
+                if (pom != null) {
+                    String mavenRules = pom.getProperties().get("debian.mavenRules");
+                    if (mavenRules != null) {
+                        StringTokenizer st = new StringTokenizer(mavenRules, ",");
+                        while (st.hasMoreTokens()) {
+                            String ruleDef = st.nextToken().trim();
+                            pomTransformer.getRulesFiles().get(RULES).add(new DependencyRule(ruleDef));
+                        }
                     }
                 }
+
+                return null;
             }
-            if (verbose) {
-                if (!skipReason.isEmpty()) {
-                    System.out.println("[skipped - " + skipReason + "]");
-                } else {
-                    System.out.println("[skipped]");
-                }
-            }
-            return null;
-        }
+        } catch (XMLStreamException e) { e.printStackTrace(); // TODO Auto-generated catch block
+        } catch (IOException e) { e.printStackTrace(); }
 
         POMInfo pom = getRepository().searchMatchingPOM(dependency);
         try {
