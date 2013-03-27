@@ -29,13 +29,17 @@ import org.debian.maven.repo.Dependency;
 
 public class PackageScanner {
 
-    private boolean offline;
+    private final boolean offline;
     // Keep the list of known files and their package
     private Map<File, String> filesInPackages = new HashMap<File, String>();
     private Map<String, List<String>> cacheOfSharedJars = new HashMap<String, List<String>>();
 
-    public void setOffline(boolean offline) {
+    public PackageScanner(boolean offline) {
         this.offline = offline;
+    }
+
+    public PackageScanner newInstanceWithFreshCaches() {
+        return new PackageScanner(offline);
     }
 
     public DebianDependency searchPkg(File dir, String extension) {

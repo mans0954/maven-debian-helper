@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.maven.project.MavenProject;
+import org.debian.maven.packager.util.PackageScanner;
 import org.debian.maven.repo.DependencyRuleSetFiles.RulesType;
 
 /**
@@ -110,7 +111,7 @@ public class DependenciesMojo
             f.mkdirs();
         }
 
-        DependenciesSolver solver = new DependenciesSolver(outputDirectory);
+        DependenciesSolver solver = new DependenciesSolver(outputDirectory, new PackageScanner(offline));
 
         File basedir = project.getBasedir();
         // TODO: use the list of project defined here for some initialisation step, I've forgotten what to do...
@@ -128,7 +129,6 @@ public class DependenciesMojo
         solver.packageType = packageType;
         solver.generateJavadoc = resolveJavadoc;
         solver.interactive = interactive;
-        solver.setOffline(offline);
         solver.setListOfPoms(listOfPoms);
         solver.verbose = verbose;
 

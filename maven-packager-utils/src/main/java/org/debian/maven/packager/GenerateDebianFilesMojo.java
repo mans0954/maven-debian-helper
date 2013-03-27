@@ -123,7 +123,7 @@ public class GenerateDebianFilesMojo extends AbstractMojo {
      */
     protected boolean generateJavadoc;
 
-    private PackageScanner scanner = new PackageScanner();
+    private PackageScanner scanner = new PackageScanner(false);
     private LicensesScanner licensesScanner = new LicensesScanner();
     private UserInteraction userInteraction = new UserInteraction();
 

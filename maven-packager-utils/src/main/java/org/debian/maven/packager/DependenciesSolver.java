@@ -158,7 +158,6 @@ public class DependenciesSolver {
     private Set<Dependency> ignoredDependencies = new TreeSet<Dependency>();
     private Set<Dependency> notIgnoredDependencies = new TreeSet<Dependency>();
     private DebianDependencies debianDeps = new DebianDependencies();
-    private boolean offline;
     boolean runTests;
     boolean generateJavadoc;
     boolean interactive = true;
@@ -173,10 +172,11 @@ public class DependenciesSolver {
     // Keep the list of packages and dependencies
     private Map<DebianDependency, Dependency> versionedPackagesAndDependencies = new HashMap<DebianDependency, Dependency>();
     private List<Rule> defaultRules = new ArrayList<Rule>();
-    private PackageScanner scanner = new PackageScanner();
+    private PackageScanner scanner;
 
-    public DependenciesSolver(File outputDirectory) {
+    public DependenciesSolver(File outputDirectory, PackageScanner scanner) {
         this.outputDirectory = outputDirectory;
+        this.scanner = scanner;
         pomTransformer.setVerbose(true);
         pomTransformer.setFixVersions(false);
         pomTransformer.setRulesFiles(initDependencyRuleSetFiles(outputDirectory, verbose));
@@ -218,11 +218,6 @@ public class DependenciesSolver {
             log.log(Level.SEVERE, "Cannot read resource " + resource, e);
         }
         return sb.toString();
-    }
-
-    public void setOffline(boolean offline) {
-        this.offline = offline;
-        scanner.setOffline(offline);
     }
 
     private boolean containsPlugin(String[][] pluginDefinitions, Dependency plugin) {
@@ -916,9 +911,7 @@ public class DependenciesSolver {
                         System.out.println("Rescanning /usr/share/maven-repo...");
                         pomTransformer.getRepository().scan();
                         // Clear caches
-                        scanner = new PackageScanner();
-                        scanner.setOffline(offline);
-                        
+                        scanner = scanner.newInstanceWithFreshCaches();
                         return resolveDependency(dependency, sourcePom, buildTime, mavenExtension, management, false);
                     }
                 }
@@ -1104,8 +1097,7 @@ public class DependenciesSolver {
         }
 
         File outputDirectory = new File(baseDirectory, "debian");
-        DependenciesSolver solver = new DependenciesSolver(outputDirectory);
-        solver.setOffline(offline);
+        DependenciesSolver solver = new DependenciesSolver(outputDirectory, new PackageScanner(offline));
         solver.interactive = interactive;
         solver.generateJavadoc = generateJavadoc;
         solver.runTests = runTests;
