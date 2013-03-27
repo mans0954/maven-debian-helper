@@ -68,7 +68,7 @@ public class DependenciesSolverTest extends TestCase {
      */
     public void testSolvePlexusActiveCollectionsDependencies() throws Exception {
         useFile("plexus-active-collections/pom.xml", pomFile);
-        DependenciesSolver solver = new DependenciesSolver(testDir, new PackageScanner(true));
+        DependenciesSolver solver = new DependenciesSolver(testDir, new PackageScanner(true), false);
         solver.mavenRepo = getFileInClasspath("repository/root.dir").getParentFile();
         solver.exploreProjects = true;
         solver.packageName = "libplexus-active-collections-java";
@@ -76,7 +76,6 @@ public class DependenciesSolverTest extends TestCase {
         File listOfPoms = getFileInClasspath("libplexus-active-collections-java.poms");
         solver.setBaseDir(getFileInClasspath("plexus-active-collections/pom.xml").getParentFile());
         solver.setListOfPoms(new File(listOfPoms.getParent(), listOfPoms.getName()));
-        solver.interactive = false;
 
         solver.solveDependencies();
 
@@ -99,7 +98,7 @@ public class DependenciesSolverTest extends TestCase {
      */
     public void testSolvePlexusUtils2Dependencies() throws Exception {
         useFile("plexus-utils2/pom.xml", pomFile);
-        DependenciesSolver solver = new DependenciesSolver(testDir, new PackageScanner(true));
+        DependenciesSolver solver = new DependenciesSolver(testDir, new PackageScanner(true), false);
         solver.mavenRepo = getFileInClasspath("repository/root.dir").getParentFile();
         solver.exploreProjects = true;
         solver.packageName = "libplexus-utils2-java";
@@ -108,7 +107,6 @@ public class DependenciesSolverTest extends TestCase {
         File listOfPoms = getFileInClasspath("libplexus-utils2-java.poms");
         solver.setBaseDir(getFileInClasspath("plexus-utils2/pom.xml").getParentFile());
         solver.setListOfPoms(new File(listOfPoms.getParent(), listOfPoms.getName()));
-        solver.interactive = false;
 
         solver.solveDependencies();
 
@@ -131,7 +129,7 @@ public class DependenciesSolverTest extends TestCase {
      */
     public void testSolveOpenMRSDependenciesWithErrors() throws Exception {
         useFile("openmrs/pom.xml", pomFile);
-        DependenciesSolver solver = new DependenciesSolver(testDir, new PackageScanner(true));
+        DependenciesSolver solver = new DependenciesSolver(testDir, new PackageScanner(true), false);
         solver.mavenRepo = getFileInClasspath("repository/root.dir").getParentFile();
         solver.exploreProjects = false;
         solver.packageName = "openmrs";
@@ -140,7 +138,6 @@ public class DependenciesSolverTest extends TestCase {
         File listOfPoms = getFileInClasspath("openmrs.poms");
         solver.setBaseDir(getFileInClasspath("openmrs/pom.xml").getParentFile());
         solver.setListOfPoms(new File(listOfPoms.getParent(), listOfPoms.getName()));
-        solver.interactive = false;
 
         solver.solveDependencies();
 
@@ -150,7 +147,7 @@ public class DependenciesSolverTest extends TestCase {
 
     public void testSolveOpenMRSDependencies() throws Exception {
         useFile("openmrs/pom.xml", pomFile);
-        DependenciesSolver solver = new DependenciesSolver(testDir, new PackageScanner(true));
+        DependenciesSolver solver = new DependenciesSolver(testDir, new PackageScanner(true), false);
         solver.mavenRepo = getFileInClasspath("repository/root.dir").getParentFile();
         solver.exploreProjects = false;
         solver.packageName = "openmrs";
@@ -161,7 +158,6 @@ public class DependenciesSolverTest extends TestCase {
         File listOfPoms = getFileInClasspath("openmrs.poms");
         solver.setBaseDir(getFileInClasspath("openmrs/pom.xml").getParentFile());
         solver.setListOfPoms(new File(listOfPoms.getParent(), listOfPoms.getName()));
-        solver.interactive = false;
 
         solver.solveDependencies();
 
@@ -181,7 +177,7 @@ public class DependenciesSolverTest extends TestCase {
 
     public void testSolveOpenMRSApiDependencies() throws Exception {
         useFile("openmrs/api/pom.xml", pomFile);
-        DependenciesSolver solver = new DependenciesSolver(testDir, new PackageScanner(true));
+        DependenciesSolver solver = new DependenciesSolver(testDir, new PackageScanner(true), false);
         solver.mavenRepo = getFileInClasspath("repository/root.dir").getParentFile();
         solver.exploreProjects = false;
         solver.packageName = "openmrs";
@@ -208,7 +204,6 @@ public class DependenciesSolverTest extends TestCase {
         File listOfPoms = getFileInClasspath("openmrs-api.poms");
         solver.setBaseDir(getFileInClasspath("openmrs/pom.xml").getParentFile());
         solver.setListOfPoms(new File(listOfPoms.getParent(), listOfPoms.getName()));
-        solver.interactive = false;
 
         solver.solveDependencies();
 
@@ -228,7 +223,7 @@ public class DependenciesSolverTest extends TestCase {
 
     public void testSolveBuildhelperPluginDependencies() throws Exception {
         useFile("buildhelper-maven-plugin/pom.xml", pomFile);
-        DependenciesSolver solver = new DependenciesSolver(testDir, new PackageScanner(true));
+        DependenciesSolver solver = new DependenciesSolver(testDir, new PackageScanner(true), false);
         solver.mavenRepo = getFileInClasspath("repository/root.dir").getParentFile();
         solver.exploreProjects =  false;
         solver.packageName = "buildhelper-maven-plugin";
@@ -241,7 +236,6 @@ public class DependenciesSolverTest extends TestCase {
         File listOfPoms = getFileInClasspath("buildhelper-maven-plugin.poms");
         solver.setBaseDir(getFileInClasspath("buildhelper-maven-plugin/pom.xml").getParentFile());
         solver.setListOfPoms(new File(listOfPoms.getParent(), listOfPoms.getName()));
-        solver.interactive = false;
         solver.verbose = true;
 
         solver.solveDependencies();
@@ -262,7 +256,7 @@ public class DependenciesSolverTest extends TestCase {
 
     public void testSolvePlexusCompilerDependencies() throws Exception {
         useFile("plexus-compiler/pom.xml", pomFile);
-        DependenciesSolver solver = new DependenciesSolver(testDir, new PackageScanner(true));
+        DependenciesSolver solver = new DependenciesSolver(testDir, new PackageScanner(true), false);
         solver.mavenRepo = getFileInClasspath("repository/root.dir").getParentFile();
         // libplexus-compiler-java.poms already contains some POMs but we want to discover them all 
         solver.exploreProjects = true;
@@ -292,7 +286,6 @@ public class DependenciesSolverTest extends TestCase {
         File listOfPoms = getFileInClasspath("libplexus-compiler-java.poms");
         solver.setBaseDir(getFileInClasspath("plexus-compiler/pom.xml").getParentFile());
         solver.setListOfPoms(new File(listOfPoms.getParent(), listOfPoms.getName()));
-        solver.interactive = false;
         solver.runTests = true;
         solver.verbose = true;
 

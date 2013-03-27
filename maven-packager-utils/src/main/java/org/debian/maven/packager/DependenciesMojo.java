@@ -111,7 +111,7 @@ public class DependenciesMojo
             f.mkdirs();
         }
 
-        DependenciesSolver solver = new DependenciesSolver(outputDirectory, new PackageScanner(offline));
+        DependenciesSolver solver = new DependenciesSolver(outputDirectory, new PackageScanner(offline), interactive);
 
         File basedir = project.getBasedir();
         // TODO: use the list of project defined here for some initialisation step, I've forgotten what to do...
@@ -128,7 +128,6 @@ public class DependenciesMojo
         solver.packageName = packageName;
         solver.packageType = packageType;
         solver.generateJavadoc = resolveJavadoc;
-        solver.interactive = interactive;
         solver.setListOfPoms(listOfPoms);
         solver.verbose = verbose;
 
