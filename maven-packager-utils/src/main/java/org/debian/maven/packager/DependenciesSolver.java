@@ -594,14 +594,10 @@ public class DependenciesSolver {
         // Ignore fast cases
         if (pom == null) {
             if (management) {
-                if (verbose) {
-                    System.out.println("[skipped dependency or plugin management]");
-                }
+                if (verbose) System.out.println("[skipped dependency or plugin management]");
                 return null;
             } else if ("maven-plugin".equals(dependency.getType()) && packageType.equals("ant")) {
-                if (verbose) {
-                    System.out.println("[skipped - not used in Ant build]");
-                }
+                if (verbose) System.out.println("[skipped - not used in Ant build]");
                 return null;
             }
         }
@@ -620,9 +616,8 @@ public class DependenciesSolver {
         // for Debian.
         //
         if (pom == null && "jar".equals(dependency.getType())) {
-            if (verbose) {
-                System.out.println("[check dependency with bundle type]");
-            }
+            if (verbose) System.out.println("[check dependency with bundle type]");
+
             Dependency bundleDependency = dependency.builder().setType("bundle").build();
             pom = getRepository().searchMatchingPOM(bundleDependency);
             if (pom != null) {
@@ -713,19 +708,17 @@ public class DependenciesSolver {
                     }
                 }
             }
-            if (interactive) {
-                boolean tryAgain = userInteraction.askYesNo("Try again to resolve the dependency?", true);
-                if (tryAgain) {
-                    System.out.println("Rescanning /usr/share/maven-repo...");
-                    pomTransformer.getRepository().scan();
-                    // Clear caches
-                    scanner = scanner.newInstanceWithFreshCaches();
-                    return resolveDependency(dependency, sourcePom, buildTime, mavenExtension, management, false);
-                }
+
+            if (interactive && userInteraction.askYesNo("Try again to resolve the dependency?", true)) {
+                System.out.println("Rescanning /usr/share/maven-repo...");
+                pomTransformer.getRepository().scan();
+                // Clear caches
+                scanner = scanner.newInstanceWithFreshCaches();
+                return resolveDependency(dependency, sourcePom, buildTime, mavenExtension, management, false);
             }
-            if (verbose) {
-                System.out.println("[error]");
-            }
+
+            if (verbose) System.out.println("[error]");
+
             throw new DependencyNotFoundException(dependency);
         }
 
