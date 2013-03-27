@@ -393,8 +393,7 @@ public class DependenciesSolver {
             return;
         }
 
-        String pomRelPath = projectPom.getAbsolutePath().substring(baseDir.getAbsolutePath().length() + 1);
-        System.out.println("Analysing " + pomRelPath + "...");
+        System.out.println("Analysing " + IOUtil.relativePath(baseDir, projectPom) + "...");
 
         try {
             POMInfo pom = getPOM(projectPom);
@@ -448,7 +447,7 @@ public class DependenciesSolver {
             }
 
             if (filterModules) {
-                boolean includeModule = userInteraction.askYesNo("Include the module " + pomRelPath + " ?", true);
+                boolean includeModule = userInteraction.askYesNo("Include the module " + IOUtil.relativePath(baseDir, projectPom) + " ?", true);
                 if (!includeModule) {
                     pomTransformer.getListOfPOMs().getOrCreatePOMOptions(projectPom).setIgnore(true);
                     String type = "*";
@@ -463,7 +462,7 @@ public class DependenciesSolver {
             }
 
             projectPoms.add(pom.getThisPom());
-            
+
             // Previous rule from another run
             boolean explicitlyMentionedInRules = false;
             for (DependencyRule previousRule : pomTransformer.getRulesFiles().get(RULES).findMatchingRules(pom.getThisPom())) {
@@ -544,7 +543,7 @@ public class DependenciesSolver {
                     pomTransformer.getListOfPOMs().getOrCreatePOMOptions(projectPom).setNoParent(true);
                 }
                 if (!baseDir.equals(projectPom.getParentFile())) {
-                    System.out.println("Checking the parent dependency in the sub project " + pomRelPath);
+                    System.out.println("Checking the parent dependency in the sub project " + IOUtil.relativePath(baseDir, projectPom));
                     resolveDependency(pom.getParent(), projectPom, false, false, false, true);
                 }
             }

@@ -90,4 +90,8 @@ public class IOUtil {
             file.mkdirs();
         }
     }
+
+    public static String relativePath(File base, File inBase) {
+        return inBase.getAbsolutePath().substring(base.getAbsolutePath().length() + 1);
+    }
 }
