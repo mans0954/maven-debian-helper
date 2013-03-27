@@ -467,41 +467,8 @@ public class DependenciesSolver {
             }
 
             if (interactive && !explicitlyMentionedInRules && !"maven-plugin".equals(pom.getThisPom().getType())) {
-                String version = pom.getThisPom().getVersion();
-                String question = "\n"
-                    + "Version of " + pom.getThisPom().getGroupId() + ":"
-                    + pom.getThisPom().getArtifactId() + " is " + version
-                    + "Choose how it will be transformed:";
-
-                List<Rule> choices = new ArrayList<Rule>();
-
-                if (versionToRules.containsKey(version)) {
-                    choices.add(versionToRules.get(version));
-                }
-
-                Pattern p = Pattern.compile("(\\d+)(\\..*)");
-                Matcher matcher = p.matcher(version);
-                if (matcher.matches()) {
-                    String mainVersion = matcher.group(1);
-                    Rule mainVersionRule = new Rule("s/" + mainVersion + "\\..*/" + mainVersion + ".x/",
-                        "Replace all versions starting by " + mainVersion + ". with " + mainVersion + ".x");
-                    if (!choices.contains(mainVersionRule)) {
-                        choices.add(mainVersionRule);
-                    }
-                }
-                for (Rule rule : defaultRules) {
-                    if (!choices.contains(rule)) {
-                        choices.add(rule);
-                    }
-                }
-
-                List<String> choicesDescriptions = new ArrayList<String>();
-                for(Rule choice : choices) {
-                    choicesDescriptions.add(choice.getDescription());
-                }
-                int choice = userInteraction.askChoices(question, 0, choicesDescriptions);
-                Rule selectedRule = choices.get(choice - 1);
-                versionToRules.put(version, selectedRule);
+                Rule selectedRule = userInteraction.askForVersionRule(pom.getThisPom(), versionToRules, defaultRules);
+                versionToRules.put(pom.getThisPom().getVersion(), selectedRule);
                 if (selectedRule.getPattern().equals("CUSTOM")) {
                     String s = userInteraction.ask("Enter the pattern for your custom rule (in the form s/regex/replace/)")
                                .toLowerCase();

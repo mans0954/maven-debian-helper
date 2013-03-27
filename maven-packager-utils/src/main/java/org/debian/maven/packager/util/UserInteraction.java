@@ -5,6 +5,12 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.debian.maven.repo.Dependency;
+import org.debian.maven.repo.Rule;
 
 public class UserInteraction {
 	private static final List<String> YESNO = new ArrayList<String>(2);
@@ -116,4 +122,44 @@ public class UserInteraction {
     public void print(String text) {
     	System.out.print(text);
     }
+
+    // extracted from DependencySolver
+    // TODO can be simplified / cleaned up
+    public Rule askForVersionRule(Dependency dependency, Map<String, Rule> versionToRules, List<Rule> defaultRules) {
+        String question = "\n"
+            + "Version of " + dependency.getGroupId() + ":"
+            + dependency.getArtifactId() + " is " + dependency.getVersion()
+            + "Choose how it will be transformed:";
+
+        List<Rule> choices = new ArrayList<Rule>();
+
+        if (versionToRules.containsKey(dependency.getVersion())) {
+            choices.add(versionToRules.get(dependency.getVersion()));
+        }
+
+        Pattern p = Pattern.compile("(\\d+)(\\..*)");
+        Matcher matcher = p.matcher(dependency.getVersion());
+        if (matcher.matches()) {
+            String mainVersion = matcher.group(1);
+            Rule mainVersionRule = new Rule("s/" + mainVersion + "\\..*/" + mainVersion + ".x/",
+                "Replace all versions starting by " + mainVersion + ". with " + mainVersion + ".x");
+            if (!choices.contains(mainVersionRule)) {
+                choices.add(mainVersionRule);
+            }
+        }
+        for (Rule rule : defaultRules) {
+            if (!choices.contains(rule)) {
+                choices.add(rule);
+            }
+        }
+
+        List<String> choicesDescriptions = new ArrayList<String>();
+        for(Rule choice : choices) {
+            choicesDescriptions.add(choice.getDescription());
+        }
+        int choice = askChoices(question, 0, choicesDescriptions);
+        Rule selectedRule = choices.get(choice - 1);
+        return selectedRule;
+    }
+
 }
