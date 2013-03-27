@@ -666,9 +666,7 @@ public class DependenciesSolver {
             }
 
             // We're not ignoring the dependency
-            DebianDependency pkg = scanner.searchPkg(new File("/usr/share/maven-repo/"
-                    + dependency.getGroupId().replace('.', '/')
-                    + "/" + dependency.getArtifactId()), ".pom");
+            DebianDependency pkg = scanner.searchPkgContainingPom(dependency);
             if (pkg != null) {
                 String installedVersion = scanner.getPackageVersion(pkg, true);
                 if (installedVersion != null) {
@@ -683,7 +681,7 @@ public class DependenciesSolver {
             }
 
             if (interactive && pkg == null) {
-                pkg = scanner.searchPkg(new File("/usr/share/java/" + dependency.getArtifactId() + ".jar"));
+                pkg = scanner.searchPkgContainingJar(dependency);
                 if (pkg != null) {
                     String q = "[error] Package " + pkg + " does not contain Maven dependency " + dependency + " but there seem to be a match\n"
                      + "If the package contains already Maven artifacts but the names don't match, try to enter a substitution rule\n"

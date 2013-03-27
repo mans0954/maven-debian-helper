@@ -78,6 +78,17 @@ public class PackageScanner {
 
     }
 
+
+    public DebianDependency searchPkgContainingPom(Dependency dependency) {
+        // TODO shouldn't we use the mavenRepo property of DependencySolver for the mavenRepo path?
+        return searchPkg(new File("/usr/share/maven-repo/" + dependency.getGroupId().replace('.', '/')
+            + "/" + dependency.getArtifactId()) , ".pom");
+    }
+
+    public DebianDependency searchPkgContainingJar(Dependency dependency) {
+        return searchPkg(new File("/usr/share/java/" + dependency.getArtifactId() + ".jar"));
+    }
+
     public DebianDependency searchJavaDocPkg(DebianDependency dependency) {
         return searchPkg(new File("/usr/share/doc/" + dependency.getPackageName() + "/api/index.html"));
     }
