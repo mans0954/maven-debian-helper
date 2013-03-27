@@ -509,9 +509,8 @@ public class DependenciesSolver {
                     defaultRules.add(selectedRule);
                 }
 
-                String dependencyRule = pom.getThisPom().getGroupId() + " " + pom.getThisPom().getArtifactId()
-                        + " " + pom.getThisPom().getType() + " " + selectedRule.toString();
-                pomTransformer.getRulesFiles().get(RULES).add(new DependencyRule(dependencyRule));
+                pomTransformer.getRulesFiles().get(RULES).add(new DependencyRule(pom.getThisPom().getGroupId(), 
+                    pom.getThisPom().getArtifactId(), pom.getThisPom().getType(), selectedRule.toString()));
                 POMInfo transformedPom = pom.newPOMFromRules(pomTransformer.getRulesFiles().get(RULES).getRules(), getRepository());
                 getRepository().registerPom(projectPom, transformedPom);
                 projectPoms.add(transformedPom.getThisPom());
