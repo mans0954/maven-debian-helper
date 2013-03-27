@@ -623,15 +623,12 @@ public class DependenciesSolver {
             if (pom != null) {
                 dependency = bundleDependency;
                 for (DependencyRule rule: pom.getPublishedRules()) {
-                    if (rule.matches(dependency)) {
-                        Dependency transformed = rule.apply(dependency);
-                        if (transformed.getGroupId().equals(dependency.getGroupId())
-                                && transformed.getArtifactId().equals(dependency.getArtifactId())
-                                && transformed.getType().equals(dependency.getType())) {
-                            String newRule = pom.getThisPom().getGroupId() + " " + pom.getThisPom().getArtifactId()
-                                    + " s/jar/bundle/ " + rule.getVersionRule().toString();
-                            pomTransformer.getRulesFiles().get(RULES).add(new DependencyRule(newRule));
-                        }
+                    if (rule.matchesAndPreservesGroupArtifactAndType(dependency)) {
+                        pomTransformer.getRulesFiles().get(RULES).add(new DependencyRule(
+                            pom.getThisPom().getGroupId(),
+                            pom.getThisPom().getArtifactId(),
+                            "s/jar/bundle/",
+                            rule.getVersionRule().toString()));
                     }
                 }
             }
