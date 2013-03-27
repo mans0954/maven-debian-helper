@@ -660,11 +660,8 @@ public class DependenciesSolver {
             }
             if (ignoreDependency) {
                 ignoredDependencies.add(dependency);
-                String ruleDef = dependency.getGroupId() + " " + dependency.getArtifactId() + " * *";
-                pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule(ruleDef));
-                if (verbose) {
-                    System.out.println("[ignored]");
-                }
+                pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule(dependency.getGroupId(), dependency.getArtifactId(), "*", "*"));
+                if (verbose) System.out.println("[ignored]");
                 return null;
             } else {
                 DebianDependency pkg = scanner.searchPkg(new File("/usr/share/maven-repo/"
