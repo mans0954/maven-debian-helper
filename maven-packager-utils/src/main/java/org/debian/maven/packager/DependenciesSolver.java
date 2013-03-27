@@ -469,22 +469,13 @@ public class DependenciesSolver {
         }
 
         String sourcePomLoc = sourcePom.getName();
-        if (verbose) {
-            String msg = "Resolving " + dependency;
-            if (dependency.getScope() != null) {
-                msg += " of scope " + dependency.getScope();
-            }
-            System.out.println(msg + "...");
-        }
+        if (verbose) System.out.println("Resolving " + dependency + dependency.getScope() == null ? "" : " of scope " + dependency.getScope() + " ...");
 
         // First let the packager mark as ignored those dependencies which should be ignored
         if (ignoreDependencyQuestion.askIgnoreUnnecessaryDependency(dependency, sourcePomLoc, runTests, generateJavadoc)) {
             ignoredDependencies.add(dependency);
-            String ruleDef = dependency.getGroupId() + " " + dependency.getArtifactId() + " * *";
-            pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule(ruleDef));
-            if (verbose) {
-                System.out.println("[ignored]");
-            }
+            pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule(dependency.getGroupId(), dependency.getArtifactId(), "*", "*"));
+            if (verbose)  System.out.println("[ignored]");
             return null;
         }
 
