@@ -663,70 +663,72 @@ public class DependenciesSolver {
                 pomTransformer.getRulesFiles().get(IGNORE).add(new DependencyRule(dependency.getGroupId(), dependency.getArtifactId(), "*", "*"));
                 if (verbose) System.out.println("[ignored]");
                 return null;
-            } else {
-                DebianDependency pkg = scanner.searchPkg(new File("/usr/share/maven-repo/"
-                        + dependency.getGroupId().replace('.', '/')
-                        + "/" + dependency.getArtifactId()), ".pom");
-                if (pkg != null) {
-                    String installedVersion = scanner.getPackageVersion(pkg, true);
-                    if (installedVersion != null) {
-                        System.out.println("[error] Package " + pkg + " (" + installedVersion + ") is already installed and contains a possible match," );
-                        System.out.println("but I cannot resolve library " + dependency + " in it.");
-                        System.out.println("[error] Please check manually that the library is up to date, otherwise it may be necessary to package version "
-                                + dependency.getVersion() + " in Debian.");
-                    } else {
-                        System.out.println("[warning] Please install the missing dependency. Run the following command in another terminal:");
-                        System.out.println("  sudo apt-get install " + pkg);
-                    }
+            }
+
+            // We're not ignoring the dependency
+            DebianDependency pkg = scanner.searchPkg(new File("/usr/share/maven-repo/"
+                    + dependency.getGroupId().replace('.', '/')
+                    + "/" + dependency.getArtifactId()), ".pom");
+            if (pkg != null) {
+                String installedVersion = scanner.getPackageVersion(pkg, true);
+                if (installedVersion != null) {
+                    System.out.println("[error] Package " + pkg + " (" + installedVersion + ") is already installed and contains a possible match," );
+                    System.out.println("but I cannot resolve library " + dependency + " in it.");
+                    System.out.println("[error] Please check manually that the library is up to date, otherwise it may be necessary to package version "
+                            + dependency.getVersion() + " in Debian.");
+                } else {
+                    System.out.println("[warning] Please install the missing dependency. Run the following command in another terminal:");
+                    System.out.println("  sudo apt-get install " + pkg);
                 }
-                if (interactive && pkg == null) {
-                    pkg = scanner.searchPkg(new File("/usr/share/java/" + dependency.getArtifactId() + ".jar"));
-                    if (pkg != null) {
-                        String q = "[error] Package " + pkg + " does not contain Maven dependency " + dependency + " but there seem to be a match\n"
-                         + "If the package contains already Maven artifacts but the names don't match, try to enter a substitution rule\n"
-                         + "of the form s/groupId/newGroupId/ s/artifactId/newArtifactId/ jar s/version/newVersion/ here:";
-                        String newRule = userInteraction.ask(q);
-                        if (!newRule.isEmpty()) {
-                            DependencyRule userRule = new DependencyRule(newRule);
+            }
+
+            if (interactive && pkg == null) {
+                pkg = scanner.searchPkg(new File("/usr/share/java/" + dependency.getArtifactId() + ".jar"));
+                if (pkg != null) {
+                    String q = "[error] Package " + pkg + " does not contain Maven dependency " + dependency + " but there seem to be a match\n"
+                     + "If the package contains already Maven artifacts but the names don't match, try to enter a substitution rule\n"
+                     + "of the form s/groupId/newGroupId/ s/artifactId/newArtifactId/ jar s/version/newVersion/ here:";
+                    String newRule = userInteraction.ask(q);
+                    if (!newRule.isEmpty()) {
+                        DependencyRule userRule = new DependencyRule(newRule);
+                        pomTransformer.getRulesFiles().get(RULES).add(userRule);
+                        System.out.println("Please suggest the maintainer of package " + pkg + " to add this rule to debian/maven.publishedRules");
+                        return resolveDependency(dependency.applyRules(Arrays.asList(userRule)), sourcePom, buildTime, mavenExtension, management, false);
+                    }
+                } else {
+                    String newRule = userInteraction.ask(
+                            "[error] Cannot resolve Maven dependency " + dependency + ". If you know a package that contains a compatible dependency,\n"
+                          + "try to enter a substitution rule of the form s/groupId/newGroupId/ s/artifactId/newArtifactId/ jar s/version/newVersion/ here:\n");
+                    while (!newRule.isEmpty()) {
+                        DependencyRule userRule = new DependencyRule(newRule);
+                        Dependency newDependency = dependency.applyRules(Arrays.asList(userRule));
+                        if (newDependency.equals(dependency)) {
+                            newRule = userInteraction.ask("Your rule doesn't seem to apply on " + dependency
+                             + "Please enter a substitution rule of the form s/groupId/newGroupId/ s/artifactId/newArtifactId/ jar s/version/newVersion/ here,"
+                             + "or press <Enter> to give up");
+                        } else {
                             pomTransformer.getRulesFiles().get(RULES).add(userRule);
-                            System.out.println("Please suggest the maintainer of package " + pkg + " to add this rule to debian/maven.publishedRules");
+                            System.out.println("Rescanning /usr/share/maven-repo...");
+                            pomTransformer.getRepository().scan();
                             return resolveDependency(dependency.applyRules(Arrays.asList(userRule)), sourcePom, buildTime, mavenExtension, management, false);
                         }
-                    } else {
-                        String newRule = userInteraction.ask(
-                                "[error] Cannot resolve Maven dependency " + dependency + ". If you know a package that contains a compatible dependency,\n"
-                              + "try to enter a substitution rule of the form s/groupId/newGroupId/ s/artifactId/newArtifactId/ jar s/version/newVersion/ here:\n");
-                        while (!newRule.isEmpty()) {
-                            DependencyRule userRule = new DependencyRule(newRule);
-                            Dependency newDependency = dependency.applyRules(Arrays.asList(userRule));
-                            if (newDependency.equals(dependency)) {
-                                newRule = userInteraction.ask("Your rule doesn't seem to apply on " + dependency
-                                 + "Please enter a substitution rule of the form s/groupId/newGroupId/ s/artifactId/newArtifactId/ jar s/version/newVersion/ here,"
-                                 + "or press <Enter> to give up");
-                            } else {
-                                pomTransformer.getRulesFiles().get(RULES).add(userRule);
-                                System.out.println("Rescanning /usr/share/maven-repo...");
-                                pomTransformer.getRepository().scan();
-                                return resolveDependency(dependency.applyRules(Arrays.asList(userRule)), sourcePom, buildTime, mavenExtension, management, false);
-                            }
-                        }
                     }
                 }
-                if (interactive) {
-                    boolean tryAgain = userInteraction.askYesNo("Try again to resolve the dependency?", true);
-                    if (tryAgain) {
-                        System.out.println("Rescanning /usr/share/maven-repo...");
-                        pomTransformer.getRepository().scan();
-                        // Clear caches
-                        scanner = scanner.newInstanceWithFreshCaches();
-                        return resolveDependency(dependency, sourcePom, buildTime, mavenExtension, management, false);
-                    }
-                }
-                if (verbose) {
-                    System.out.println("[error]");
-                }
-                throw new DependencyNotFoundException(dependency);
             }
+            if (interactive) {
+                boolean tryAgain = userInteraction.askYesNo("Try again to resolve the dependency?", true);
+                if (tryAgain) {
+                    System.out.println("Rescanning /usr/share/maven-repo...");
+                    pomTransformer.getRepository().scan();
+                    // Clear caches
+                    scanner = scanner.newInstanceWithFreshCaches();
+                    return resolveDependency(dependency, sourcePom, buildTime, mavenExtension, management, false);
+                }
+            }
+            if (verbose) {
+                System.out.println("[error]");
+            }
+            throw new DependencyNotFoundException(dependency);
         }
 
         // Handle the case of Maven plugins built and used in a multi-module build:
