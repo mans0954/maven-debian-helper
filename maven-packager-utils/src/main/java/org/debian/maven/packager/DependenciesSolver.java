@@ -341,10 +341,7 @@ public class DependenciesSolver {
         pomTransformer.setRepository(getRepository());
         pomTransformer.usePluginVersionsFromRepository();
 
-        File f = outputDirectory;
-        if (!f.exists()) {
-            f.mkdirs();
-        }
+        IOUtil.mkDirIfNotExists(outputDirectory);
 
         if (exploreProjects) {
             File pom;

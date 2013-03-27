@@ -18,6 +18,7 @@ package org.debian.maven.packager.util;
 
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
@@ -81,6 +82,12 @@ public class IOUtil {
         } catch (IOException ex) {
             ex.printStackTrace();
             handler.failure();
+        }
+    }
+
+    public static void mkDirIfNotExists(File file) {
+        if (!file.exists()) {
+            file.mkdirs();
         }
     }
 }
