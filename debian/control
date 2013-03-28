@@ -3,18 +3,18 @@ Section: java
 Priority: optional
 Maintainer: Debian Java Maintainers <pkg-java-maintainers@lists.alioth.debian.org>
 Uploaders: Torsten Werner <twerner@debian.org>, Ludovic Claude <ludovic.claude@laposte.net>,
- Damien Raude-Morvan <drazzib@debian.org>
+ Damien Raude-Morvan <drazzib@debian.org>, Thomas Koch <thomas@koch.ro>
 Build-Depends: cdbs, debhelper (>= 7), default-jdk, maven-ant-helper (>= 7.0), ant-optional, help2man
-Build-Depends-Indep: maven-repo-helper (>= 1.7.1), junit4, libmaven-plugin-tools-java,
+Build-Depends-Indep: maven-repo-helper (= 1.8), junit4, libmaven-plugin-tools-java,
  libplexus-velocity-java, libcommons-io-java
 Standards-Version: 3.9.3
-Vcs-Svn: svn://svn.debian.org/svn/pkg-java/trunk/maven-debian-helper
-Vcs-Browser: http://svn.debian.org/wsvn/pkg-java/trunk/maven-debian-helper/
+Vcs-Git: git://anonscm.debian.org/pkg-java/maven-debian-helper.git
+Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-java/maven-debian-helper.git
 Homepage: http://wiki.debian.org/Java/MavenBuilder
 
 Package: maven-debian-helper
 Architecture: all
-Depends: ${misc:Depends}, default-jdk, maven-repo-helper (>= 1.7.1), maven2 (>= 2.2.1-5),
+Depends: ${misc:Depends}, default-jdk, maven-repo-helper (= 1.8), maven2 (>= 2.2.1-5),
  libmaven-clean-plugin-java, libmaven-resources-plugin-java,
  libmaven-compiler-plugin-java, libmaven-jar-plugin-java, libmaven-site-plugin-java,
  libsurefire-java, velocity, libplexus-velocity-java
