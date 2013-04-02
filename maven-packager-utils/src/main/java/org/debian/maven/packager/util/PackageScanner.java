@@ -74,8 +74,7 @@ public class PackageScanner {
             pkg = packageResult.getPackages().iterator().next();
             filesInPackages.put(cacheId, pkg);
         }
-        return new DebianDependency(pkg);
-
+        return pkg == null ? null : new DebianDependency(pkg);
     }
 
 
