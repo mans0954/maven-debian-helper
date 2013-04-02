@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class LicensesScanner {
-	private final UserInteraction userInteraction = new UserInteraction();
+    private final UserInteraction userInteraction = new UserInteraction();
 
     public Set<String> discoverLicenses(List<License> projectLicenses) {
         Set<String> licenses = new TreeSet<String>();

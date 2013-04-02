@@ -857,9 +857,9 @@ public class DependenciesSolver {
             } else if (arg.startsWith("-b")) {
                 baseDirectory = new File(arg.substring(2));
             } else if (arg.startsWith("--base-directory=")) {
-            	baseDirectory = new File(arg.substring("--base-directory=".length()));
+                baseDirectory = new File(arg.substring("--base-directory=".length()));
             } else if (arg.equals("--non-explore")) {
-            	exploreProjects = false;
+                exploreProjects = false;
             }
             i = inc(i, args);
         }

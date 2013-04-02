@@ -13,13 +13,12 @@ import org.debian.maven.repo.Dependency;
 import org.debian.maven.repo.Rule;
 
 public class UserInteraction {
-	private static final List<String> YESNO = new ArrayList<String>(2);
-	
-	{
-		YESNO.add("y");
-		YESNO.add("n");
-	}
-	
+    private static final List<String> YESNO = new ArrayList<String>(2);
+    static {
+        YESNO.add("y");
+        YESNO.add("n");
+    }
+
     public String readLine() {
         LineNumberReader consoleReader = new LineNumberReader(new InputStreamReader(System.in));
         try {
@@ -29,75 +28,80 @@ public class UserInteraction {
             return "";
         }
     }
-    
+
     public String ask(String question) {
-    	println(question);
-    	print("> ");
-    	return readLine();
+        println(question);
+        print("> ");
+        return readLine();
     }
-    
+
     public boolean askYesNo(String question, boolean defaultOpt) {
-    	println(question);
-    	print(formatChoicesShort(defaultOpt ? 0 : 1, YESNO));
-    	print(" > ");
-    	String response = readLine();
-    	if("" == response) return defaultOpt;
-    	else return response.startsWith("y");
+        println(question);
+        print(formatChoicesShort(defaultOpt ? 0 : 1, YESNO));
+        print(" > ");
+        String response = readLine();
+        if ("" == response) {
+            return defaultOpt;
+        } else {
+            return response.startsWith("y");
+        }
     }
-    
+
     private String formatChoicesShort(int defaultOpt, Iterable<String> choices) {
-    	StringBuilder sb = new StringBuilder();
-    	int counter = 0;
-    	for(String choice : choices) {
-    		if(counter > 0) {
-    			sb.append("/");
-    		}
-    		if(counter == defaultOpt) {
-    			sb.append("[").append(choice).append("]");
-    		} else {
-    			sb.append(choice);
-    		}
-    		++counter;
-    	}
-    	return sb.toString();
+        StringBuilder sb = new StringBuilder();
+        int counter = 0;
+        for (String choice : choices) {
+            if (counter > 0) {
+                sb.append("/");
+            }
+            if (counter == defaultOpt) {
+                sb.append("[").append(choice).append("]");
+            } else {
+                sb.append(choice);
+            }
+            ++counter;
+        }
+        return sb.toString();
     }
-    
+
     public int askChoices(String question, int defaultOpt, Iterable<String> choices) {
-    	println(question);
-    	print(formatChoicesLong(defaultOpt, choices));
-    	print("> ");
-    	String response = readLine();
-    	if("" == response) return defaultOpt;
+        println(question);
+        print(formatChoicesLong(defaultOpt, choices));
+        print("> ");
+        String response = readLine();
+        if ("" == response) {
+            return defaultOpt;
+        }
         try {
             return Integer.parseInt(response);
         } catch (NumberFormatException e) {
-        	return defaultOpt;
+            return defaultOpt;
         }
     }
-    
+
     private String formatChoicesLong(int defaultOpt, Iterable<String> choices) {
-    	StringBuilder sb = new StringBuilder();
-    	int counter = 0;
-    	for(String choice : choices) {
-    		if(counter == defaultOpt) {
-    			sb.append("[").append(counter).append("]");
-    		} else {
-    			sb.append(counter);
-    		}
-    		sb.append(" - ").append(choice).append("\n");
-    		++counter;
-    	}
-    	return sb.toString();
+        StringBuilder sb = new StringBuilder();
+        int counter = 0;
+        for (String choice : choices) {
+            if (counter == defaultOpt) {
+                sb.append("[").append(counter).append("]");
+            } else {
+                sb.append(counter);
+            }
+            sb.append(" - ").append(choice).append("\n");
+            ++counter;
+        }
+        return sb.toString();
     }
-    
+
     /**
      * Asks the user a question with a multi line response.
-     * 
+     *
      * The user finishes the response by entering two empty lines.
      */
     public String askMultiLine(String question) {
-    	println(question);
-    	StringBuffer sb = new StringBuffer();
+        println(question);
+        StringBuffer sb = new StringBuffer();
         int emptyEnterCount = 0;
         while (emptyEnterCount < 2) {
             String s = readLine();
@@ -114,22 +118,22 @@ public class UserInteraction {
         }
         return sb.toString();
     }
-    
+
     public void println(String text) {
-    	System.out.println(text);
+        System.out.println(text);
     }
-    
+
     public void print(String text) {
-    	System.out.print(text);
+        System.out.print(text);
     }
 
     // extracted from DependencySolver
     // TODO can be simplified / cleaned up
     public Rule askForVersionRule(Dependency dependency, Map<String, Rule> versionToRules, List<Rule> defaultRules) {
         String question = "\n"
-            + "Version of " + dependency.getGroupId() + ":"
-            + dependency.getArtifactId() + " is " + dependency.getVersion()
-            + "Choose how it will be transformed:";
+                + "Version of " + dependency.getGroupId() + ":"
+                + dependency.getArtifactId() + " is " + dependency.getVersion()
+                + "Choose how it will be transformed:";
 
         List<Rule> choices = new ArrayList<Rule>();
 
@@ -142,7 +146,7 @@ public class UserInteraction {
         if (matcher.matches()) {
             String mainVersion = matcher.group(1);
             Rule mainVersionRule = new Rule("s/" + mainVersion + "\\..*/" + mainVersion + ".x/",
-                "Replace all versions starting by " + mainVersion + ". with " + mainVersion + ".x");
+                    "Replace all versions starting by " + mainVersion + ". with " + mainVersion + ".x");
             if (!choices.contains(mainVersionRule)) {
                 choices.add(mainVersionRule);
             }
@@ -154,7 +158,7 @@ public class UserInteraction {
         }
 
         List<String> choicesDescriptions = new ArrayList<String>();
-        for(Rule choice : choices) {
+        for (Rule choice : choices) {
             choicesDescriptions.add(choice.getDescription());
         }
         int choice = askChoices(question, 0, choicesDescriptions);
