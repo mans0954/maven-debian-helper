@@ -40,7 +40,7 @@ public class UserInteraction {
         print(formatChoicesShort(defaultOpt ? 0 : 1, YESNO));
         print(" > ");
         String response = readLine();
-        if ("" == response) {
+        if ("".equals(response)) {
             return defaultOpt;
         } else {
             return response.startsWith("y");
@@ -69,7 +69,7 @@ public class UserInteraction {
         print(formatChoicesLong(defaultOpt, choices));
         print("> ");
         String response = readLine();
-        if ("" == response) {
+        if ("".equals(response)) {
             return defaultOpt;
         }
         try {
