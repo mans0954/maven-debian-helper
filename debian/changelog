@@ -2,6 +2,8 @@ maven-debian-helper (1.6.1) UNRELEASED; urgency=low
 
   [Emmanuel Bourg]
   * Fixed the format URL in the generated debian/copyright file (Closes: #690307)
+  * debian/control: Update Standards-Version to 3.9.4 (no changes)
+  * mh_make: Update generated control to use Standards-Version 3.9.4
 
  -- Emmanuel Bourg <ebourg@apache.org>  Tue, 02 Apr 2013 01:28:49 +0200
 

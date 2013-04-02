@@ -7,7 +7,7 @@ Uploaders: Torsten Werner <twerner@debian.org>, Ludovic Claude <ludovic.claude@l
 Build-Depends: cdbs, debhelper (>= 7), default-jdk, maven-ant-helper (>= 7.0), ant-optional, help2man
 Build-Depends-Indep: maven-repo-helper (= 1.8), junit4, libmaven-plugin-tools-java,
  libplexus-velocity-java, libcommons-io-java
-Standards-Version: 3.9.3
+Standards-Version: 3.9.4
 Vcs-Git: git://anonscm.debian.org/pkg-java/maven-debian-helper.git
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-java/maven-debian-helper.git
 Homepage: http://wiki.debian.org/Java/MavenBuilder
