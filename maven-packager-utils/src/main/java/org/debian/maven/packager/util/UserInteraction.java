@@ -162,7 +162,7 @@ public class UserInteraction {
             choicesDescriptions.add(choice.getDescription());
         }
         int choice = askChoices(question, 0, choicesDescriptions);
-        Rule selectedRule = choices.get(choice - 1);
+        Rule selectedRule = choices.get(choice);
         return selectedRule;
     }
 
