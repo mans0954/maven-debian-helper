@@ -364,7 +364,7 @@ public class GenerateDebianFilesMojo extends AbstractMojo {
                     tagMarker = baseUrl.substring(slashPos + 1);
                     baseUrl = baseUrl.substring(0, slashPos);
                 }
-                if (tagPos < 0 && downloadUrl.indexOf("/trunk") >= 0) {
+                if (tagPos < 0 && downloadUrl.contains("/trunk")) {
                     System.out.println("Download URL does not include a tagged revision but /trunk found,");
                     System.out.println("Trying to guess the address of the tagged revision.");
                     tag = "trunk";
@@ -425,8 +425,7 @@ public class GenerateDebianFilesMojo extends AbstractMojo {
                 boolean containsJars = false;
                 boolean containsPlugins = false;
                 if (project.getPackaging().equals("pom") && project.getModules().size() > 0) {
-                    for (Iterator<MavenProject> i = collectedProjects.iterator(); i.hasNext(); ) {
-                        MavenProject module = i.next();
+                    for (MavenProject module : collectedProjects) {
                         if (module.getPackaging().equals("maven-plugin")) {
                             containsPlugins = true;
                         } else if (!module.getPackaging().equals("pom")) {

@@ -26,7 +26,6 @@ import java.io.Reader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,8 +50,7 @@ public class DependenciesSolverTest extends TestCase {
 
     protected void tearDown() throws Exception {
         super.tearDown();
-        for (Iterator<Reader> i = openedReaders.iterator(); i.hasNext(); ) {
-            Reader reader = i.next();
+        for (Reader reader : openedReaders) {
             try {
                 reader.close();
             } catch (IOException ex) {
@@ -142,7 +140,7 @@ public class DependenciesSolverTest extends TestCase {
         solver.solveDependencies();
 
         assertEquals(1, solver.issues.size());
-        assertTrue(solver.issues.get(0).toString().indexOf("buildnumber-maven-plugin") > 0);
+        assertTrue(solver.issues.get(0).indexOf("buildnumber-maven-plugin") > 0);
     }
 
     public void testSolveOpenMRSDependencies() throws Exception {

@@ -95,33 +95,33 @@ public class LicensesScanner {
         } else if (licenseName.contains("artistic ") || licenseUrl.contains("artistic-license")) {
             licenses.add("Artistic");
             recognized = true;
-        } else if (licenseName.indexOf("apache ") >= 0 || licenseUrl.indexOf("apache") >= 0) {
-            if (licenseName.indexOf("2.") >= 0 || licenseUrl.indexOf("2.") >= 0) {
+        } else if (licenseName.contains("apache ") || licenseUrl.contains("apache")) {
+            if (licenseName.contains("2.") || licenseUrl.contains("2.")) {
                 licenses.add("Apache-2.0");
                 recognized = true;
-            } else if (licenseName.indexOf("1.0") >= 0 || licenseUrl.indexOf("1.0") >= 0) {
+            } else if (licenseName.contains("1.0") || licenseUrl.contains("1.0")) {
                 licenses.add("Apache-1.0");
                 recognized = true;
-            } else if (licenseName.indexOf("1.1") >= 0 || licenseUrl.indexOf("1.1") >= 0) {
+            } else if (licenseName.contains("1.1") || licenseUrl.contains("1.1")) {
                 licenses.add("Apache-1.1");
                 recognized = true;
             }
-        } else if (licenseName.indexOf("lgpl ") >= 0 || licenseUrl.indexOf("lgpl") >= 0) {
-            if (licenseName.indexOf("2.1") >= 0 || licenseUrl.indexOf("2.1") >= 0) {
+        } else if (licenseName.contains("lgpl ") || licenseUrl.contains("lgpl")) {
+            if (licenseName.contains("2.1") || licenseUrl.contains("2.1")) {
                 licenses.add("LGPL-2.1");
                 recognized = true;
-            } else if (licenseName.indexOf("2") >= 0 || licenseUrl.indexOf("2") >= 0) {
+            } else if (licenseName.contains("2") || licenseUrl.contains("2")) {
                 licenses.add("LGPL-2");
                 recognized = true;
-            } else if (licenseName.indexOf("3") >= 0 || licenseUrl.indexOf("3") >= 0) {
+            } else if (licenseName.contains("3") || licenseUrl.contains("3")) {
                 licenses.add("LGPL-2");
                 recognized = true;
             }
-        } else if (licenseName.indexOf("gpl ") >= 0 || licenseUrl.indexOf("gpl") >= 0) {
-            if (licenseName.indexOf("2") >= 0 || licenseUrl.indexOf("2") >= 0) {
+        } else if (licenseName.contains("gpl ") || licenseUrl.contains("gpl")) {
+            if (licenseName.contains("2") || licenseUrl.contains("2")) {
                 licenses.add("GPL-2");
                 recognized = true;
-            } else if (licenseName.indexOf("3") >= 0 || licenseUrl.indexOf("3") >= 0) {
+            } else if (licenseName.contains("3") || licenseUrl.contains("3")) {
                 licenses.add("GPL-3");
                 recognized = true;
             }

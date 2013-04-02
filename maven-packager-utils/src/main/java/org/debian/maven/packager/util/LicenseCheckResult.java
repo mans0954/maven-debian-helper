@@ -29,10 +29,10 @@ public class LicenseCheckResult implements OutputHandler {
         if (line.startsWith(".") && line.indexOf(":") > 0) {
             int col = line.lastIndexOf(":");
             String license = line.substring(col + 1).trim();
-            if (license.indexOf("UNKNOWN") >= 0) {
+            if (license.contains("UNKNOWN")) {
                 return;
             }
-            if (license.indexOf("*") >= 0) {
+            if (license.contains("*")) {
                 license = license.substring(license.lastIndexOf("*") + 1).trim();
             }
             licenses.add(license);
