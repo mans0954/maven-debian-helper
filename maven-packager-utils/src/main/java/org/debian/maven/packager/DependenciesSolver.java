@@ -124,7 +124,7 @@ public class DependenciesSolver {
 
     // TODO move to another class for reuse
     private static String readResource(String resource) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         try {
             InputStream is = DependenciesSolver.class.getResourceAsStream("/" + resource);
             LineNumberReader r = new LineNumberReader(new InputStreamReader(is));

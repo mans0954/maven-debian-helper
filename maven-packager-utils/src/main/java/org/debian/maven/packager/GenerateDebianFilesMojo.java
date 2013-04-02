@@ -230,7 +230,7 @@ public class GenerateDebianFilesMojo extends AbstractMojo {
             }
             if (project.getDescription() != null) {
                 StringTokenizer st = new StringTokenizer(project.getDescription().trim(), "\n\t ");
-                StringBuffer descLine = new StringBuffer();
+                StringBuilder descLine = new StringBuilder();
                 while (st.hasMoreTokens()) {
                     descLine.append(st.nextToken());
                     descLine.append(" ");
@@ -240,7 +240,7 @@ public class GenerateDebianFilesMojo extends AbstractMojo {
                             line = ".";
                         }
                         description.add(line);
-                        descLine = new StringBuffer();
+                        descLine = new StringBuilder();
                     }
                 }
             }

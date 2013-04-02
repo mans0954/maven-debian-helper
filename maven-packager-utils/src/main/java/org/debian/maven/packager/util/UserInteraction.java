@@ -101,7 +101,7 @@ public class UserInteraction {
      */
     public String askMultiLine(String question) {
         println(question);
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int emptyEnterCount = 0;
         while (emptyEnterCount < 2) {
             String s = readLine();
