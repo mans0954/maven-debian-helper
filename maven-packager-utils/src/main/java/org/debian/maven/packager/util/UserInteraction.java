@@ -133,7 +133,7 @@ public class UserInteraction {
         String question = "\n"
                 + "Version of " + dependency.getGroupId() + ":"
                 + dependency.getArtifactId() + " is " + dependency.getVersion()
-                + "Choose how it will be transformed:";
+                + "\nChoose how it will be transformed:";
 
         List<Rule> choices = new ArrayList<Rule>();
 
