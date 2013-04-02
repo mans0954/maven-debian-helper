@@ -1,19 +1,25 @@
 package org.debian.maven.packager;
 
+import java.util.regex.Pattern;
+
+import static org.debian.maven.util.Preconditions.*;
+
 public class DebianDependency implements Comparable<DebianDependency> {
+
+    private static final Pattern VALID_DEBIAN_PACKAGE_NAME = Pattern
+            .compile("^[a-z0-9][a-z0-9+-.]+$");
 
     private final String packageName;
     private final String minimumVersion;
 
-    public DebianDependency(String pkgname, String minimumVersion) {
+    public DebianDependency(String packageName, String minimumVersion) {
         super();
-        if(pkgname.contains(" ")) throw new IllegalArgumentException("Not a valid package name: " + pkgname);
-        this.packageName = pkgname;
-        this.minimumVersion = minimumVersion;
+        this.packageName = checkPackageName(packageName);
+        this.minimumVersion = checkNotNull(minimumVersion);
     }
 
-    public DebianDependency(String pkgname) {
-        this(pkgname, "");
+    public DebianDependency(String packageName) {
+        this(packageName, "");
     }
 
     @Override
@@ -24,6 +30,23 @@ public class DebianDependency implements Comparable<DebianDependency> {
     }
 
     public String getPackageName() {
+        return packageName;
+    }
+
+    /**
+     * Check whether packageName is valid according to the Debian Policy 5.6.1.
+     * 
+     * Package names must consist only of lower case letters (a-z), digits
+     * (0-9), plus (+) and minus (-) signs, and periods (.). They must be at
+     * least two characters long and must start with an alphanumeric character.
+     */
+    public static boolean isValidDebianPackageName(String packageName) {
+        return VALID_DEBIAN_PACKAGE_NAME.matcher(packageName).matches();
+    }
+
+    public static String checkPackageName(String packageName) {
+        if (!isValidDebianPackageName(checkNotEmpty(packageName)))
+            throw new IllegalArgumentException("Not a valid package name: " + packageName);
         return packageName;
     }
 
