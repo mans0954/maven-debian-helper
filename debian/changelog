@@ -1,11 +1,21 @@
-maven-debian-helper (1.6.1) UNRELEASED; urgency=low
+maven-debian-helper (1.6.1) experimental; urgency=low
 
   [Emmanuel Bourg]
   * Fixed the format URL in the generated debian/copyright file (Closes: #690307)
   * debian/control: Update Standards-Version to 3.9.4 (no changes)
   * mh_make: Update generated control to use Standards-Version 3.9.4
+  * Replaced tabs with spaces in Java files
+  * Replaced StringBuffers with StringBuilders
+  * Minor code changes (for each loops, indexOf->contains)
 
- -- Emmanuel Bourg <ebourg@apache.org>  Tue, 02 Apr 2013 01:28:49 +0200
+  [ Thomas Koch ]
+  * fixed off-by-one error in version rule question
+  * Do better tests for valid Debian package names
+  * add missing newline
+  * fix bad check for default response in user interaction
+  * fix NPE when package is not found
+
+ -- Thomas Koch <thomas@koch.ro>  Thu, 04 Apr 2013 20:38:45 +0200
 
 maven-debian-helper (1.6) experimental; urgency=low
 
