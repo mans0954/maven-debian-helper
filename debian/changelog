@@ -1,3 +1,9 @@
+maven-debian-helper (1.6.2) UNRELEASED; urgency=low
+
+  * Fixed a typo in the help message for the --from-svn option in mh_make
+
+ -- Emmanuel Bourg <ebourg@apache.org>  Thu, 25 Apr 2013 13:40:00 +0200
+
 maven-debian-helper (1.6.1) experimental; urgency=low
 
   [Emmanuel Bourg]

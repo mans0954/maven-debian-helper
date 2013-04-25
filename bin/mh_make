@@ -71,7 +71,7 @@ FROM_SVN=$(getarg s from-svn)
 VERBOSE=$(getarg v verbose)
 
 if [ "$FROM_SVN" == "true" ]; then
-	echo "The syntax for the --for-svn option is --from-svn=<url>, please try again"
+	echo "The syntax for the --from-svn option is --from-svn=<url>, please try again"
 	exit 1
 fi
 
