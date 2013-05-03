@@ -6,6 +6,7 @@ include /usr/share/cdbs/1/class/ant.mk
 PACKAGE              := $(DEB_SOURCE_PACKAGE)
 VERSION              := $(shell echo ${DEB_UPSTREAM_VERSION} | sed -r 's/([0-9\.]+).*/\1/')
 JAVA_HOME            := /usr/lib/jvm/default-java
+PERL_DIR             := $(shell perl -MConfig -e 'print $$Config{vendorlib}')
 DEB_JARS             := ant-junit junit commons-io classworlds maven-core maven-artifact maven-artifact-manager maven-model \
  maven-compat maven-plugin-api maven-project maven-scm-api velocity file-management plexus-utils \
  plexus-container-default-alpha maven-repo-helper
@@ -47,7 +48,8 @@ install/$(PACKAGE)::
 	  -r maven-debian-helper-$(DEB_UPSTREAM_VERSION) \
 	  man/mvn-debian.pod > man/mvn-debian.1
 	dh_installman $(MAN_PAGES) man/mvn-debian.1
-	install -D share/perl/maven.pm debian/tmp/$$(perl -MConfig -e 'print $$Config{vendorlib}')/Debian/Debhelper/Buildsystem/maven.pm
+	install -D share/perl/maven.pm debian/tmp/$(PERL_DIR)/Debian/Debhelper/Buildsystem/maven.pm
+	install -D share/perl/maven3.pm debian/tmp/$(PERL_DIR)/Debian/Debhelper/Buildsystem/maven3.pm
 
 cleanbuilddir::
 	mh_unpatchpoms -p$(PACKAGE)

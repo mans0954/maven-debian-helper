@@ -18,20 +18,30 @@ sub check_auto_buildable {
 	return (-e $this->get_sourcepath("pom.xml")) ? 1 : 0;
 }
 
+sub maven_dir {
+	return '/usr/share/maven2';
+}
+
+sub boot_jar {
+	my $this=shift;
+	return $this->maven_dir() . '/boot/classworlds.jar';
+}
+
 sub new {
 	my $class=shift;
 	my $this=$class->SUPER::new(@_);
 	my $java_home = (exists $ENV{JAVA_HOME}) ? $ENV{JAVA_HOME} : '/usr/lib/jvm/default-java';
+	my $maven_dir = $this->maven_dir();
 
 	my @packages = @{$dh{DOPACKAGES}};
 	$this->{package} = shift @packages;
 	$this->{doc_package} = (grep /-doc$/, @packages)[0];
-	my $classconf = '/etc/maven2/m2-debian.conf';
+	my $classconf = "$maven_dir/conf/m2-debian.conf";
 	if (!$this->{doc_package}) {
-		$classconf = '/etc/maven2/m2-debian-nodocs.conf';
+		$classconf = "$maven_dir/conf/m2-debian-nodocs.conf";
 	}
 
-	my @classpath = ('/usr/share/maven2/boot/classworlds.jar');
+	my @classpath = ($this->boot_jar());
 	if (-e "$java_home/lib/tools.jar") {
 		push(@classpath, "$java_home/lib/tools.jar");
 	}
@@ -45,7 +55,7 @@ sub new {
 	@{$this->{maven_cmd}} = ($java_home . '/bin/java',
 		@jvmopts,
 		"org.codehaus.classworlds.Launcher",
-		"-s/etc/maven2/settings-debian.xml",
+		"-s$maven_dir/conf/settings-debian.xml",
 		"-Ddebian.dir=$this->{cwd}/debian",
 		"-Dmaven.repo.local=$this->{cwd}/debian/maven-repo");
 	return $this;
