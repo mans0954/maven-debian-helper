@@ -13,6 +13,7 @@ Build-Depends-Indep: junit4,
                      libcommons-io-java,
                      libmaven-plugin-tools-java,
                      libplexus-velocity-java,
+                     libplexus-classworlds2-java,
                      maven-repo-helper (>= 1.8.6)
 Standards-Version: 3.9.5
 Vcs-Git: git://anonscm.debian.org/pkg-java/maven-debian-helper.git

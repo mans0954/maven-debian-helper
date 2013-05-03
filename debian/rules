@@ -9,7 +9,7 @@ JAVA_HOME            := /usr/lib/jvm/default-java
 PERL_DIR             := $(shell perl -MConfig -e 'print $$Config{vendorlib}')
 DEB_JARS             := ant-junit junit commons-io classworlds maven-core maven-artifact maven-artifact-manager maven-model \
  maven-compat maven-plugin-api maven-project maven-scm-api velocity file-management plexus-utils \
- plexus-container-default-alpha maven-repo-helper
+ plexus-container-default-alpha maven-repo-helper plexus-classworlds2
 DEB_ANT_BUILD_TARGET := package #javadoc
 DEB_ANT_BUILDFILE    := debian/build.xml
 DEB_ANT_ARGS         := -Dpackage=$(PACKAGE) -Dbin.package=$(PACKAGE)

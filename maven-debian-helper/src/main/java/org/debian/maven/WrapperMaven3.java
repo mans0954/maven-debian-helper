@@ -1,3 +1,5 @@
+package org.debian.maven;
+
 /*
  * Copyright 2013 Debian Java Developers.
  *
@@ -14,19 +16,17 @@
  * limitations under the License.
  */
 
-package org.debian.maven;
-
 import java.io.IOException;
 import java.lang.reflect.Method;
 
-import org.codehaus.classworlds.ClassWorld;
-import org.codehaus.classworlds.ClassRealm;
-import org.codehaus.classworlds.NoSuchRealmException;
+import org.codehaus.plexus.classworlds.ClassWorld;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 
 /**
- * This is a wrapper for the main function of Maven 2.
+ * This is a wrapper for the main function of Maven 3.
  */
-public class Wrapper extends WrapperBase {
+public class WrapperMaven3 extends WrapperBase {
 
     public static int main(String[] args, ClassWorld classWorld) throws IOException {
         init(args);
@@ -52,4 +52,3 @@ public class Wrapper extends WrapperBase {
         }
     }
 }
-
