@@ -1,7 +1,6 @@
 bin/mh_*			/usr/bin
 bin/mvn-debian			/usr/bin
-etc/*.conf			/etc/maven2/
-etc/*.xml			/etc/maven2/
+etc/*				/etc
 share/cdbs/1/class/*.mk		/usr/share/cdbs/1/class
 share/maven-debian-helper/*.sh	/usr/share/maven-debian-helper
 usr/share/perl5

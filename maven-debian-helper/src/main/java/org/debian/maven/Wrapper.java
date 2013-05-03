@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Properties;
 
-import org.apache.maven.cli.compat.CompatibleMain;
+import org.apache.maven.cli.MavenCli;
 import org.codehaus.classworlds.ClassWorld;
 
 /**
@@ -86,6 +86,6 @@ public class Wrapper {
         
         updateCommandLine(args);
         
-        return CompatibleMain.main(newArgs, classWorld);
+        return MavenCli.main(newArgs, classWorld);
     }
 }
