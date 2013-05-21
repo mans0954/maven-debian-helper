@@ -14,7 +14,7 @@ Homepage: http://wiki.debian.org/Java/MavenBuilder
 
 Package: maven-debian-helper
 Architecture: all
-Depends: ${misc:Depends}, default-jdk, maven-repo-helper (= 1.8.1), maven2 (>= 2.2.1-5),
+Depends: ${misc:Depends}, default-jdk, maven-repo-helper (= 1.8.2), maven2 (>= 2.2.1-5),
  libmaven-clean-plugin-java, libmaven-resources-plugin-java,
  libmaven-compiler-plugin-java, libmaven-jar-plugin-java, libmaven-site-plugin-java,
  libsurefire-java, velocity, libplexus-velocity-java
