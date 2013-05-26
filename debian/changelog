@@ -1,10 +1,19 @@
 maven-debian-helper (1.6.2) unstable; urgency=low
 
+  [ Thomas Koch ]
+  * Upload to unstable
+  * Depend on maven-repo-helper >= 1.8.3
+
+  [ Emmanuel Bourg ]
+  * Added myself to the uploaders
   * Fixed a typo in the help message for the --from-svn option in mh_make
   * Updated the dependency on maven-repo-helper (= 1.8.2)
-  * Upload to unstable
 
- -- Emmanuel Bourg <ebourg@apache.org>  Tue, 21 May 2013 01:17:37 +0200
+  [ Jakub Adam ]
+  * maven.pm: Rename maven-debian-plugin -> debian-maven-plugin
+    (Closes: #706782)
+
+ -- Thomas Koch <thomas@koch.ro>  Sun, 26 May 2013 11:25:14 +0200
 
 maven-debian-helper (1.6.1) experimental; urgency=low
 
