@@ -36,16 +36,18 @@ sub new {
 		push(@classpath, "$java_home/lib/tools.jar");
 	}
 
+	my @jvmopts = ('-noverify', '-cp', join(':',@classpath),
+		"-Dclassworlds.conf=$classconf");
+	if (-e "$this->{cwd}/debian/maven.properties") {
+		push (@jvmopts, "-Dproperties.file.manual=$this->{cwd}/debian/maven.properties");
+	}
+
 	@{$this->{maven_cmd}} = ($java_home . '/bin/java',
-		'-noverify', '-cp', join(':',@classpath),
-		"-Dclassworlds.conf=$classconf",
+		@jvmopts,
 		"org.codehaus.classworlds.Launcher",
 		"-s/etc/maven2/settings-debian.xml",
 		"-Ddebian.dir=$this->{cwd}/debian",
 		"-Dmaven.repo.local=$this->{cwd}/debian/maven-repo");
-	if (-e "$this->{cwd}/debian/maven.properties") {
-		push (@{$this->{maven_cmd}}, "-Dproperties.file.manual=$this->{cwd}/debian/maven.properties");
-	}
 	return $this;
 }
 
