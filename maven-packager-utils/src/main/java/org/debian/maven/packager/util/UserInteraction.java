@@ -86,7 +86,7 @@ public class UserInteraction {
             if (counter == defaultOpt) {
                 sb.append("[").append(counter).append("]");
             } else {
-                sb.append(counter);
+                sb.append(" ").append(counter).append(" ");
             }
             sb.append(" - ").append(choice).append("\n");
             ++counter;
