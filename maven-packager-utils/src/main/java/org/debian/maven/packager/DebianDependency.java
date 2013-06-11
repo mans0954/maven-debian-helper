@@ -45,8 +45,9 @@ public class DebianDependency implements Comparable<DebianDependency> {
     }
 
     public static String checkPackageName(String packageName) {
-        if (!isValidDebianPackageName(checkNotEmpty(packageName)))
+        if (packageName == null || !isValidDebianPackageName(checkNotEmpty(packageName))) {
             throw new IllegalArgumentException("Not a valid package name: " + packageName);
+        }
         return packageName;
     }
 
