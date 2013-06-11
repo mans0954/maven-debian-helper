@@ -386,8 +386,7 @@ public class GenerateDebianFilesMojo extends AbstractMojo {
                     scanner.makeExecutable("debian/orig-tar.sh");
 
                 } else {
-                    System.err.println("Cannot locate the version in the download url (" +
-                            downloadUrl + ").");
+                    System.err.println("Cannot locate the version in the download url (" + downloadUrl + ").");
                     System.err.println("Please run again and provide the download location with an explicit version tag, e.g.");
                     System.err.println("-DdownloadUrl=scm:svn:http://svn.codehaus.org/modello/tags/modello-1.0-alpha-21/");
                 }

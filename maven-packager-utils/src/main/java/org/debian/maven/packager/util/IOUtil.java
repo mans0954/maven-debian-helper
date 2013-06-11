@@ -53,14 +53,12 @@ public class IOUtil {
 
                     public void run() {
                         try {
-                            InputStreamReader isr = new InputStreamReader(process.getInputStream());
-                            BufferedReader br = new BufferedReader(isr);
-                            LineNumberReader aptIn = new LineNumberReader(br);
+                            LineNumberReader in = new LineNumberReader(new BufferedReader(new InputStreamReader(process.getInputStream())));
                             String line;
-                            while ((line = aptIn.readLine()) != null) {
+                            while ((line = in.readLine()) != null) {
                                 handler.newLine(line);
                             }
-                            aptIn.close();
+                            in.close();
                         } catch (IOException ex) {
                             ex.printStackTrace();
                         }

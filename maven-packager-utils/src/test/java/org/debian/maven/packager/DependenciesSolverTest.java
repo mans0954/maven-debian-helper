@@ -355,15 +355,15 @@ public class DependenciesSolverTest extends TestCase {
     }
 
     protected File getFileInClasspath(String resource) {
-        if (! resource.startsWith("/")) {
+        if (!resource.startsWith("/")) {
             resource = "/" + resource;
         }
         URL url = this.getClass().getResource(resource);
         File f;
         try {
-          f = new File(url.toURI());
-        } catch(URISyntaxException e) {
-          f = new File(url.getPath());
+            f = new File(url.toURI());
+        } catch (URISyntaxException e) {
+            f = new File(url.getPath());
         }
         return f;
     }

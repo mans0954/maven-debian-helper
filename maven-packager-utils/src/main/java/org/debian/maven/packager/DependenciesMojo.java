@@ -122,11 +122,9 @@ public class DependenciesMojo extends AbstractMojo {
      */
     protected boolean verbose;
 
-    public void execute()
-            throws MojoExecutionException {
-        File f = outputDirectory;
-        if (!f.exists()) {
-            f.mkdirs();
+    public void execute() throws MojoExecutionException {
+        if (!outputDirectory.exists()) {
+            outputDirectory.mkdirs();
         }
 
         DependenciesSolver solver = new DependenciesSolver(outputDirectory, new PackageScanner(offline), interactive);

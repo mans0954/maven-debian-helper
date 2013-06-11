@@ -6,14 +6,12 @@ import static org.debian.maven.util.Preconditions.*;
 
 public class DebianDependency implements Comparable<DebianDependency> {
 
-    private static final Pattern VALID_DEBIAN_PACKAGE_NAME = Pattern
-            .compile("^[a-z0-9][a-z0-9+-.]+$");
+    private static final Pattern VALID_DEBIAN_PACKAGE_NAME = Pattern.compile("^[a-z0-9][a-z0-9+-.]+$");
 
     private final String packageName;
     private final String minimumVersion;
 
     public DebianDependency(String packageName, String minimumVersion) {
-        super();
         this.packageName = checkPackageName(packageName);
         this.minimumVersion = checkNotNull(minimumVersion);
     }
@@ -22,11 +20,8 @@ public class DebianDependency implements Comparable<DebianDependency> {
         this(packageName, "");
     }
 
-    @Override
     public String toString() {
-        if(minimumVersion.isEmpty())
-            return packageName;
-        return packageName + " (>= " + minimumVersion + ")";
+        return minimumVersion.isEmpty() ? packageName : packageName + " (>= " + minimumVersion + ")";
     }
 
     public String getPackageName() {
