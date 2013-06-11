@@ -1,9 +1,5 @@
 package org.debian.maven.plugin;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
-
 /*
  * Copyright 2011 Ludovic Claude.
  *
@@ -20,9 +16,20 @@ import java.util.StringTokenizer;
  * limitations under the License.
  */
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
-public class DirectoryUtils {
+class DirectoryUtils {
 
+    /**
+     * Returns the relative path to a file relatively to a source directory.
+     * The path returned can be used to create a relative symbolic link
+     * in the source directory to the target file.
+     * 
+     * @param absSrcDir      the absolute path of the source directory (e.g. /usr/share/java)
+     * @param absTargetPath  the absolute path of the target file (e.g. /usr/share/maven-repo/foo/foo.jar)
+     */
     public static String relativePath(String absSrcDir, String absTargetPath) {
         List<String> src = splitDirs(absSrcDir);
         List<String> target = splitDirs(absTargetPath);
