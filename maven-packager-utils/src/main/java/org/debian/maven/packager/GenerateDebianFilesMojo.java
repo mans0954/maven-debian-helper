@@ -52,71 +52,93 @@ public class GenerateDebianFilesMojo extends AbstractMojo {
      * @required
      */
     protected MavenProject project;
+    
     /**
      * A list of every project in this reactor; provided by Maven
+     * 
      * @parameter expression="${project.collectedProjects}"
      */
     protected List<MavenProject> collectedProjects;
+    
     /**
      * @parameter expression="${localRepository}"
      * @required
      * @readonly
      */
     protected ArtifactRepository localRepository;
+    
     /**
      * Location of the file.
+     * 
      * @parameter expression="${debian.directory}"
      *   default-value="debian"
      */
     protected File outputDirectory;
+    
     /**
      * Name of the packager (e.g. 'Ludovic Claude')
+     * 
      * @parameter expression="${packager}"
      * @required
      */
     protected String packager;
+    
     /**
      * Email of the packager (e.g. 'ludovic.claude@laposte.net')
+     * 
      * @parameter expression="${email}"
      * @required
      */
     protected String email;
+    
     /**
      * License used by the packager (e.g. 'GPL-3' or 'Apache-2.0')
      * See http://dep.debian.net/deps/dep5/ for the list of licenses.
+     * 
      * @parameter expression="${packagerLicense}" default-value="GPL-3"
      * @required
      */
     protected String packagerLicense;
+    
     /**
      * Name of the source package (e.g. 'commons-lang')
+     * 
      * @parameter expression="${package}"
      * @required
      */
     protected String packageName;
+    
     /**
      * Name of the binary package (e.g. 'libcommons-lang-java')
+     * 
      * @parameter expression="${bin.package}"
      * @required
      */
     protected String binPackageName;
+    
     /**
      * Type of the package (e.g. 'maven' or 'ant')
+     * 
      * @parameter expression="${packageType}" default-value="maven"
      */
     protected String packageType;
+    
     /**
      * URL for downloading the source code, in the form scm:[svn|cvs]:http://xxx/
      * for downloads using a source code repository,
      * or http://xxx.[tar|zip|gz|tgz] for downloads using source tarballs.
+     * 
      * @parameter expression="${downloadUrl}"
      */
     protected String downloadUrl;
+    
     /**
      * If true, include running the tests during the build.
+     * 
      * @parameter expression="${runTests}" default-value="false"
      */
     protected boolean runTests;
+    
     /**
      * If true, generate the Javadoc packaged in a separate package.
      * @parameter expression="${generateJavadoc}" default-value="false"
@@ -127,8 +149,7 @@ public class GenerateDebianFilesMojo extends AbstractMojo {
     private LicensesScanner licensesScanner = new LicensesScanner();
     private UserInteraction userInteraction = new UserInteraction();
 
-    public void execute()
-            throws MojoExecutionException {
+    public void execute() throws MojoExecutionException {
         File f = outputDirectory;
         if (!f.exists()) {
             f.mkdirs();

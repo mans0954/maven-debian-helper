@@ -48,57 +48,76 @@ public class DependenciesMojo extends AbstractMojo {
      * @required
      */
     protected MavenProject project;
+    
     /**
      * A list of every project in this reactor; provided by Maven
+     * 
      * @parameter expression="${project.collectedProjects}"
      */
     protected List<MavenProject> collectedProjects;
+    
     /**
      * Location of the file.
+     * 
      * @parameter expression="${debian.directory}"
      *   default-value="debian"
      */
     protected File outputDirectory;
+    
     /**
      * Name of the package (e.g. 'commons-lang')
+     * 
      * @parameter expression="${package}"
      * @required
      */
     protected String packageName;
+    
     /**
      * Type of the package (e.g. 'maven' or 'ant')
+     * 
      * @parameter expression="${packageType}" default-value="maven"
      */
     protected String packageType;
+    
     /**
      * Should we also resolve Javadoc dependencies
+     * 
      * @parameter expression="${resolveJavadoc}" default-value="false"
      */
     protected boolean resolveJavadoc;
+    
     /**
      * Location for the list of POMs file.
+     * 
      * @required
      * @parameter expression="debian/${package}.poms"
      */
     protected File listOfPoms;
+    
     /**
      * Location of the Maven repository
      *
      * @parameter expression="${maven.repo.local}" default-value="/usr/share/maven-repo"
      */
     protected File mavenRepo;
+    
     /**
      * Interactive execution will ask questions to the user
+     * 
      * @parameter expression="${interactive}" default-value="true"
      */
     protected boolean interactive;
+    
     /**
      * Offline prevents any download from Internet
+     * 
      * @parameter expression="${offline}" default-value="false"
      */
     protected boolean offline;
+    
     /**
      * Try to be verbose
+     * 
      * @parameter expression="${verbose}" default-value="false"
      */
     protected boolean verbose;
