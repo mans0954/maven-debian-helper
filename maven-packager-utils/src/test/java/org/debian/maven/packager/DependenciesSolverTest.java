@@ -39,7 +39,7 @@ import static org.debian.maven.repo.DependencyRuleSetFiles.RulesType.*;
 
 public class DependenciesSolverTest extends TestCase {
 
-    private File testDir = new File("tmp");
+    private File testDir = new File("target/tmp");
     private File pomFile = new File(testDir, "pom.xml");
     private List<Reader> openedReaders = new ArrayList<Reader>();
 
