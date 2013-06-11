@@ -1,5 +1,3 @@
-package org.debian.maven.packager.util;
-
 /*
  * Copyright 2012 Ludovic Claude.
  *
@@ -16,6 +14,7 @@ package org.debian.maven.packager.util;
  * limitations under the License.
  */
 
+package org.debian.maven.packager.util;
 
 import junit.framework.TestCase;
 
@@ -35,6 +34,5 @@ public class LicensesScannerTest extends TestCase {
         assertTrue(scanner.recognizeLicense(licenses, "", "http://www.apache.org/licenses/LICENSE-2.0"));
         assertEquals("Apache-2.0", licenses.iterator().next());
         licenses.clear();
-                
     }
 }

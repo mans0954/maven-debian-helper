@@ -1,5 +1,3 @@
-package org.debian.maven.packager.util;
-
 /*
  * Copyright 2012 Ludovic Claude.
  *
@@ -16,6 +14,7 @@ package org.debian.maven.packager.util;
  * limitations under the License.
  */
 
+package org.debian.maven.packager.util;
 
 import org.junit.Test;
 
