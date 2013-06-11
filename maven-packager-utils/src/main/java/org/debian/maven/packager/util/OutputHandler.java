@@ -16,6 +16,9 @@
 
 package org.debian.maven.packager.util;
 
+/**
+ * Handles the output of an external command line by line.
+ */
 public interface OutputHandler {
 
     void newLine(String line);

@@ -18,16 +18,9 @@ package org.debian.maven.packager.util;
 
 public class NoOutputHandler implements OutputHandler {
 
-    private boolean failed;
-
     public void newLine(String line) {
     }
 
     public void failure() {
-        failed = true;
-    }
-
-    public boolean isFailed() {
-        return failed;
     }
 }

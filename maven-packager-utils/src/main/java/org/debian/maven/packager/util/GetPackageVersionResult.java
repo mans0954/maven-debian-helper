@@ -23,7 +23,6 @@ public class GetPackageVersionResult implements OutputHandler {
 
     private static final Pattern APT_VERSION_PATTERN = Pattern.compile("^\\s+.*\\s\\((.+)-.+?\\)$");
     private String result;
-    private boolean failed;
 
     public void newLine(String line) {
         if (result != null) {
@@ -47,14 +46,9 @@ public class GetPackageVersionResult implements OutputHandler {
     }
 
     public void failure() {
-        failed = true;
     }
 
     public String getResult() {
         return result;
-    }
-
-    public boolean isFailed() {
-        return failed;
     }
 }

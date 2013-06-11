@@ -23,7 +23,6 @@ public class GetChangelogVersionResult implements OutputHandler {
 
     private String result;
     private final Pattern pattern;
-    private boolean failed;
 
     public GetChangelogVersionResult(String pkg) {
         this.pattern = Pattern.compile(pkg + "\\s\\(.*\\)");
@@ -40,15 +39,9 @@ public class GetChangelogVersionResult implements OutputHandler {
     }
 
     public void failure() {
-        failed = true;
     }
 
     public String getResult() {
         return result;
     }
-
-    public boolean isFailed() {
-        return failed;
-    }
-
 }
