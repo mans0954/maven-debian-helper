@@ -326,14 +326,12 @@ public class GenerateDebianFilesMojo extends AbstractMojo {
 
                 if ("ant".equals(packageType)) {
                     Set<String> compileJars = new TreeSet<String>();
-                    for (Iterator<String> i = compileDepends.iterator(); i.hasNext();) {
-                        String library = i.next();
+                    for (String library : compileDepends) {
                         compileJars.addAll(scanner.listSharedJars(library));
                     }
                     context.put("compileJars", compileJars);
                     Set<String> testJars = new TreeSet<String>();
-                    for (Iterator<String> i = testDepends.iterator(); i.hasNext();) {
-                        String library = (String) i.next();
+                    for (String library : testDepends) {
                         testJars.addAll(scanner.listSharedJars(library));
                     }
                     context.put("testJars", testJars);
@@ -349,8 +347,7 @@ public class GenerateDebianFilesMojo extends AbstractMojo {
                     listOfJavadocPOMs =  new ListOfPOMs(new File(outputDirectory, binPackageName + "-doc.poms"));
                 }
                 setupArtifactLocation(listOfPOMs, listOfJavadocPOMs, project);
-                for (Iterator<MavenProject> i = collectedProjects.iterator(); i.hasNext();) {
-                    MavenProject mavenProject = i.next();
+                for (MavenProject mavenProject : collectedProjects) {
                     setupArtifactLocation(listOfPOMs, listOfJavadocPOMs, mavenProject);
                 }
                 listOfPOMs.save();
