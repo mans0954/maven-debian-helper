@@ -193,7 +193,7 @@ public class GenerateDebianFilesMojo extends AbstractMojo {
             context.put("licenses", licenses);
 
             if (licenses.size() == 1) {
-                packagerLicense = (String) licenses.iterator().next();
+                packagerLicense = licenses.iterator().next();
             }
             if (packagerLicense == null) {
                 String q = "Packager license for the debian/ files was not found, please enter a license name preferably in one of:\n"
@@ -245,27 +245,10 @@ public class GenerateDebianFilesMojo extends AbstractMojo {
             context.put("copyrightYear", copyrightYear);
             context.put("currentYear", new Integer(currentYear));
 
-            List<String> description = new ArrayList<String>();
             if (project.getDescription() == null || project.getDescription().trim().isEmpty()) {
                 project.setDescription(userInteraction.askMultiLine("Please enter a short description of the project, press Enter twice to stop."));
             }
-            if (project.getDescription() != null) {
-                StringTokenizer st = new StringTokenizer(project.getDescription().trim(), "\n\t ");
-                StringBuilder descLine = new StringBuilder();
-                while (st.hasMoreTokens()) {
-                    descLine.append(st.nextToken());
-                    descLine.append(" ");
-                    if (descLine.length() > 70 || !st.hasMoreTokens()) {
-                        String line = descLine.toString().trim();
-                        if (line.isEmpty()) {
-                            line = ".";
-                        }
-                        description.add(line);
-                        descLine = new StringBuilder();
-                    }
-                }
-            }
-            context.put("description", description);
+            context.put("description", formatDescription(project.getDescription()));
 
             File substvarsFile = new File(outputDirectory, binPackageName + ".substvars");
             if (substvarsFile.exists()) {
@@ -475,6 +458,35 @@ public class GenerateDebianFilesMojo extends AbstractMojo {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    /**
+     * Format the specified text to be suitable as a package long description.
+     * Lines are wrapped after 70 characters and a dot is placed on empty lines.
+     * 
+     * @param description
+     */
+    List<String> formatDescription(String description) {
+        List<String> lines = new ArrayList<String>();
+        
+        if (description != null) {
+            StringTokenizer st = new StringTokenizer(description.trim(), "\n\t ");
+            StringBuilder descLine = new StringBuilder();
+            while (st.hasMoreTokens()) {
+                descLine.append(st.nextToken());
+                descLine.append(" ");
+                if (descLine.length() > 70 || !st.hasMoreTokens()) {
+                    String line = descLine.toString().trim();
+                    if (line.isEmpty()) {
+                        line = ".";
+                    }
+                    lines.add(line);
+                    descLine = new StringBuilder();
+                }
+            }
+        }
+        
+        return lines;
     }
 
     private List<WrappedProject> wrapMavenProjects(List<MavenProject> projects) {
