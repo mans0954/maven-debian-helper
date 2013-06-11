@@ -547,8 +547,7 @@ public class SysInstallMojo extends AbstractMojo {
      * command for creating the relative symlink
      */
     private String[] linkCommand(String source, String dest) {
-        String[] command = {"ln", "-s", source, dest};
-        return command;
+        return new String[]{"ln", "-s", source, dest};
     }
 
     private void mkdir(String path) throws IOException {
@@ -712,7 +711,7 @@ public class SysInstallMojo extends AbstractMojo {
         params.add(cleanedPomSrcPath());
         params.add(cleanedPomPropertiesSrcPath());
 
-        POMCleaner.main((String[]) params.toArray(new String[params.size()]));
+        POMCleaner.main(params.toArray(new String[params.size()]));
 
         Properties pomProperties = new Properties();
         try {
@@ -731,7 +730,7 @@ public class SysInstallMojo extends AbstractMojo {
             params.add(debianPomSrcPath());
             params.add(debianPomPropertiesSrcPath());
 
-            POMCleaner.main((String[]) params.toArray(new String[params.size()]));
+            POMCleaner.main(params.toArray(new String[params.size()]));
         }
     }
 
