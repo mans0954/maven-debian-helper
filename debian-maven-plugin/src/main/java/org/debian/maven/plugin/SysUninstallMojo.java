@@ -38,6 +38,7 @@ public class SysUninstallMojo extends SysInstallMojo {
     // Private methods
     // ----------------------------------------------------------------------
 
+    @Override
     protected void runMojo() throws IOException {
         FileUtils.forceDelete(fullRepoPath());
         FileUtils.fileDelete(fullCompatPath());

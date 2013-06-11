@@ -66,7 +66,7 @@ public class InstallMojo extends SysInstallMojo {
     /**
      * Returns e.g. $CURDIR/debian/libfoobar-java
      */
-
+    @Override
     protected String packagePath() {
         return getDebianDir() + "/" + getDestPackage();
     }
@@ -74,6 +74,7 @@ public class InstallMojo extends SysInstallMojo {
     /**
      * absolute path to destination dir
      */
+    @Override
     protected String fullRepoPath() {
         if (useMavenRepoLocal) {
             return mavenRepoLocal.getAbsolutePath() + "/" + destRepoPath();
@@ -85,6 +86,7 @@ public class InstallMojo extends SysInstallMojo {
     /**
      * absolute path to destination dir
      */
+    @Override
     protected String debianFullRepoPath() {
         if (useMavenRepoLocal) {
             return mavenRepoLocal.getAbsolutePath() + "/" + debianRepoPath();

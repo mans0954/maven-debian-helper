@@ -51,6 +51,7 @@ public class InstallDocMojo extends SysInstallDocMojo {
     /**
      * Returns e.g. $CURDIR/debian/libfoobar-java
      */
+    @Override
     protected String packagePath() {
         if (useMavenRepoLocal) {
             return mavenRepoLocal.getAbsolutePath();

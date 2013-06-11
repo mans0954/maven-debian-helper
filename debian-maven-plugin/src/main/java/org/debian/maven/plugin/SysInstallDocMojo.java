@@ -37,6 +37,7 @@ public class SysInstallDocMojo extends SysInstallMojo {
     /**
      * do the actual work
      */
+    @Override
     protected void runMojo() throws IOException {
         copyJar();
     }
