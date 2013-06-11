@@ -17,6 +17,7 @@ package org.debian.maven.plugin;
  */
 
 import java.io.IOException;
+
 import org.codehaus.plexus.util.FileUtils;
 
 /**
@@ -24,23 +25,21 @@ import org.codehaus.plexus.util.FileUtils;
  *
  * @goal sysuninstall
  */
-public class SysUninstallMojo extends SysInstallMojo
-{
-  // ----------------------------------------------------------------------
-  // Mojo parameters
-  // ----------------------------------------------------------------------
+public class SysUninstallMojo extends SysInstallMojo {
+    // ----------------------------------------------------------------------
+    // Mojo parameters
+    // ----------------------------------------------------------------------
 
-  // ----------------------------------------------------------------------
-  // Public methods
-  // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    // Public methods
+    // ----------------------------------------------------------------------
 
-  // ----------------------------------------------------------------------
-  // Private methods
-  // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    // Private methods
+    // ----------------------------------------------------------------------
 
-  protected void runMojo() throws IOException
-  {
-    FileUtils.forceDelete(fullRepoPath());
-    FileUtils.fileDelete(fullCompatPath());
-  }
+    protected void runMojo() throws IOException {
+        FileUtils.forceDelete(fullRepoPath());
+        FileUtils.fileDelete(fullCompatPath());
+    }
 }

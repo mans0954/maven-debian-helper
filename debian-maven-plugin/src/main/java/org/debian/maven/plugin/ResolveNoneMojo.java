@@ -25,9 +25,8 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @goal resolve-none
  * @aggregator true
  */
-public class ResolveNoneMojo extends AbstractMojo
-{
-  public void execute() throws MojoExecutionException
-  {
-  }
+public class ResolveNoneMojo extends AbstractMojo {
+    
+    public void execute() throws MojoExecutionException {
+    }
 }
