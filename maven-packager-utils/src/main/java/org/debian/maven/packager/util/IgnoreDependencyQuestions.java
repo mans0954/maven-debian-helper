@@ -20,6 +20,7 @@ public class IgnoreDependencyQuestions {
         {"org.apache.maven.plugins", "maven-release-plugin"},
         {"org.apache.maven.plugins", "maven-repository-plugin"},
         {"org.apache.maven.plugins", "maven-scm-plugin"},
+        {"org.apache.maven.plugins", "maven-scm-publish-plugin"},
         {"org.apache.maven.plugins", "maven-stage-plugin"},
         {"org.apache.maven.plugins", "maven-eclipse-plugin"},
         {"org.apache.maven.plugins", "maven-idea-plugin"},
