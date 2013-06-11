@@ -1,5 +1,3 @@
-package org.debian.maven.packager;
-
 /*
  * Copyright 2009 Ludovic Claude.
  *
@@ -15,6 +13,8 @@ package org.debian.maven.packager;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package org.debian.maven.packager;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -38,8 +38,7 @@ import org.debian.maven.repo.DependencyRuleSetFiles.RulesType;
  * 
  * @author Ludovic Claude
  */
-public class DependenciesMojo
-        extends AbstractMojo {
+public class DependenciesMojo extends AbstractMojo {
 
     /**
      * The Maven Project Object

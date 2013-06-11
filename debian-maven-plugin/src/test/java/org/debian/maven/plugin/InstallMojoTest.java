@@ -1,24 +1,3 @@
-package org.debian.maven.plugin;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.apache.commons.io.FileUtils;
-
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-
 /*
  * Copyright 2012 Ludovic Claude.
  *
@@ -35,6 +14,26 @@ import static junit.framework.Assert.assertNotNull;
  * limitations under the License.
  */
 
+package org.debian.maven.plugin;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.commons.io.FileUtils;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+
 public class InstallMojoTest {
 
     private File testDir = new File("tmp");
@@ -49,8 +48,7 @@ public class InstallMojoTest {
 
     @After
     public void tearDown() throws Exception {
-        for (Iterator<Reader> i = openedReaders.iterator(); i.hasNext(); ) {
-            Reader reader = (Reader) i.next();
+        for (Reader reader : openedReaders) {
             try {
                 reader.close();
             } catch (IOException ex) {
@@ -176,15 +174,15 @@ public class InstallMojoTest {
 
 
     protected File getFileInClasspath(String resource) {
-        if (! resource.startsWith("/")) {
+        if (!resource.startsWith("/")) {
             resource = "/" + resource;
         }
         URL url = this.getClass().getResource(resource);
         File f;
         try {
-          f = new File(url.toURI());
-        } catch(URISyntaxException e) {
-          f = new File(url.getPath());
+            f = new File(url.toURI());
+        } catch (URISyntaxException e) {
+            f = new File(url.getPath());
         }
         return f;
     }

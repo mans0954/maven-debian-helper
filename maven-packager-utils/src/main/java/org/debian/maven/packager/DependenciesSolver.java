@@ -1,5 +1,3 @@
-package org.debian.maven.packager;
-
 /*
  * Copyright 2009 Ludovic Claude.
  * Copyright 2011 Damien Raude-Morvan.
@@ -16,6 +14,8 @@ package org.debian.maven.packager;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package org.debian.maven.packager;
 
 import java.io.File;
 import java.io.IOException;

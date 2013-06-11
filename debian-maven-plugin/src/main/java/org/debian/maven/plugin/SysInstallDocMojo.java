@@ -1,7 +1,3 @@
-package org.debian.maven.plugin;
-
-import java.io.IOException;
-
 /*
  * Copyright 2009 Torsten Werner, Ludovic Claude.
  *
@@ -17,6 +13,10 @@ import java.io.IOException;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package org.debian.maven.plugin;
+
+import java.io.IOException;
 
 /**
  * Install the javadoc jar.

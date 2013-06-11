@@ -1,5 +1,3 @@
-package org.debian.maven.plugin;
-
 /*
  * Copyright 2009 Torsten Werner.
  *
@@ -16,8 +14,10 @@ package org.debian.maven.plugin;
  * limitations under the License.
  */
 
+package org.debian.maven.plugin;
+
 /**
- * resolves compile dependencies
+ * Resolves compile dependencies
  *
  * @goal resolve-compile
  * @requiresDependencyResolution compile

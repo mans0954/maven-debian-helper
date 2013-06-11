@@ -1,5 +1,3 @@
-package org.debian.maven.plugin;
-
 /*
  * Copyright 2009 Torsten Werner.
  *
@@ -16,11 +14,13 @@ package org.debian.maven.plugin;
  * limitations under the License.
  */
 
+package org.debian.maven.plugin;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
 /**
- * dummy goal that just reads the pom.xml files including parents
+ * Dummy goal that just reads the pom.xml files including parents
  *
  * @goal resolve-none
  * @aggregator true

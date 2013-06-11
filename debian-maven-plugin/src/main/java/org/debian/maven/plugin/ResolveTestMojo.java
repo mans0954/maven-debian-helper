@@ -1,5 +1,3 @@
-package org.debian.maven.plugin;
-
 /*
  * Copyright 2009 Torsten Werner.
  *
@@ -16,8 +14,10 @@ package org.debian.maven.plugin;
  * limitations under the License.
  */
 
+package org.debian.maven.plugin;
+
 /**
- * resolves test dependencies
+ * Resolves test dependencies
  *
  * @goal resolve-test
  * @requiresDependencyResolution test
