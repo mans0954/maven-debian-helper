@@ -37,6 +37,12 @@ import org.debian.maven.repo.POMCleaner;
  */
 public class SysInstallMojo extends AbstractMojo {
 
+    /** Regex for detecting that package is a libXXX-java package */
+    private static final Pattern JAVA_LIB_REGEX = Pattern.compile("lib.*-java");
+
+    /** Regex for detecting that package is a maven plugin package */
+    private static final Pattern PLUGIN_REGEX = Pattern.compile("lib.*-maven-plugin-java|libmaven-.*-plugin-java");
+
     // ----------------------------------------------------------------------
     // Mojo parameters
     // ----------------------------------------------------------------------
@@ -178,16 +184,6 @@ public class SysInstallMojo extends AbstractMojo {
 
     private String classifier;
 
-    /**
-     * Regex for detecting that package is a libXXX-java package
-     */
-    private static final Pattern javaLibRegex = Pattern.compile("lib.*-java");
-
-    /**
-     * Regex for detecting that package is a maven plugin package
-     */
-    private static final Pattern pluginRegex =
-        Pattern.compile("lib.*-maven-plugin-java|libmaven-.*-plugin-java");
 
     // ----------------------------------------------------------------------
     // Public methods
@@ -196,8 +192,7 @@ public class SysInstallMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException {
         try {
             runMojo();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             getLog().error("execution failed", e);
             throw new MojoExecutionException("IOException catched");
         }
@@ -672,8 +667,8 @@ public class SysInstallMojo extends AbstractMojo {
             // If package is a java libary (lib.*-java)and is not a maven plugin
             // (lib.*-plugin-java) potentially install to /usr/share/java
             boolean packageIsJavaLib =
-                    javaLibRegex.matcher(destPackage).matches() &&
-                   !pluginRegex.matcher(destPackage).matches();
+                    JAVA_LIB_REGEX.matcher(destPackage).matches() &&
+                   !PLUGIN_REGEX.matcher(destPackage).matches();
 
             // Its also possible to configure USJ install using
             // DEB_MAVEN_INSTALL_TO_USJ which we should honour
