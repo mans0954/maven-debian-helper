@@ -66,6 +66,7 @@ public class IgnoreDependencyQuestions {
         {"org.codehaus.mojo", "javancss-maven-plugin"},
         {"org.codehaus.mojo", "jdepend-maven-plugin"},
         {"org.codehaus.mojo", "jxr-maven-plugin"},
+        {"org.codehaus.mojo", "l10n-maven-plugin"},
         {"org.codehaus.mojo", "dashboard-maven-plugin"},
         {"org.codehaus.mojo", "emma-maven-plugin"},
         {"org.codehaus.mojo", "sonar-maven-plugin"},
@@ -122,9 +123,7 @@ public class IgnoreDependencyQuestions {
         if (!interactive || notIgnoredDependencies.contains(dependency)) {
             return false;
         }
-        String q = "\n" + "In " + sourcePomLoc + ":"
-                 + message
-                 + "  " + dependency;
+        String q = "\n" + "In " + sourcePomLoc + ":" + message + "  " + dependency;
         boolean ignore = userInteraction.askYesNo(q, defaultToIgnore);
         if (!ignore) {
             notIgnoredDependencies.add(dependency);
