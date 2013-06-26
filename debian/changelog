@@ -1,5 +1,6 @@
 maven-debian-helper (1.6.4) unstable; urgency=low
 
+  [ Emmanuel Bourg ]
   * Don't install the documentation jar by default (Closes: #711852)
   * Generate canonical URLs for the Vcs-* fields
   * Refer to "Debian systems" instead of "Debian GNU/Linux system"
@@ -11,6 +12,10 @@ maven-debian-helper (1.6.4) unstable; urgency=low
   * Added maven-scm-publish-plugin to the list of the ignored plugins
   * Added rat-maven-plugin to the list of the ignored plugins
   * Code clean up and minor syntax changes
+
+  [ Jakub Adam ]
+  * dh build: Touch debian/stamp-poms-patched after mh_patchpoms is run
+    (Closes: #714189)
 
  -- Emmanuel Bourg <ebourg@apache.org>  Wed, 07 Aug 2013 13:00:25 +0200
 

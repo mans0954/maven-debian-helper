@@ -62,6 +62,7 @@ sub configure {
 	$this->doit_in_sourcedir("mh_patchpoms", "-p$this->{package}",
 		"--debian-build", "--keep-pom-version",
 		"--maven-repo=$this->{cwd}/debian/maven-repo", @patch_args);
+	doit("touch", "debian/stamp-poms-patched");
 }
 
 sub build {
@@ -119,6 +120,7 @@ sub clean {
 		doit("rm", "-r", "$this->{cwd}/debian/maven-repo");
 	}
 	$this->doit_in_sourcedir("mh_unpatchpoms", "-p$this->{package}");
+	doit("rm", "-f", "debian/stamp-poms-patched");
 	doit("mh_clean");
 }
 
