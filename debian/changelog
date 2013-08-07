@@ -1,8 +1,18 @@
-maven-debian-helper (1.6.4) UNRELEASED; urgency=low
+maven-debian-helper (1.6.4) unstable; urgency=low
 
   * Don't install the documentation jar by default (Closes: #711852)
+  * Generate canonical URLs for the Vcs-* fields
+  * Refer to "Debian systems" instead of "Debian GNU/Linux system"
+    in the generated copyright file
+  * Fixed the information message displayed when resolving dependencies
+    (regression in version 1.6)
+  * Added l10n-maven-plugin to the list of the documentation plugins
+  * Added maven-svn-wagon to the list of the ignored extensions
+  * Added maven-scm-publish-plugin to the list of the ignored plugins
+  * Added rat-maven-plugin to the list of the ignored plugins
+  * Code clean up and minor syntax changes
 
- -- Emmanuel Bourg <ebourg@apache.org>  Tue, 30 Jul 2013 15:22:00 +0200
+ -- Emmanuel Bourg <ebourg@apache.org>  Wed, 07 Aug 2013 13:00:25 +0200
 
 maven-debian-helper (1.6.3) unstable; urgency=low
 
