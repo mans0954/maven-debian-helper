@@ -5,7 +5,7 @@ include /usr/share/cdbs/1/class/maven.mk
 
 JAVA_HOME := /usr/lib/jvm/default-java
 #if ($project.Packaging == "pom")
-DEB_MAVEN_DOC_TARGET := javadoc:jar javadoc:aggregate
+DEB_MAVEN_DOC_TARGET := javadoc:javadoc javadoc:aggregate
 #end
 
 get-orig-source:
