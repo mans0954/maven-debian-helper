@@ -36,6 +36,7 @@ public class IgnoreDependencyQuestions {
         {"org.apache.maven.plugins", "maven-enforcer-plugin"},
         {"org.apache.maven.plugins", "maven-gpg-plugin"},
         {"org.apache.rat", "apache-rat-plugin"},
+        {"org.codehaus.mojo", "rat-maven-plugin"},
         {"org.codehaus.mojo", "buildnumber-maven-plugin"},
         {"org.apache.maven.plugins", "maven-verifier-plugin"},
         {"org.codehaus.mojo", "findbugs-maven-plugin"},
