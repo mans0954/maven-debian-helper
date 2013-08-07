@@ -1,8 +1,20 @@
-maven-debian-helper (1.6.3) UNRELEASED; urgency=low
+maven-debian-helper (1.6.4) UNRELEASED; urgency=low
 
   * Don't install the documentation jar by default (Closes: #711852)
 
  -- Emmanuel Bourg <ebourg@apache.org>  Tue, 30 Jul 2013 15:22:00 +0200
+
+maven-debian-helper (1.6.3) unstable; urgency=low
+
+  [ Emmanuel Bourg ]
+  * Align the options vertically when asking how the version should be
+    transformed
+
+  [ Jakub Adam ]
+  * maven.pm: pass properties.file.manual as JVM system property
+    (Closes: #710131)
+
+ -- Thomas Koch <thomas@koch.ro>  Sun, 09 Jun 2013 19:29:44 +0200
 
 maven-debian-helper (1.6.2) unstable; urgency=low
 
