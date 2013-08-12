@@ -153,6 +153,18 @@ public class SysInstallMojo extends AbstractMojo {
     private String mavenRules;
 
     /**
+     * @parameter expression="${maven.ignoreRules}" default-value="maven.ignoreRules"
+     * @required
+     */
+    private String mavenIgnoreRules;
+
+    /**
+     * @parameter expression="${maven.publishedRules}" default-value="maven.publishedRules"
+     * @required
+     */
+    private String mavenPublishedRules;
+
+    /**
      * root directory of the Maven repository
      *
      * @parameter expression="${basedir}"
@@ -304,6 +316,22 @@ public class SysInstallMojo extends AbstractMojo {
 
     public void setMavenRules(String mavenRules) {
         this.mavenRules = mavenRules;
+    }
+
+    public String getMavenIgnoreRules() {
+        return mavenIgnoreRules;
+    }
+
+    public void setMavenIgnoreRules(String mavenIgnoreRules) {
+        this.mavenIgnoreRules = mavenIgnoreRules;
+    }
+
+    public String getMavenPublishedRules() {
+        return mavenPublishedRules;
+    }
+
+    public void setMavenPublishedRules(String mavenPublishedRules) {
+        this.mavenPublishedRules = mavenPublishedRules;
     }
 
     public File getRepoDir() {
@@ -685,10 +713,16 @@ public class SysInstallMojo extends AbstractMojo {
         params.add("--package=" + destPackage);
         String mavenRulesPath = new File(debianDir, mavenRules).getAbsolutePath();
         params.add("--rules=" + mavenRulesPath);
+        String mavenIgnoreRulesPath = new File(debianDir, mavenIgnoreRules).getAbsolutePath();
+        params.add("--ignore-rules=" + mavenIgnoreRulesPath);
+        String mavenPublishedRulesPath = new File(debianDir, mavenPublishedRules).getAbsolutePath();
+        params.add("--published-rules=" + mavenPublishedRulesPath);
 
         System.out.println("Cleaning pom file: " + pomFile + " with options:");
         System.out.println("\t--keep-pom-version --package=" + destPackage);
         System.out.println("\t--rules=" + mavenRulesPath);
+        System.out.println("\t--ignore-rules=" + mavenIgnoreRulesPath);
+        System.out.println("\t--published-rules=" + mavenPublishedRulesPath);
 
         // add optional --no-parent option
         if (pomOption != null && pomOption.isNoParent()) {
