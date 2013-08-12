@@ -1,4 +1,4 @@
-maven-debian-helper (1.6.4) unstable; urgency=low
+maven-debian-helper (1.6.4) UNRELEASED; urgency=low
 
   [ Emmanuel Bourg ]
   * Don't install the documentation jar by default (Closes: #711852)
@@ -16,6 +16,10 @@ maven-debian-helper (1.6.4) unstable; urgency=low
   [ Jakub Adam ]
   * dh build: Touch debian/stamp-poms-patched after mh_patchpoms is run
     (Closes: #714189)
+
+  [ James Page ]
+  * Send options for --published-rules and --ignore-rules to POMCleaner
+    during SysInstallMojo (Closes: #719487).
 
  -- Emmanuel Bourg <ebourg@apache.org>  Wed, 07 Aug 2013 13:00:25 +0200
 
