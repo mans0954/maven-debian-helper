@@ -1,10 +1,3 @@
-maven-debian-helper (1.6.5) UNRELEASED; urgency=low
-
-  * Send options for --published-rules and --ignore-rules to POMCleaner
-    during SysInstallMojo (Closes: #719487).
-
- -- James Page <james.page@ubuntu.com>  Tue, 13 Aug 2013 12:19:25 +0100
-
 maven-debian-helper (1.6.4) unstable; urgency=low
 
   [ Emmanuel Bourg ]
@@ -23,6 +16,10 @@ maven-debian-helper (1.6.4) unstable; urgency=low
   [ Jakub Adam ]
   * dh build: Touch debian/stamp-poms-patched after mh_patchpoms is run
     (Closes: #714189)
+
+  [ James Page ]
+  * Send options for --published-rules and --ignore-rules to POMCleaner
+    during SysInstallMojo (Closes: #719487).
 
  -- Emmanuel Bourg <ebourg@apache.org>  Wed, 07 Aug 2013 13:00:25 +0200
 
