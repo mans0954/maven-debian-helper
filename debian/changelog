@@ -5,6 +5,7 @@ maven-debian-helper (1.6.5) UNRELEASED; urgency=low
     "install" to "package")
   * Adjust mh_resolve_dependencies arguments in dh to match CDBS
   * Adjust debian-maven-plugin options in dh to match CDBS
+  * Switch maven doc target back to javadoc:jar (was javadoc:javadoc)
 
  -- Wolodja Wentland <debian@babilen5.org>  Sat, 17 Aug 2013 15:24:16 +0000
 
