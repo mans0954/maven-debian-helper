@@ -1,4 +1,4 @@
-maven-debian-helper (1.6.5) UNRELEASED; urgency=low
+maven-debian-helper (1.6.5) unstable; urgency=low
 
   * Add Wolodja Wentland to uploaders
   * Prevent artifact installation during dh build (switch maven target from
