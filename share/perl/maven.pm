@@ -69,7 +69,7 @@ sub build {
  	my $this=shift;
 
 	if (!@_) {
-		push(@_, "install");
+		push(@_, "package");
 		if ($this->{doc_package}) {
 			push(@_, "javadoc:javadoc", "javadoc:aggregate");
 		}
