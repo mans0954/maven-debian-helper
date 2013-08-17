@@ -3,6 +3,7 @@ maven-debian-helper (1.6.5) UNRELEASED; urgency=low
   * Add Wolodja Wentland to uploaders
   * Prevent artifact installation during dh build (switch maven target from
     "install" to "package")
+  * Adjust mh_resolve_dependencies arguments in dh to match CDBS
 
  -- Wolodja Wentland <debian@babilen5.org>  Sat, 17 Aug 2013 15:24:16 +0000
 

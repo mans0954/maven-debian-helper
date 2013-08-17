@@ -90,6 +90,7 @@ sub install {
 	if ($this->{doc_package}) {
 		push(@resolvedep_args, "--javadoc");
 	}
+	push(@resolvedep_args, "--base-directory=$this->{cwd}", "--non-explore");
 
 	$this->doit_in_builddir(@{$this->{maven_cmd}},
 		"-Ddebian.package=$this->{package}",
