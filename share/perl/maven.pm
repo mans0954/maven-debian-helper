@@ -71,7 +71,7 @@ sub build {
 	if (!@_) {
 		push(@_, "package");
 		if ($this->{doc_package}) {
-			push(@_, "javadoc:javadoc", "javadoc:aggregate");
+			push(@_, "javadoc:jar", "javadoc:aggregate");
 		}
 	}
 
