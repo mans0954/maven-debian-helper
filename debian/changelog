@@ -1,3 +1,9 @@
+maven-debian-helper (1.6.5) UNRELEASED; urgency=low
+
+  * Add Wolodja Wentland to uploaders
+
+ -- Wolodja Wentland <debian@babilen5.org>  Sat, 17 Aug 2013 15:24:16 +0000
+
 maven-debian-helper (1.6.4) unstable; urgency=low
 
   [ Emmanuel Bourg ]
