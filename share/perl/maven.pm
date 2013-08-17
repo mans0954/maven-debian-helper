@@ -93,7 +93,9 @@ sub install {
 	push(@resolvedep_args, "--base-directory=$this->{cwd}", "--non-explore");
 
 	$this->doit_in_builddir(@{$this->{maven_cmd}},
+		"-Ddebian.dir=$this->{cwd}/debian",
 		"-Ddebian.package=$this->{package}",
+		"-Dmaven.repo.local=$this->{cwd}/debian/maven-repo",
 		"-Dinstall.to.usj=true",
 		"org.debian.maven:debian-maven-plugin:$maven_debian_version:install");
 	$this->doit_in_builddir("mh_resolve_dependencies", "--non-interactive",
