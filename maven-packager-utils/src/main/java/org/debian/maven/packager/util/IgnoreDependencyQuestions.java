@@ -29,7 +29,9 @@ public class IgnoreDependencyQuestions {
         {"org.codehaus.mojo", "netbeans-freeform-maven-plugin"},
         {"org.codehaus.mojo", "nbm-maven-plugin"},
         {"org.codehaus.mojo", "ideauidesigner-maven-plugin"},
-        {"org.codehaus.mojo", "scmchangelog-maven-plugin"},};
+        {"org.codehaus.mojo", "scmchangelog-maven-plugin"},
+        {"com.github.github", "site-maven-plugin"},
+    };
     private static final String[][] PLUGINS_THAT_CAN_BE_IGNORED = {
         {"org.apache.maven.plugins", "maven-ant-plugin"},
         {"org.apache.maven.plugins", "maven-assembly-plugin"},
