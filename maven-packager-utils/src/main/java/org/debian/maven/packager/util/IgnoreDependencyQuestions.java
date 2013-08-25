@@ -43,6 +43,7 @@ public class IgnoreDependencyQuestions {
         {"org.apache.maven.plugins", "maven-verifier-plugin"},
         {"org.codehaus.mojo", "findbugs-maven-plugin"},
         {"org.codehaus.mojo", "fitnesse-maven-plugin"},
+        {"org.codehaus.mojo", "ianal-maven-plugin"},
         {"org.codehaus.mojo", "selenium-maven-plugin"},
         {"org.codehaus.mojo", "dbunit-maven-plugin"},
         {"org.codehaus.mojo", "failsafe-maven-plugin"},

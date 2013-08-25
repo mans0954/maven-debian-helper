@@ -1,6 +1,7 @@
 maven-debian-helper (1.6.6) UNRELEASED; urgency=low
 
   * Added com.github.github:site-maven-plugin to the ignored plugins
+  * Added org.codehaus.mojo:ianal-maven-plugin to the ignored plugins
   * Updated the Maven dependency on maven-repo-helper (1.8.4)
 
  -- Emmanuel Bourg <ebourg@apache.org>  Fri, 23 Aug 2013 22:46:59 +0200
