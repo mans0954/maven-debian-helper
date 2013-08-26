@@ -161,9 +161,9 @@ public class PackageScanner {
         IOUtil.executeProcess(new String[]{"chmod", "+x", file}, new NoOutputHandler());
     }
 
-    public ArrayList<DebianDependency> addDocDependencies(Collection<DebianDependency> debianDeps, Map<DebianDependency,
+    public List<DebianDependency> addDocDependencies(Collection<DebianDependency> debianDeps, Map<DebianDependency,
         Dependency> versionedPackagesAndDependencies) {
-        ArrayList<DebianDependency> docDeps = new ArrayList<DebianDependency>();
+        List<DebianDependency> docDeps = new ArrayList<DebianDependency>();
         for (DebianDependency dependency : debianDeps) {
             Dependency runtimeDependency = versionedPackagesAndDependencies.get(dependency);
             if (runtimeDependency != null && "pom".equals(runtimeDependency.getType())) {
