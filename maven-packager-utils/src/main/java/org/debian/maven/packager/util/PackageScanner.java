@@ -89,8 +89,23 @@ public class PackageScanner {
         return searchPkg(new File("/usr/share/java/" + dependency.getArtifactId() + ".jar"));
     }
 
+    /**
+     * Searches the package containing the Javadoc for the specified package.
+     * 
+     * @param dependency
+     */
     public DebianDependency searchJavaDocPkg(DebianDependency dependency) {
-        return searchPkg(new File("/usr/share/doc/" + dependency.getPackageName() + "/api/index.html"));
+        DebianDependency pkg = searchPkg(new File("/usr/share/doc/" + dependency.getPackageName() + "/api/index.html"));
+        if (pkg == null) {
+            pkg = searchPkg(new File("/usr/share/doc/" + dependency.getPackageName() + "-doc/api/index.html"));
+        }
+        if (pkg == null) {
+            pkg = searchPkg(new File("/usr/share/doc/" + dependency.getPackageName() + "/apidocs/index.html"));
+        }
+        if (pkg == null) {
+            pkg = searchPkg(new File("/usr/share/doc/" + dependency.getPackageName() + "-doc/apidocs/index.html"));
+        }
+        return pkg;
     }
 
     public DebianDependency searchPkg(File fileToSearch) {
