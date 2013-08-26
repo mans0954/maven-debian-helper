@@ -4,6 +4,8 @@ maven-debian-helper (1.6.6) UNRELEASED; urgency=low
   * Added org.codehaus.mojo:ianal-maven-plugin to the ignored plugins
   * Updated the Maven dependency on maven-repo-helper (1.8.4)
   * Improved the detection of the documentation packages
+  * Fixed an IllegalArgumentException when a documentation package is not found
+    (Closes: #712506)
 
  -- Emmanuel Bourg <ebourg@apache.org>  Fri, 23 Aug 2013 22:46:59 +0200
 
