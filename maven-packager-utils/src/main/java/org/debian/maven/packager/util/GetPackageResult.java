@@ -19,6 +19,15 @@ package org.debian.maven.packager.util;
 import java.util.Set;
 import java.util.TreeSet;
 
+/**
+ * Parses the output of the <tt>dpkg --search</tt> and <tt>apt-file find</tt>
+ * commands and extracts the name of the packages matching the search criteria.
+ * <p>
+ * The format expected is:
+ * <pre>
+ *     &lt;pkg>: &lt;file>
+ * </pre>
+ */
 public class GetPackageResult implements OutputHandler {
 
     private final Set<String> result = new TreeSet<String>();
