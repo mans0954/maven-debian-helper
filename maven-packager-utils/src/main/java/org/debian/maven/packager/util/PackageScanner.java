@@ -175,10 +175,6 @@ public class PackageScanner {
         return jars;
     }
 
-    public void makeExecutable(String file) {
-        IOUtil.executeProcess(new String[]{"chmod", "+x", file}, new NoOutputHandler());
-    }
-
     public List<DebianDependency> addDocDependencies(Collection<DebianDependency> debianDeps, Map<DebianDependency,
         Dependency> versionedPackagesAndDependencies) {
         List<DebianDependency> docDeps = new ArrayList<DebianDependency>();

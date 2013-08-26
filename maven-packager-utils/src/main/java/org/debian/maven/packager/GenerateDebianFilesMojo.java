@@ -383,7 +383,7 @@ public class GenerateDebianFilesMojo extends AbstractMojo {
                     generateFile(context, "watch.svn.vm", outputDirectory, "watch");
                     generateFile(context, "orig-tar.svn.vm", outputDirectory, "orig-tar.sh");
 
-                    scanner.makeExecutable("debian/orig-tar.sh");
+                    new File("debian/orig-tar.sh").setExecutable(true);
 
                 } else {
                     System.err.println("Cannot locate the version in the download url (" + downloadUrl + ").");
@@ -402,7 +402,7 @@ public class GenerateDebianFilesMojo extends AbstractMojo {
             generateFile(context, "compat.vm", outputDirectory, "compat");
             generateFile(context, rulesTemplate, outputDirectory, "rules");
 
-            scanner.makeExecutable("debian/rules");
+            new File("debian/rules").setExecutable(true);
 
             String debianVersion = projectVersion.replace("-alpha-", "~alpha");
             debianVersion = debianVersion.replace("-beta-", "~beta");
