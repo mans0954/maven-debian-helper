@@ -42,18 +42,18 @@ public class PackageScanner {
     }
 
     public DebianDependency searchPkg(File dir, String extension) {
-        GetPackageContainingPatternResult packageResult = new GetPackageContainingPatternResult(extension);
-        File cacheId = new File(dir, "<ANY>" + extension);
-
+        // lookup the cache first
+        File cacheId = new File(dir, "<ANY>" + extension);        
         if (filesInPackages.containsKey(cacheId)) {
             return new DebianDependency(filesInPackages.get(cacheId));
         }
 
+        GetPackageContainingPatternResult packageResult = new GetPackageContainingPatternResult(extension);
+
         IOUtil.executeProcess(new String[]{"dpkg", "--search", dir.getAbsolutePath() + "/*/*"}, packageResult);
 
-        String pkg = null;
         if (!packageResult.getPackages().isEmpty()) {
-            pkg = packageResult.getPackages().iterator().next();
+            String pkg = packageResult.getPackages().iterator().next();
             filesInPackages.put(cacheId, pkg);
             return new DebianDependency(pkg);
         }
@@ -70,10 +70,12 @@ public class PackageScanner {
         }
         IOUtil.executeProcess(new String[]{"apt-file", "search", dir.getAbsolutePath()}, packageResult);
         if (!packageResult.getPackages().isEmpty()) {
-            pkg = packageResult.getPackages().iterator().next();
+            String pkg = packageResult.getPackages().iterator().next();
             filesInPackages.put(cacheId, pkg);
+            new DebianDependency(pkg);
         }
-        return pkg == null ? null : new DebianDependency(pkg);
+        
+        return null; 
     }
 
 
@@ -92,16 +94,16 @@ public class PackageScanner {
     }
 
     public DebianDependency searchPkg(File fileToSearch) {
-        GetPackageResult packageResult = new GetPackageResult();
-
+        // lookup the cache first
         if (filesInPackages.containsKey(fileToSearch)) {
             return new DebianDependency(filesInPackages.get(fileToSearch));
         }
 
-        String pkg = null;
+        GetPackageResult packageResult = new GetPackageResult();
+
         IOUtil.executeProcess(new String[]{"dpkg", "--search", fileToSearch.getAbsolutePath()}, packageResult);
         if (!packageResult.getResult().isEmpty()) {
-            pkg = packageResult.getResult().iterator().next();
+            String pkg = packageResult.getResult().iterator().next();
             filesInPackages.put(fileToSearch, pkg);
             return new DebianDependency(pkg);
         }
@@ -118,10 +120,12 @@ public class PackageScanner {
         }
         IOUtil.executeProcess(new String[]{"apt-file", "search", fileToSearch.getAbsolutePath()}, packageResult);
         if (!packageResult.getResult().isEmpty()) {
-            pkg = packageResult.getResult().iterator().next();
+            String pkg = packageResult.getResult().iterator().next();
             filesInPackages.put(fileToSearch, pkg);
+            return new DebianDependency(pkg);
         }
-        return new DebianDependency(pkg);
+        
+        return null;
     }
 
     public String getPackageVersion(DebianDependency pkg, boolean onlyInstalled) {
@@ -151,8 +155,7 @@ public class PackageScanner {
         }
         System.out.println();
         System.out.println("Looking for shared jars in package " + library + "...");
-        IOUtil.executeProcess(new String[]{"dpkg", "--listfiles", library},
-                new SharedJarOutputHandler(jars));
+        IOUtil.executeProcess(new String[]{"dpkg", "--listfiles", library}, new SharedJarOutputHandler(jars));
         cacheOfSharedJars.put(library, jars);
         return jars;
     }
