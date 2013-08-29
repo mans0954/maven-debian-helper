@@ -1,5 +1,8 @@
 Information about ${package}
-------------------------------
+#set($underline = "-")
+#set($end = $package.length())
+#foreach($i in [1 .. $end])$underline#end
+------------------
 
 This package was debianized using the mh_make command
 from the maven-debian-helper package.
