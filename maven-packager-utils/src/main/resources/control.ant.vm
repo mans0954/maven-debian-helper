@@ -25,7 +25,7 @@ Build-Depends-Indep:#printDependencies($buildDependencies)$space
 Standards-Version: 3.9.4
 Vcs-Svn: svn://anonscm.debian.org/pkg-java/trunk/${package}
 Vcs-Browser: http://anonscm.debian.org/viewvc/pkg-java/trunk/${package}
-Homepage:#if(${project.Url}) ${project.Url} #else TODO #end
+Homepage:#if(${project.Url}) ${project.Url}#else TODO #end
 
 
 Package: ${binPackage}
