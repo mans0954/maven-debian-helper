@@ -314,7 +314,7 @@ public class DependenciesSolver {
             getRepository().registerPom(projectPom, pom);
             // Also register automatically the test jar which may accompany the current jar and be
             // used in another module of the same project
-            if ("jar".equals(pom.getThisPom().getType())) {
+            if (pom.getThisPom().isJar()) {
                 POMInfo testPom = (POMInfo) pom.clone();
                 testPom.getThisPom().setType("test-jar");
                 getRepository().registerPom(projectPom, testPom);
@@ -356,7 +356,7 @@ public class DependenciesSolver {
                 }
             }
 
-            if (interactive && !explicitlyMentionedInRules && !"maven-plugin".equals(pom.getThisPom().getType())) {
+            if (interactive && !explicitlyMentionedInRules && !pom.getThisPom().isPlugin()) {
                 Rule selectedRule = userInteraction.askForVersionRule(pom.getThisPom(), versionToRules, defaultRules);
                 versionToRules.put(pom.getThisPom().getVersion(), selectedRule);
                 if (selectedRule.getPattern().equals("CUSTOM")) {
@@ -372,7 +372,7 @@ public class DependenciesSolver {
                 getRepository().registerPom(projectPom, transformedPom);
                 projectPoms.add(transformedPom.getThisPom());
 
-                if ("bundle".equals(pom.getThisPom().getType())) {
+                if (pom.getThisPom().isBundle()) {
                     String question2 = pom.getThisPom().getGroupId() + ":" + pom.getThisPom().getArtifactId() +
                             " is a bundle.\n"
                             + "Inform mh_make that dependencies of type jar which may match this library should be transformed into bundles automatically?";
@@ -456,7 +456,7 @@ public class DependenciesSolver {
     private static boolean canBeSkippedBecauseAntIsUsedForPackaging(Dependency thisPom, String packageType, Dependency dependency, boolean runTests, boolean verbose) {
         if (!packageType.equals("ant")) return false;
 
-        if ("maven-plugin".equals(dependency.getType()) && !thisPom.getType().equals("pom")) {
+        if (dependency.isPlugin() && !thisPom.isPom()) {
             if(verbose) System.out.println("[skipped - Maven plugins are not used during a build with Ant]");
             return true;
         }
@@ -559,7 +559,7 @@ public class DependenciesSolver {
             }
         }
 
-        if (pom == null && "maven-plugin".equals(dependency.getType())) {
+        if (pom == null && dependency.isPlugin()) {
             List<POMInfo> matchingPoms = getRepository().searchMatchingPOMsIgnoreVersion(dependency);
             if (matchingPoms.size() > 1) {
                 issues.add(sourcePomLoc + ": More than one version matches the plugin " + dependency.getGroupId() + ":"
@@ -577,7 +577,7 @@ public class DependenciesSolver {
             if (management) {
                 if (verbose) System.out.println("[skipped dependency or plugin management]");
                 return null;
-            } else if ("maven-plugin".equals(dependency.getType()) && packageType.equals("ant")) {
+            } else if (dependency.isPlugin() && packageType.equals("ant")) {
                 if (verbose) System.out.println("[skipped - not used in Ant build]");
                 return null;
             }
@@ -596,7 +596,7 @@ public class DependenciesSolver {
         // libraries from jar type into bundle types, and apply as well the version substitution (for example to 2.x)
         // for Debian.
         //
-        if (pom == null && "jar".equals(dependency.getType())) {
+        if (pom == null && dependency.isJar()) {
             if (verbose) System.out.println("[check dependency with bundle type]");
 
             Dependency bundleDependency = dependency.builder().setType("bundle").build();
@@ -703,7 +703,7 @@ public class DependenciesSolver {
         // Handle the case of Maven plugins built and used in a multi-module build:
         // they need to be added to maven.cleanIgnoreRules to avoid errors during
         // a mvn clean
-        if ("maven-plugin".equals(dependency.getType()) && containsDependencyIgnoreVersion(projectPoms, dependency)) {
+        if (dependency.isPlugin() && containsDependencyIgnoreVersion(projectPoms, dependency)) {
             String ruleDef = dependency.getGroupId() + " " + dependency.getArtifactId() + " maven-plugin *";
             pomTransformer.getRulesFiles().get(CLEAN).add(new DependencyRule(ruleDef));
         }
@@ -726,7 +726,7 @@ public class DependenciesSolver {
                 if (buildTime) {
                     if ("test".equals(dependency.getScope())) {
                         debianDeps.add(TEST, libraryWithVersionConstraint);
-                    } else if ("maven-plugin".equals(dependency.getType())) {
+                    } else if (dependency.isPlugin()) {
                         if (!packageType.equals("ant")) {
                             debianDeps.add(COMPILE, libraryWithVersionConstraint);
                         }

@@ -180,7 +180,7 @@ public class PackageScanner {
         List<DebianDependency> docDeps = new ArrayList<DebianDependency>();
         for (DebianDependency dependency : debianDeps) {
             Dependency runtimeDependency = versionedPackagesAndDependencies.get(dependency);
-            if (runtimeDependency != null && "pom".equals(runtimeDependency.getType())) {
+            if (runtimeDependency != null && runtimeDependency.isPom()) {
                 continue;
             }
             DebianDependency docPkg = searchJavaDocPkg(dependency);

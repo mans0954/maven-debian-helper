@@ -180,7 +180,7 @@ public class IgnoreDependencyQuestions {
     }
 
     public String askIgnoreNeededDependency(String sourcePomLoc, Dependency dependency) {
-        String type = "maven-plugin".equals(dependency.getType()) ? "plugin" : "dependency";
+        String type = dependency.isPlugin() ? "plugin" : "dependency";
         String question = "This " + type + " cannot be found in the Debian Maven repository. Ignore this " + type + "?";
 
         if (!askIgnoreDependency(sourcePomLoc, dependency, question, false)) {
