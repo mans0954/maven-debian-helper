@@ -2,12 +2,19 @@ maven-debian-helper (1.6.6) UNRELEASED; urgency=low
 
   * Added com.github.github:site-maven-plugin to the ignored plugins
   * Added org.codehaus.mojo:ianal-maven-plugin to the ignored plugins
-  * Added com.mycila.maven-license-plugin:maven-license-plugin to the ignored plugins
+  * Added com.mycila.maven-license-plugin:maven-license-plugin
+    to the ignored plugins
   * Added wagon-gitsite to the ignored extensions
   * Updated the Maven dependency on maven-repo-helper (1.8.4)
   * Improved the detection of the documentation packages
   * Fixed an IllegalArgumentException when a documentation package is not found
     (Closes: #712506)
+
+  [ Steffen Moeller ]
+  * Removed the trailing white space after the Homepage field
+    in the generated control file
+  * Fixed the length of the separator underlining the title
+    in the generated README.source
 
  -- Emmanuel Bourg <ebourg@apache.org>  Fri, 23 Aug 2013 22:46:59 +0200
 
