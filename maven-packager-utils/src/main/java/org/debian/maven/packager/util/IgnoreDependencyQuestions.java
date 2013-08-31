@@ -97,6 +97,8 @@ public class IgnoreDependencyQuestions {
         {"org.apache.maven.wagon", "wagon-webdav"},
         {"org.apache.maven.wagon", "wagon-webdav-jackrabbit"},
         {"org.jvnet.wagon-svn", "wagon-svn"},
+        {"org.kathrynhuxtable.maven.wagon", "wagon-gitsite"},
+        {"com.github.stephenc.wagon", "wagon-gitsite"},
         {"com.google.code.maven-svn-wagon", "maven-svn-wagon"},
     };
 
