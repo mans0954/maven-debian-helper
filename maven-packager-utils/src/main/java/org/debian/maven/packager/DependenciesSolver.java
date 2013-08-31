@@ -25,6 +25,8 @@ import java.io.LineNumberReader;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -83,12 +85,16 @@ public class DependenciesSolver {
     private boolean filterModules = false;
     boolean verbose = false;
     private Map<String, POMInfo> pomInfoCache = new HashMap<String, POMInfo>();
-    // Keep the original POMs for reference
+
+    /** The original POMs for reference */
     private Map<String, POMInfo> originalPomInfoCache = new HashMap<String, POMInfo>();
-    // Keep the previous selected rule for a given version
+
+    /** Map of the previously selected rule for a given version */
     private Map<String, Rule> versionToRules = new HashMap<String, Rule>();
-    // Keep the list of packages and dependencies
+
+    /** List of packages and dependencies */
     private Map<DebianDependency, Dependency> versionedPackagesAndDependencies = new HashMap<DebianDependency, Dependency>();
+
     private List<Rule> defaultRules = new ArrayList<Rule>();
     private PackageScanner scanner;
 
@@ -101,12 +107,9 @@ public class DependenciesSolver {
         pomTransformer.setFixVersions(false);
         pomTransformer.setRulesFiles(initDependencyRuleSetFiles(outputDirectory, verbose));
 
-        Rule toDebianRule = new Rule("s/.*/debian/", "Change the version to the symbolic 'debian' version");
-        Rule keepVersionRule = new Rule("*", "Keep the version");
-        Rule customRule = new Rule("CUSTOM", "Custom rule");
-        defaultRules.add(toDebianRule);
-        defaultRules.add(keepVersionRule);
-        defaultRules.add(customRule);
+        defaultRules.add(new Rule("s/.*/debian/", "Change the version to the symbolic 'debian' version"));
+        defaultRules.add(new Rule("*", "Keep the version"));
+        defaultRules.add(new Rule("CUSTOM", "Custom rule"));
     }
 
     public static DependencyRuleSetFiles initDependencyRuleSetFiles(File outputDirectory, boolean verbose) {
@@ -357,12 +360,12 @@ public class DependenciesSolver {
             }
 
             if (interactive && !explicitlyMentionedInRules && !pom.getThisPom().isPlugin()) {
-                Rule selectedRule = userInteraction.askForVersionRule(pom.getThisPom(), versionToRules, defaultRules);
+                Rule selectedRule = askForVersionRule(pom.getThisPom());
                 versionToRules.put(pom.getThisPom().getVersion(), selectedRule);
                 if (selectedRule.getPattern().equals("CUSTOM")) {
-                    String s = userInteraction.ask("Enter the pattern for your custom rule (in the form s/regex/replace/)")
+                    String rule = userInteraction.ask("Enter the pattern for your custom rule (in the form s/regex/replace/)")
                                .toLowerCase();
-                    selectedRule = new Rule(s, "My custom rule " + s);
+                    selectedRule = new Rule(rule, "My custom rule " + rule);
                     defaultRules.add(selectedRule);
                 }
 
@@ -420,6 +423,60 @@ public class DependenciesSolver {
             log.log(Level.SEVERE, "", ex);
             System.exit(1);
         }
+    }
+
+    /**
+     * Asks the user to specify the substitution rule for the version.
+     * 
+     * @param dependency
+     * @return the version rule selected
+     */
+    public Rule askForVersionRule(Dependency dependency) {
+        String question = "\n"
+                + "Version of " + dependency.getGroupId() + ":"
+                + dependency.getArtifactId() + " is " + dependency.getVersion()
+                + "\nChoose how the version will be transformed:";
+
+        List<Rule> choices = getVersionRules(dependency.getVersion());       
+        
+        // select the default choice (either the previously selected rule or the 'debian' version rule)
+        int defaultChoice = 1; // the 'debian' version rule is the first one of the default rules
+        if (versionToRules.containsKey(dependency.getVersion())) {
+            Rule previouslySelectedRule = versionToRules.get(dependency.getVersion());
+            if (choices.contains(previouslySelectedRule)) {
+                defaultChoice = choices.indexOf(previouslySelectedRule);
+            }
+        }
+
+        List<String> choicesDescriptions = new ArrayList<String>();
+        for (Rule choice : choices) {
+            choicesDescriptions.add(choice.getDescription());
+        }
+
+        int choice = userInteraction.askChoices(question, defaultChoice, choicesDescriptions);
+        return choices.get(choice);
+    }
+
+    /**
+     * Returns the substitution rules for the specified version.
+     */
+    private List<Rule> getVersionRules(String version) {
+        List<Rule> rules = new ArrayList<Rule>();
+
+        // add the 1.0 -> 1.x rule
+        Pattern p = Pattern.compile("(\\d+)(\\..*)");
+        Matcher matcher = p.matcher(version);
+        if (matcher.matches()) {
+            String mainVersion = matcher.group(1);
+            Rule mainVersionRule = new Rule("s/" + mainVersion + "\\..*/" + mainVersion + ".x/",
+                    "Replace all versions starting by " + mainVersion + ". with " + mainVersion + ".x");
+            rules.add(mainVersionRule);
+        }
+        
+        // add the default rules
+        rules.addAll(defaultRules);
+        
+        return rules;
     }
 
     private POMInfo getPOM(File projectPom) throws XMLStreamException, IOException {

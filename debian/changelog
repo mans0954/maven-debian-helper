@@ -1,5 +1,8 @@
 maven-debian-helper (1.6.6) UNRELEASED; urgency=low
 
+  * The version rule selected by default is now the symbolic 'debian' version
+  * The choices for the version rule are no longer reordered but the previous
+    choice is still selected by default
   * Added com.github.github:site-maven-plugin to the ignored plugins
   * Added org.codehaus.mojo:ianal-maven-plugin to the ignored plugins
   * Added com.mycila.maven-license-plugin:maven-license-plugin
