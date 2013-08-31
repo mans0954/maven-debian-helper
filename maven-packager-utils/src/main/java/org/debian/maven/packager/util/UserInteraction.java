@@ -13,7 +13,7 @@ public class UserInteraction {
         YESNO.add("n");
     }
 
-    public String readLine() {
+    private String readLine() {
         LineNumberReader consoleReader = new LineNumberReader(new InputStreamReader(System.in));
         try {
             return consoleReader.readLine().trim();
@@ -113,11 +113,11 @@ public class UserInteraction {
         return sb.toString();
     }
 
-    public void println(String text) {
+    private void println(String text) {
         System.out.println(text);
     }
 
-    public void print(String text) {
+    private void print(String text) {
         System.out.print(text);
     }
 }
