@@ -2,48 +2,78 @@ package org.debian.maven.packager;
 
 import java.util.regex.Pattern;
 
-import static org.debian.maven.util.Preconditions.*;
-
+/**
+ * A dependency on a Debian package, with an optional minimum version.
+ * 
+ * @since 1.8
+ */
 public class DebianDependency implements Comparable<DebianDependency> {
 
-    private static final Pattern VALID_DEBIAN_PACKAGE_NAME = Pattern.compile("^[a-z0-9][a-z0-9+-.]+$");
+    /**
+     * Pattern for valid package names according to the Debian Policy 5.6.1.
+     *
+     * Package names must consist only of lower case letters (a-z), digits
+     * (0-9), plus (+) and minus (-) signs, and periods (.). They must be at
+     * least two characters long and must start with an alphanumeric character.
+     */
+    private static final Pattern DEBIAN_PACKAGE_NAME_PATTERN = Pattern.compile("^[a-z0-9][a-z0-9+-.]+$");
 
+    /** The name of the Debian package */
     private final String packageName;
+
+    /** The minimum version required (blank if not specified) */
     private final String minimumVersion;
 
-    public DebianDependency(String packageName, String minimumVersion) {
-        this.packageName = checkPackageName(packageName);
-        this.minimumVersion = checkNotNull(minimumVersion);
+    /**
+     * Creates a dependency on the specified package.
+     * 
+     * @param packageName the name of the Debian package
+     * @param minimumVersion the minimum version required, empty if none
+     * @throws IllegalArgumentException if the package name or the minimum version is not valid
+     */
+    public DebianDependency(String packageName, String minimumVersion) throws IllegalArgumentException {
+        // check the validity of the package name
+        if (packageName == null || !DEBIAN_PACKAGE_NAME_PATTERN.matcher(packageName).matches()) {
+            throw new IllegalArgumentException("Invalid package name: " + packageName);
+        }
+        
+        if (minimumVersion == null) {
+            throw new IllegalArgumentException("Invalid minimum version: " + minimumVersion);
+        }
+        
+        this.packageName = packageName;
+        this.minimumVersion = minimumVersion;
     }
 
-    public DebianDependency(String packageName) {
+    /**
+     * Creates a non version dependency on the specified package.
+     * 
+     * @param packageName the name of the Debian package
+     * @throws IllegalArgumentException if the package name is not valid
+     */
+    public DebianDependency(String packageName) throws IllegalArgumentException {
         this(packageName, "");
     }
 
-    public String toString() {
-        return minimumVersion.isEmpty() ? packageName : packageName + " (>= " + minimumVersion + ")";
-    }
-
+    /**
+     * Returns the name of the Debian package.
+     */
     public String getPackageName() {
         return packageName;
     }
 
     /**
-     * Check whether packageName is valid according to the Debian Policy 5.6.1.
+     * Returns the string representation of the dependency using the syntax
+     * of the Debian control files:
      * 
-     * Package names must consist only of lower case letters (a-z), digits
-     * (0-9), plus (+) and minus (-) signs, and periods (.). They must be at
-     * least two characters long and must start with an alphanumeric character.
+     * <pre>
+     *     foo (>= 1.0)
+     * </pre>
+     * 
+     * @return
      */
-    static boolean isValidDebianPackageName(String packageName) {
-        return VALID_DEBIAN_PACKAGE_NAME.matcher(packageName).matches();
-    }
-
-    static String checkPackageName(String packageName) {
-        if (packageName == null || !isValidDebianPackageName(checkNotEmpty(packageName))) {
-            throw new IllegalArgumentException("Invalid package name: " + packageName);
-        }
-        return packageName;
+    public String toString() {
+        return minimumVersion.isEmpty() ? packageName : packageName + " (>= " + minimumVersion + ")";
     }
 
     @Override

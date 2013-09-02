@@ -4,36 +4,66 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import static org.debian.maven.packager.DebianDependency.checkPackageName;
-import static org.debian.maven.packager.DebianDependency.isValidDebianPackageName;
-
 public class DebianDependencyTest {
 
     @Test
-    public void testIsValidDebianPackageName() {
-        assertTrue(isValidDebianPackageName("a-"));
-        assertTrue(isValidDebianPackageName("1-"));
-        assertTrue(isValidDebianPackageName("allthecharacters-+.0123456789"));
-        assertTrue(isValidDebianPackageName("a-b"));
-
-        assertFalse(isValidDebianPackageName("aaA")); // no uppercase
-        assertFalse(isValidDebianPackageName("aa a")); // no space
-        assertFalse(isValidDebianPackageName("a")); // minimum 2 characters
-        assertFalse(isValidDebianPackageName(""));
-        assertFalse(isValidDebianPackageName("-aa")); // must start with alphanumeric 
-        assertFalse(isValidDebianPackageName("aaß")); // only basic ascii alphabet
-        assertFalse(isValidDebianPackageName("a_a")); // no underscores
-    }
-
-    @Test
-    public void testCheckPackageNameReturnsInput() {
-        String packageName = "input-name+with.weird5name";
-        assertEquals(packageName, checkPackageName(packageName));
+    public void testValidDebianPackageName() {
+        new DebianDependency("a-");
+        new DebianDependency("1-");
+        new DebianDependency("allthecharacters-+.0123456789");
+        new DebianDependency("a-b");
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void testCheckPackageNameDoesNotAcceptNull() {
-        checkPackageName(null);
+    public void testNullDebianPackageName() {
+        new DebianDependency(null);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testEmptyDebianPackageName() {
+        new DebianDependency("");
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testDebianPackageNameWithUppercase() {
+        new DebianDependency("aaA"); // no uppercase
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testDebianPackageNameWithSpace() {
+        new DebianDependency("aa a"); // no space
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testTooShortDebianPackageName() {
+        new DebianDependency("a"); // minimum 2 characters
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testDebianPackageNameWithNonAlphanumericFirstChar() {
+        new DebianDependency("-aa"); // must start with alphanumeric
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testDebianPackageNameWithNonAscii() {
+        new DebianDependency("aaß"); // only basic ascii alphabet
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testDebianPackageNameWithUnderscore() {
+        new DebianDependency("a_a"); // no underscores
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testDebianPackageNameWithNullVersion() {
+        new DebianDependency("foo", null);
+    }
+
+    @Test
+    public void testGetPackageName() {
+        String name = "input-name+with.weird5name";
+        DebianDependency dependency = new DebianDependency(name);
+        assertEquals(name, dependency.getPackageName());
     }
 
     @Test
@@ -43,11 +73,11 @@ public class DebianDependencyTest {
         DebianDependency dep3 = new DebianDependency("maven-repo-helper", "1.0");
         DebianDependency dep4 = new DebianDependency("maven-repo-helper", "2.0");
         
-        assertFalse(dep1.equals(""));
-        assertTrue(dep1.equals(dep1));
-        assertTrue(dep1.equals(dep2));
-        assertFalse(dep2.equals(dep3));
-        assertFalse(dep3.equals(dep4));
+        assertFalse(dep1.equals(""));    // different class
+        assertTrue(dep1.equals(dep1));   // same instance
+        assertTrue(dep1.equals(dep2));   // same dependency, different instances
+        assertFalse(dep2.equals(dep3));  // different dependencies
+        assertFalse(dep3.equals(dep4));  // same dependency, different versions
     }
 
     @Test
