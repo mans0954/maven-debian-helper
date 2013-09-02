@@ -48,31 +48,35 @@ public class DebianDependency implements Comparable<DebianDependency> {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((minimumVersion == null) ? 0 : minimumVersion.hashCode());
-        result = prime * result + ((packageName == null) ? 0 : packageName.hashCode());
-        return result;
+        return packageName.hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
-        DebianDependency other = (DebianDependency) obj;
-        if (minimumVersion == null) {
-            if (other.minimumVersion != null) return false;
-        } else if (!minimumVersion.equals(other.minimumVersion)) return false;
-        if (packageName == null) {
-            if (other.packageName != null) return false;
-        } else if (!packageName.equals(other.packageName)) return false;
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof DebianDependency)) {
+            return false;
+        }
+        
+        DebianDependency that = (DebianDependency) obj;
+        
+        if (!minimumVersion.equals(that.minimumVersion)) {
+            return false;
+        }
+        if (!packageName.equals(that.packageName)) {
+            return false;
+        }
+        
         return true;
     }
 
     @Override
     public int compareTo(DebianDependency other) {
-        if(equals(other)) return 0;
+        if (equals(other)) {
+            return 0;
+        }
 
         return toString().compareTo(other.toString());
     }
