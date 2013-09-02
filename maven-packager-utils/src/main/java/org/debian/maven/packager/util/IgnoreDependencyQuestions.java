@@ -3,12 +3,12 @@ package org.debian.maven.packager.util;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.debian.maven.packager.interaction.YesNoQuestion;
 import org.debian.maven.repo.Dependency;
 
 public class IgnoreDependencyQuestions {
 
     private Set<Dependency> notIgnoredDependencies = new TreeSet<Dependency>();
-    private final UserInteraction userInteraction;
     private final boolean interactive;
 
     // Plugins not useful for the build or whose use is against the
@@ -105,9 +105,8 @@ public class IgnoreDependencyQuestions {
     };
 
 
-    public IgnoreDependencyQuestions(UserInteraction userInteraction, boolean interactive) {
+    public IgnoreDependencyQuestions(boolean interactive) {
         this.interactive = interactive;
-        this.userInteraction = userInteraction;
     }
 
 
@@ -131,8 +130,8 @@ public class IgnoreDependencyQuestions {
         if (!interactive || notIgnoredDependencies.contains(dependency)) {
             return false;
         }
-        String q = "\n" + "In " + sourcePomLoc + ":" + message + "  " + dependency;
-        boolean ignore = userInteraction.askYesNo(q, defaultToIgnore);
+        String question = "\n" + "In " + sourcePomLoc + ":" + message + "  " + dependency;
+        boolean ignore = new YesNoQuestion(question, defaultToIgnore).ask();
         if (!ignore) {
             notIgnoredDependencies.add(dependency);
         }

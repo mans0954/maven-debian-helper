@@ -17,14 +17,13 @@
 package org.debian.maven.packager.util;
 
 import org.apache.maven.model.License;
+import org.debian.maven.packager.interaction.SimpleQuestion;
 
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
 public class LicensesScanner {
-    private final UserInteraction userInteraction = new UserInteraction();
-
     public Set<String> discoverLicenses(List<License> projectLicenses) {
         Set<String> licenses = new TreeSet<String>();
         for (License license : projectLicenses) {
@@ -38,9 +37,8 @@ public class LicensesScanner {
             }
             boolean recognized = recognizeLicense(licenses, licenseName, licenseUrl);
             if (!recognized) {
-                String question = "License " + licenseName + licenseUrl + " was not recognized, please enter a license name preferably in one of:"
-                 + getAvailableLicenses();
-                String s = userInteraction.ask(question);
+                String s = new SimpleQuestion("License " + licenseName + licenseUrl + " was not recognized, " +
+                                        "please enter a license name preferably in one of:" + getAvailableLicenses()).ask();
                 if (s.length() > 0) {
                     licenses.add(s);
                 }
@@ -55,9 +53,8 @@ public class LicensesScanner {
         for (String license : licenseResult.getLicenses()) {
             boolean recognized = recognizeLicense(licenses, license, "");
             if (!recognized) {
-                String question = "License " + license + " was not recognized, please enter a license name preferably in one of:"
-                 + getAvailableLicenses();
-                String s = userInteraction.ask(question);
+                String s = new SimpleQuestion("License " + license + " was not recognized, " +
+                                        "please enter a license name preferably in one of:" + getAvailableLicenses()).ask();
                 if (s.length() > 0) {
                     licenses.add(s);
                 }
@@ -65,9 +62,7 @@ public class LicensesScanner {
         }
 
         if (licenses.isEmpty()) {
-            String question = "License was not found, please enter a license name preferably in one of:"
-             + getAvailableLicenses();
-            String s = userInteraction.ask(question);
+            String s = new SimpleQuestion("License was not found, please enter a license name preferably in one of:" + getAvailableLicenses()).ask();
             if (s.length() > 0) {
                 licenses.add(s);
             }

@@ -16,20 +16,30 @@
 
 package org.debian.maven.packager;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.TreeSet;
+
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Developer;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-
-import java.io.*;
-import java.util.*;
-
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.MavenProject;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.debian.maven.packager.interaction.MultilineQuestion;
+import org.debian.maven.packager.interaction.SimpleQuestion;
 import org.debian.maven.packager.util.LicensesScanner;
 import org.debian.maven.packager.util.PackageScanner;
-import org.debian.maven.packager.util.UserInteraction;
 import org.debian.maven.repo.ListOfPOMs;
 
 /**
@@ -147,7 +157,6 @@ public class GenerateDebianFilesMojo extends AbstractMojo {
 
     private PackageScanner scanner = new PackageScanner(false);
     private LicensesScanner licensesScanner = new LicensesScanner();
-    private UserInteraction userInteraction = new UserInteraction();
 
     public void execute() throws MojoExecutionException {
         File f = outputDirectory;
@@ -183,10 +192,10 @@ public class GenerateDebianFilesMojo extends AbstractMojo {
             context.put("generateJavadoc", Boolean.valueOf(generateJavadoc));
 
             if (project.getName() == null || project.getName().isEmpty()) {
-                project.setName(userInteraction.ask("POM does not contain the project name. Please enter the name of the project:"));
+                project.setName(new SimpleQuestion("POM does not contain the project name. Please enter the name of the project:").ask());
             }
             if (project.getUrl() == null || project.getUrl().isEmpty()) {
-                project.setUrl(userInteraction.ask("POM does not contain the project URL. Please enter the URL of the project:"));
+                project.setUrl(new SimpleQuestion("POM does not contain the project URL. Please enter the URL of the project:").ask());
             }
 
             Set<String> licenses = licensesScanner.discoverLicenses(project.getLicenses());
@@ -199,7 +208,7 @@ public class GenerateDebianFilesMojo extends AbstractMojo {
                 String q = "Packager license for the debian/ files was not found, please enter a license name preferably in one of:\n"
                  + "Apache Artistic BSD FreeBSD ISC CC-BY CC-BY-SA CC-BY-ND CC-BY-NC CC-BY-NC-SA CC-BY-NC-ND CC0 CDDL CPL Eiffel"
                  + "Expat GPL LGPL GFDL GFDL-NIV LPPL MPL Perl PSF QPL W3C-Software ZLIB Zope";
-                String s = userInteraction.ask(q);
+                String s = new SimpleQuestion(q).ask();
                 if (s.length() > 0) {
                     packagerLicense = s;
                 }
@@ -223,7 +232,7 @@ public class GenerateDebianFilesMojo extends AbstractMojo {
                 }
             }
             if (copyrightOwner == null || copyrightOwner.isEmpty()) {
-                copyrightOwner = userInteraction.ask("Could not find who owns the copyright for the upstream sources, please enter his name:");
+                copyrightOwner = new SimpleQuestion("Could not find who owns the copyright for the upstream sources, please enter his name:").ask();
             }
             context.put("copyrightOwner", copyrightOwner);
 
@@ -246,7 +255,7 @@ public class GenerateDebianFilesMojo extends AbstractMojo {
             context.put("currentYear", new Integer(currentYear));
 
             if (project.getDescription() == null || project.getDescription().trim().isEmpty()) {
-                project.setDescription(userInteraction.askMultiLine("Please enter a short description of the project, press Enter twice to stop."));
+                project.setDescription(new MultilineQuestion("Please enter a short description of the project, press Enter twice to stop.").ask());
             }
             context.put("description", formatDescription(project.getDescription()));
 
