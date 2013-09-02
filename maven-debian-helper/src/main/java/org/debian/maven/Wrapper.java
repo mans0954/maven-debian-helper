@@ -31,9 +31,6 @@ import org.codehaus.classworlds.ClassWorld;
  */
 public class Wrapper {
 
-    /** Holds system properties */
-    private static Properties systemProperties = System.getProperties();
-
     /** Holds extra properties that are read from property files */
     private static Properties extraProperties = new Properties();
 
@@ -45,7 +42,7 @@ public class Wrapper {
      * properties into extraProperties
      */
     public static void updateProperties(String key) throws IOException {
-        String filename = systemProperties.getProperty(key);
+        String filename = System.getProperty(key);
         if (filename == null) {
             return;
         }
