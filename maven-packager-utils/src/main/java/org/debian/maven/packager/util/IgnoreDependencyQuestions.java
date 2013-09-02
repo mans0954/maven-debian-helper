@@ -11,8 +11,32 @@ public class IgnoreDependencyQuestions {
     private Set<Dependency> notIgnoredDependencies = new TreeSet<Dependency>();
     private final boolean interactive;
 
-    // Plugins not useful for the build or whose use is against the
-    // Debian policy
+    /** Dependencies to ignore, because they have been integrated to recent versions of the JRE */
+    private static final String[][] DEPENDENCIES_TO_IGNORE = {
+        // JAXB (added to Java 6)
+        {"jaxme", "jaxme-api"},
+        {"jaxme", "jaxmeapi"},
+        {"org.apache.ws.jaxme", "jaxmeapi"},
+        {"org.apache.geronimo.specs", "geronimo-jaxb_2.1_spec"},
+        {"org.apache.geronimo.specs", "geronimo-jaxb_2.2_spec"},
+        {"jaxb", "jsr173_api"},
+        // Java Activation Framework (added to Java 6)
+        {"activation", "activation"},
+        {"javax.activation", "activation"},
+        {"jaf", "activation"},
+        {"org.apache.geronimo.specs", "geronimo-activation_1.0.2_spec"},
+        {"org.apache.geronimo.specs", "geronimo-activation_1.1_spec"},
+        // JMX (added to Java 5)
+        {"mx4j", "mx4j"},
+        {"mx4j", "mx4j-jmx"},
+        // Java XML Streaming API (added to Java 6)
+        {"stax", "stax"},
+        {"stax", "stax-api"},
+        {"javax.xml.stream", "stax-api"},
+        {"org.apache.geronimo.specs", "geronimo-stax-api_1.2_spec"},
+    };
+
+    /** Plugins not useful for the build or whose use is against the Debian policy */
     private static final String[][] PLUGINS_TO_IGNORE = {
         {"org.apache.maven.plugins", "maven-archetype-plugin"},
         {"org.apache.maven.plugins", "changelog-maven-plugin"},
@@ -32,6 +56,7 @@ public class IgnoreDependencyQuestions {
         {"org.codehaus.mojo", "scmchangelog-maven-plugin"},
         {"com.github.github", "site-maven-plugin"},
     };
+
     private static final String[][] PLUGINS_THAT_CAN_BE_IGNORED = {
         {"org.apache.maven.plugins", "maven-ant-plugin"},
         {"org.apache.maven.plugins", "maven-assembly-plugin"},
@@ -50,6 +75,7 @@ public class IgnoreDependencyQuestions {
         {"org.codehaus.mojo", "shitty-maven-plugin"},
         {"com.mycila.maven-license-plugin", "maven-license-plugin"},
     };
+
     private static final String[][] DOC_PLUGINS = {
         {"org.apache.maven.plugins", "maven-changelog-plugin"},
         {"org.apache.maven.plugins", "maven-changes-plugin"},
@@ -79,6 +105,7 @@ public class IgnoreDependencyQuestions {
         {"org.codehaus.mojo", "surefire-report-maven-plugin"},
         {"org.jboss.maven.plugins", "maven-jdocbook-plugin"},
     };
+
     private static final String[][] TEST_PLUGINS = {
         {"org.apache.maven.plugins", "maven-failsafe-plugin"},
         {"org.apache.maven.plugins", "maven-surefire-plugin"},
@@ -88,7 +115,9 @@ public class IgnoreDependencyQuestions {
         {"org.codehaus.mojo", "selenium-maven-plugin"},
         {"org.codehaus.mojo", "dbunit-maven-plugin"},
         {"org.codehaus.mojo", "failsafe-maven-plugin"},
-        {"org.codehaus.mojo", "shitty-maven-plugin"},};
+        {"org.codehaus.mojo", "shitty-maven-plugin"},
+    };
+
     private static final String[][] EXTENSIONS_TO_IGNORE = {
         {"org.apache.maven.wagon", "wagon-ssh"},
         {"org.apache.maven.wagon", "wagon-ssh-external"},
@@ -140,6 +169,11 @@ public class IgnoreDependencyQuestions {
 
     public boolean askIgnoreUnnecessaryDependency(Dependency dependency, String sourcePomLoc,
                                                   boolean runTests, boolean generateJavadoc) {
+
+        if (containsPlugin(DEPENDENCIES_TO_IGNORE, dependency)
+         && askIgnoreDependency(sourcePomLoc, dependency,
+         "This dependency is now provided by the JRE. Ignore this dependency?"))
+            return true;
 
         if (containsPlugin(PLUGINS_TO_IGNORE, dependency)
          && askIgnoreDependency(sourcePomLoc, dependency,
