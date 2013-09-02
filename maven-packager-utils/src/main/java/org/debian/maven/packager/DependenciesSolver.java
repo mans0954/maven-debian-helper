@@ -116,12 +116,13 @@ public class DependenciesSolver {
 
     public static DependencyRuleSetFiles initDependencyRuleSetFiles(File outputDirectory, boolean verbose) {
         DependencyRuleSetFiles depFiles = new DependencyRuleSetFiles();
-        for(RulesType type : RulesType.values()) {
-            if(type.filename == null) continue;
-            File rulesFile = new File(outputDirectory, type.filename);
-            String description = readResource(type.descriptionResource);
-            DependencyRuleSet ruleSet = DependencyRuleSet.readRules(rulesFile, description, verbose, false);
-            depFiles.get(type).addAll(ruleSet);
+        for (RulesType type : RulesType.values()) {
+            if (type.filename != null) {
+                File rulesFile = new File(outputDirectory, type.filename);
+                String description = readResource(type.descriptionResource);
+                DependencyRuleSet ruleSet = DependencyRuleSet.readRules(rulesFile, description, verbose, false);
+                depFiles.get(type).addAll(ruleSet);
+            }
         }
 
         return depFiles;
@@ -962,7 +963,7 @@ public class DependenciesSolver {
         solver.saveSubstvars();
 
         if (!solver.issues.isEmpty()) {
-            System.err.println("Some problems where found in this project, exiting...");
+            System.err.println("Some problems were found in this project, exiting...");
             System.exit(1);
         }
     }
