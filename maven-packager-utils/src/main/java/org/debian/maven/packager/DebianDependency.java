@@ -35,13 +35,13 @@ public class DebianDependency implements Comparable<DebianDependency> {
      * (0-9), plus (+) and minus (-) signs, and periods (.). They must be at
      * least two characters long and must start with an alphanumeric character.
      */
-    public static boolean isValidDebianPackageName(String packageName) {
+    static boolean isValidDebianPackageName(String packageName) {
         return VALID_DEBIAN_PACKAGE_NAME.matcher(packageName).matches();
     }
 
-    public static String checkPackageName(String packageName) {
+    static String checkPackageName(String packageName) {
         if (packageName == null || !isValidDebianPackageName(checkNotEmpty(packageName))) {
-            throw new IllegalArgumentException("Not a valid package name: " + packageName);
+            throw new IllegalArgumentException("Invalid package name: " + packageName);
         }
         return packageName;
     }
