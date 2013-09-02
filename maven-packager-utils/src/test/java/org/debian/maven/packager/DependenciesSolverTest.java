@@ -16,12 +16,12 @@
 
 package org.debian.maven.packager;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.LineNumberReader;
 import java.io.Reader;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -306,8 +306,8 @@ public class DependenciesSolverTest extends TestCase {
     protected void assertFileEquals(String resource, String fileName) throws Exception {
         File file = new File(testDir, fileName);
         assertTrue(file.exists());
-        LineNumberReader fileReader = new LineNumberReader(new FileReader(file));
-        LineNumberReader refReader = new LineNumberReader(read(resource));
+        BufferedReader fileReader = new BufferedReader(new FileReader(file));
+        BufferedReader refReader = new BufferedReader(read(resource));
 
         String ref, test = null;
         boolean skipReadTest = false;

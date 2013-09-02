@@ -20,7 +20,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.LineNumberReader;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -53,7 +52,7 @@ public class IOUtil {
 
                     public void run() {
                         try {
-                            LineNumberReader in = new LineNumberReader(new BufferedReader(new InputStreamReader(process.getInputStream())));
+                            BufferedReader in = new BufferedReader(new BufferedReader(new InputStreamReader(process.getInputStream())));
                             String line;
                             while ((line = in.readLine()) != null) {
                                 handler.newLine(line);
