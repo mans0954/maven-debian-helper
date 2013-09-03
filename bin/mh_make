@@ -107,7 +107,7 @@ fi
 if [ -z "$RUN_TESTS" ]; then
 	echo
     echo "Run tests while building the package?"
-    read -p "[y]/n > " RUN
+    read -p "[Y/n] > " RUN
     RUN_TESTS="true"
     if [ "$RUN" == "n" ]; then
         RUN_TESTS=
@@ -117,7 +117,7 @@ fi
 if [ -z "$GEN_JAVADOC" ]; then
 	echo
     echo "Generate the Javadoc while building the package?"
-    read -p "[y]/n > " GEN
+    read -p "[Y/n] > " GEN
     GEN_JAVADOC="true"
     if [ "$GEN" == "n" ]; then
         GEN_JAVADOC=
