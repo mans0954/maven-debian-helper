@@ -11,6 +11,8 @@ maven-debian-helper (1.6.6) UNRELEASED; urgency=low
   * Ignore the dependencies provided by the JRE (JAF, JMX, JAXB, StAX)
   * Ask the questions again if the response is not valid
   * Depend on maven-repo-helper >= 1.8.5
+  * Build depend on debhelper 9
+  * The generated packages now depend on debhelper 9
   * Improved the detection of the documentation packages
   * Fixed an IllegalArgumentException when a documentation package is not found
     (Closes: #712506)
