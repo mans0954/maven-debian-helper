@@ -5,12 +5,12 @@
 #
 
 VERSION=$2
-TAR=../${package}_$VERSION.orig.tar.gz
+TAR=../${package}_$VERSION.orig.tar.xz
 DIR=${package}-$VERSION
 TAG=$(echo "${tagMarker}$VERSION" | sed -re's/~(alpha|beta)/-\1-/')
 
 svn export ${baseUrl}/${TAG}${suffixUrl} $DIR
-GZIP=--best tar -c -z -f $TAR --exclude '*.jar' --exclude '*.class' $DIR
+XZ_OPT=--best tar -c -J -f $TAR --exclude '*.jar' --exclude '*.class' $DIR
 rm -rf $DIR ../$TAG
 
 # move to directory 'tarballs'

@@ -17,6 +17,7 @@ maven-debian-helper (1.6.6) UNRELEASED; urgency=low
   * Fixed an IllegalArgumentException when a documentation package is not found
     (Closes: #712506)
   * Added a header to orig-tar.svn.vm
+  * Use XZ compression for the upstream tarball in the generated orig-tar.sh
 
   [ Steffen Moeller ]
   * Removed the trailing white space after the Homepage field
