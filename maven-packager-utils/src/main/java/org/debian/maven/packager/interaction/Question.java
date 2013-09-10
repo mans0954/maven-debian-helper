@@ -61,6 +61,7 @@ public abstract class Question<T> {
 
     protected void print(String text) {
         out.print(text);
+        out.flush();
     }
 
     /**
