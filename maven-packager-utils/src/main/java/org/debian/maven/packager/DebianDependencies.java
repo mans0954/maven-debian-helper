@@ -13,7 +13,7 @@ public class DebianDependencies {
     public final EnumMap<Type, Set<DebianDependency>> deps = new EnumMap<Type, Set<DebianDependency>>(Type.class);
 
     public DebianDependencies() {
-        for(Type type : Type.values()) {
+        for (Type type : Type.values()) {
             deps.put(type, new TreeSet<DebianDependency>());
         }
     }
@@ -22,7 +22,7 @@ public class DebianDependencies {
         this.deps.get(type).add(dependency);
     }
 
-    public void add (Type type, Collection<DebianDependency> dependencies) {
+    public void add(Type type, Collection<DebianDependency> dependencies) {
         get(type).addAll(dependencies);
     }
 
@@ -31,7 +31,7 @@ public class DebianDependencies {
     }
 
     public void putInProperties(Properties depVars) {
-        for(Type type : Type.values()) {
+        for (Type type : Type.values()) {
             depVars.put(type.substvarName, Strings.join(deps.get(type), ", "));
         }
     }

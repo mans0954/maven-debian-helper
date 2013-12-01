@@ -27,7 +27,7 @@ public class DebianDependency implements Comparable<DebianDependency> {
     /**
      * Creates a dependency on the specified package.
      * 
-     * @param packageName the name of the Debian package
+     * @param packageName    the name of the Debian package
      * @param minimumVersion the minimum version required, empty if none
      * @throws IllegalArgumentException if the package name or the minimum version is not valid
      */
@@ -69,8 +69,6 @@ public class DebianDependency implements Comparable<DebianDependency> {
      * <pre>
      *     foo (>= 1.0)
      * </pre>
-     * 
-     * @return
      */
     public String toString() {
         return minimumVersion.isEmpty() ? packageName : packageName + " (>= " + minimumVersion + ")";
