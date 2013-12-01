@@ -22,7 +22,7 @@ Build-Depends: debhelper (>= 9), default-jdk, maven-repo-helper (>= 1.7.1)#if ($
 #if(!$buildDependencies.isEmpty())
 Build-Depends-Indep:#printDependencies($buildDependencies)$space
 #end
-Standards-Version: 3.9.4
+Standards-Version: 3.9.5
 Vcs-Svn: svn://anonscm.debian.org/pkg-java/trunk/${package}
 Vcs-Browser: http://anonscm.debian.org/viewvc/pkg-java/trunk/${package}
 Homepage:#if(${project.Url}) ${project.Url}#else TODO #end
