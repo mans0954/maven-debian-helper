@@ -27,9 +27,6 @@ maven-debian-helper (1.6.6) UNRELEASED; urgency=low
   * Fixed the length of the separator underlining the title
     in the generated README.source
 
-  [ tony mancill ]
-  * Add libasm3-java to build dependencies. (Closes: #729771)
-
  -- Emmanuel Bourg <ebourg@apache.org>  Fri, 23 Aug 2013 22:46:59 +0200
 
 maven-debian-helper (1.6.5) unstable; urgency=low
