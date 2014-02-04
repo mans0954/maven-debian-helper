@@ -207,7 +207,7 @@ public class SysInstallMojo extends AbstractMojo {
             runMojo();
         } catch (IOException e) {
             getLog().error("execution failed", e);
-            throw new MojoExecutionException("IOException catched");
+            throw new MojoExecutionException("Failed to execute " + getClass().getSimpleName(), e);
         }
     }
 
