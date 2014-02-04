@@ -41,6 +41,7 @@ import org.debian.maven.packager.interaction.SimpleQuestion;
 import org.debian.maven.packager.util.LicensesScanner;
 import org.debian.maven.packager.util.PackageScanner;
 import org.debian.maven.repo.ListOfPOMs;
+import org.debian.maven.repo.POMOptions;
 
 /**
  * Generate the Debian files for packaging the current Maven project.
@@ -522,12 +523,12 @@ public class GenerateDebianFilesMojo extends AbstractMojo {
                 extension = mavenProject.getArtifact().getFile().toString();
                 extension = extension.substring(extension.lastIndexOf('.') + 1);
             }
-            ListOfPOMs.POMOptions pomOptions = listOfPOMs.getOrCreatePOMOptions(pomFile);
+            POMOptions pomOptions = listOfPOMs.getOrCreatePOMOptions(pomFile);
             pomOptions.setArtifact(dirRelPath + "target/" + mavenProject.getArtifactId() + "-*."
                 + extension);
             if ("jar".equals(extension) && generateJavadoc && "ant".equals(packageType) && listOfJavadocPOMs != null) {
                 String artifactId = mavenProject.getArtifact().getArtifactId();
-                ListOfPOMs.POMOptions javadocPomOptions = listOfJavadocPOMs.getOrCreatePOMOptions(pomFile);
+                POMOptions javadocPomOptions = listOfJavadocPOMs.getOrCreatePOMOptions(pomFile);
                 javadocPomOptions.setIgnorePOM(true);
                 javadocPomOptions.setArtifact(dirRelPath + "target/" + artifactId + ".javadoc.jar");
                 javadocPomOptions.setClassifier("javadoc");

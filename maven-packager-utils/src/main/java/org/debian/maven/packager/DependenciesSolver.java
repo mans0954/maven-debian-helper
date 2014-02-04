@@ -42,6 +42,7 @@ import org.debian.maven.repo.DependencyRuleSetFiles;
 import org.debian.maven.repo.ListOfPOMs;
 import org.debian.maven.repo.POMHandler;
 import org.debian.maven.repo.POMInfo;
+import org.debian.maven.repo.POMOptions;
 import org.debian.maven.repo.Substvars;
 import org.debian.maven.repo.DependencyRuleSetFiles.RulesType;
 import org.debian.maven.repo.POMInfo.DependencyType;
@@ -488,7 +489,7 @@ public class DependenciesSolver {
         }
         File tmpDest = File.createTempFile("pom", ".tmp", baseDir);
         tmpDest.deleteOnExit();
-        ListOfPOMs.POMOptions options = pomTransformer.getListOfPOMs().getOrCreatePOMOptions(projectPom);
+        POMOptions options = pomTransformer.getListOfPOMs().getOrCreatePOMOptions(projectPom);
         boolean noParent = false;
         boolean hasPackageVersion = false;
         if (options != null) {

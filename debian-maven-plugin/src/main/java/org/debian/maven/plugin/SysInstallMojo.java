@@ -29,6 +29,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.FileUtils;
 import org.debian.maven.repo.ListOfPOMs;
 import org.debian.maven.repo.POMCleaner;
+import org.debian.maven.repo.POMOptions;
 
 /**
  * Install pom and jar files into the /usr/share/hierarchy
@@ -663,7 +664,7 @@ public class SysInstallMojo extends AbstractMojo {
         String relativePomPath = originalPom.getAbsolutePath();
         relativePomPath = relativePomPath.substring(debianDir.getParentFile().getAbsolutePath().length() + 1);
 
-        ListOfPOMs.POMOptions pomOption = listOfPOMs.getPOMOptions(relativePomPath);
+        POMOptions pomOption = listOfPOMs.getPOMOptions(relativePomPath);
 
         if (pomOption != null && pomOption.isIgnore()) {
             throw new RuntimeException("POM file " + pomFile + " should be ignored");
