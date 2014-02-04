@@ -74,6 +74,8 @@ public class InstallMojoTest {
         mojo.setInstallToUsj(false);
         mojo.setJarDir(getFileInClasspath("plexus-compiler/plexus-compiler-test/target/plexus-compiler-test-1.8.2.jar").getParentFile().getAbsolutePath());
         mojo.setMavenRules("maven.rules");
+        mojo.setMavenIgnoreRules("maven.ignoreRules");
+        mojo.setMavenPublishedRules("maven.publishedRules");
         mojo.setNoUsjVersionless(false);
         mojo.setDebianPackage("libplexus-compiler-java");
         mojo.setDestPackage("libplexus-compiler-java");
@@ -108,6 +110,8 @@ public class InstallMojoTest {
         mojo.setInstallToUsj(true);
         mojo.setJarDir(getFileInClasspath("plexus-compiler/plexus-compiler-api/target/plexus-compiler-api-1.8.2.jar").getParentFile().getAbsolutePath());
         mojo.setMavenRules("maven.rules");
+        mojo.setMavenIgnoreRules("maven.ignoreRules");
+        mojo.setMavenPublishedRules("maven.publishedRules");
         mojo.setNoUsjVersionless(false);
         mojo.setDebianPackage("libplexus-compiler-java");
         mojo.setDestPackage("libplexus-compiler-java");
@@ -150,6 +154,8 @@ public class InstallMojoTest {
         mojo.setInstallToUsj(false);
         mojo.setJarDir(getFileInClasspath("plexus-compiler/plexus-compiler-test/target/plexus-compiler-test-1.8.2.jar").getParentFile().getAbsolutePath());
         mojo.setMavenRules("maven.rules");
+        mojo.setMavenIgnoreRules("maven.ignoreRules");
+        mojo.setMavenPublishedRules("maven.publishedRules");
         mojo.setNoUsjVersionless(false);
         mojo.setDebianPackage("libplexus-compiler-java");
         mojo.setDestPackage("libplexus-compiler-java");
