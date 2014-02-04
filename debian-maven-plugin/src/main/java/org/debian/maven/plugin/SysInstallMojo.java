@@ -570,8 +570,19 @@ public class SysInstallMojo extends AbstractMojo {
     /**
      * command for creating the relative symlink
      */
-    private String[] linkCommand(String source, String dest) {
-        return new String[]{"ln", "-s", source, dest};
+    private void link(String target, String linkName) throws IOException {
+        if (System.getProperty("os.name").contains("Windows")) {
+            File linkNameFile = new File(linkName).getAbsoluteFile();
+            linkNameFile.getParentFile().mkdirs();
+            Process process = new ProcessBuilder().command("cmd", "/C", "mklink", linkNameFile.getAbsolutePath(), target.replace('/', '\\')).start();
+            try {
+                process.waitFor();
+            } catch (InterruptedException e) {
+                throw new IOException(e);
+            }
+        } else {
+            Runtime.getRuntime().exec(new String[]{"ln", "-s", target, linkName}, null);
+        }
     }
 
     private void mkdir(String path) throws IOException {
@@ -584,10 +595,6 @@ public class SysInstallMojo extends AbstractMojo {
         }
     }
 
-    private void run(String[] command) throws IOException {
-        Runtime.getRuntime().exec(command, null);
-    }
-
     /**
      * if a jar exists: copy it to the Maven repository
      */
@@ -598,7 +605,7 @@ public class SysInstallMojo extends AbstractMojo {
             FileUtils.copyFile(jarFile, new File(jarDestPath()));
             if (debianVersion != null && !debianVersion.equals(version)) {
                 mkdir(debianFullRepoPath());
-                run(linkCommand(jarDestRelPath(), debianJarDestPath()));
+                link(jarDestRelPath(), debianJarDestPath());
             }
         }
     }
@@ -613,10 +620,10 @@ public class SysInstallMojo extends AbstractMojo {
             mkdir(compatSharePath());
             FileUtils.copyFile(jarFile, new File(fullCompatPath()));
             if (noUsjVersionless) {
-                run(linkCommand(destUsjJarName(), versionedFullCompatPath()));
+                link(destUsjJarName(), versionedFullCompatPath());
             } else {
-                run(linkCommand(destUsjJarName(), fullCompatPath()));
-                run(linkCommand(destUsjJarName(), versionedFullCompatPath()));
+                link(destUsjJarName(), fullCompatPath());
+                link(destUsjJarName(), versionedFullCompatPath());
             }
         }
     }
@@ -636,10 +643,10 @@ public class SysInstallMojo extends AbstractMojo {
                 targetPath = fullCompatPath();
             }
 
-            run(linkCommand(DirectoryUtils.relativePath(fullRepoPath(), targetPath), jarDestPath()));
+            link(DirectoryUtils.relativePath(fullRepoPath(), targetPath), jarDestPath());
             if (debianVersion != null && !debianVersion.equals(version)) {
                 mkdir(debianFullRepoPath());
-                run(linkCommand(DirectoryUtils.relativePath(debianFullRepoPath(), targetPath), debianJarDestPath()));
+                link(DirectoryUtils.relativePath(debianFullRepoPath(), targetPath), debianJarDestPath());
             }
         }
     }
