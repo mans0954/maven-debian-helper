@@ -798,10 +798,10 @@ public class DependenciesSolver {
                         debianDeps.add(COMPILE, libraryWithVersionConstraint);
                     }
                 } else {
-                    if (dependency.isOptional()) {
-                        debianDeps.add(OPTIONAL, libraryWithVersionConstraint);
-                    } else if ("test".equals(dependency.getScope())) {
+                    if ("test".equals(dependency.getScope())) {
                         debianDeps.add(TEST, libraryWithVersionConstraint);
+                    } else if (dependency.isOptional()) {
+                        debianDeps.add(OPTIONAL, libraryWithVersionConstraint);
                     } else {
                         debianDeps.add(RUNTIME, libraryWithVersionConstraint);
                     }
