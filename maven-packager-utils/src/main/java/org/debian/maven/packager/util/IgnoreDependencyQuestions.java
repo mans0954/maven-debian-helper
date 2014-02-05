@@ -55,6 +55,7 @@ public class IgnoreDependencyQuestions {
         {"org.codehaus.mojo", "ideauidesigner-maven-plugin"},
         {"org.codehaus.mojo", "scmchangelog-maven-plugin"},
         {"com.github.github", "site-maven-plugin"},
+        {"com.googlecode.maven-gcu-plugin", "maven-gcu-plugin"},
     };
 
     private static final String[][] PLUGINS_THAT_CAN_BE_IGNORED = {
