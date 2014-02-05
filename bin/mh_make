@@ -34,7 +34,7 @@ syntax()
    echo -e "\tDEBEMAIL - your packager email address"
    echo -e "\tDEBLICENSE - the license for the files under the debian/ directory"
    echo -e "\t  must be one of GPL2, GPL3, LGPL2.1, Apache-2.0, BSD or any license"
-   echo -e "\t  short name defined in http://dep.debian.net/deps/dep5/"
+   echo -e "\t  short name defined in http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/"
    exit 1
 }
 
@@ -82,8 +82,8 @@ if [ -z "$PACKAGE" ]; then
         PACKAGE=$(echo "$PACKAGE" | sed 's|.*/||' )
     fi
     echo
-    echo "Enter the name of the new Debian source package.
-    read -p "[$PACKAGE] >" USER_PACKAGE
+    echo "Enter the name of the new Debian source package:"
+    read -p "[$PACKAGE] > " USER_PACKAGE
     if [ -n "$USER_PACKAGE" ]; then
         PACKAGE=$USER_PACKAGE
     fi
@@ -97,8 +97,8 @@ if [ -z "$BIN_PACKAGE" ]; then
         BIN_PACKAGE="lib${PACKAGE}-java"
     fi
 	echo
-    echo "Enter the name of the binary package."
-    read -p "[$BIN_PACKAGE] >" USER_PACKAGE
+    echo "Enter the name of the binary package:"
+    read -p "[$BIN_PACKAGE] > " USER_PACKAGE
     if [ -n "$USER_PACKAGE" ]; then
         BIN_PACKAGE=$USER_PACKAGE
     fi
