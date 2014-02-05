@@ -23,13 +23,25 @@ package org.debian.maven.packager.interaction;
  */
 public class SimpleQuestion extends Question<String> {
 
+    private String defaultValue;
+
     public SimpleQuestion(String question) {
         super(question);
+    }
+
+    public SimpleQuestion(String question, String defaultValue) {
+        super(question);
+        this.defaultValue = defaultValue;
     }
 
     @Override
     public String ask() {
         println(question);
+        if (defaultValue != null) {
+            print("[");
+            print(defaultValue);
+            print("] ");
+        }
         print("> ");
         return readLine();
     }

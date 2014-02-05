@@ -82,8 +82,8 @@ if [ -z "$PACKAGE" ]; then
         PACKAGE=$(echo "$PACKAGE" | sed 's|.*/||' )
     fi
     echo
-    echo "Enter the name of the new Debian source package. If empty, it will defaults to $PACKAGE"
-    read -p ">" USER_PACKAGE
+    echo "Enter the name of the new Debian source package.
+    read -p "[$PACKAGE] >" USER_PACKAGE
     if [ -n "$USER_PACKAGE" ]; then
         PACKAGE=$USER_PACKAGE
     fi
@@ -97,8 +97,8 @@ if [ -z "$BIN_PACKAGE" ]; then
         BIN_PACKAGE="lib${PACKAGE}-java"
     fi
 	echo
-    echo "Enter the name of the binary package. If empty, it will defaults to $BIN_PACKAGE"
-    read -p ">" USER_PACKAGE
+    echo "Enter the name of the binary package."
+    read -p "[$BIN_PACKAGE] >" USER_PACKAGE
     if [ -n "$USER_PACKAGE" ]; then
         BIN_PACKAGE=$USER_PACKAGE
     fi

@@ -330,8 +330,8 @@ public class DependenciesSolver {
             knownProjectDependencies.add(pom.getThisPom());
 
             if (interactive && packageVersion == null) {
-                String question = "Enter the upstream version for the package. If you press <Enter> it will default to " + pom.getOriginalVersion();
-                String v = new SimpleQuestion(question).ask();
+                String question = "Enter the upstream version for the package.";
+                String v = new SimpleQuestion(question, pom.getOriginalVersion()).ask();
                 if (v.isEmpty()) {
                     v = pom.getOriginalVersion();
                 }
