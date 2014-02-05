@@ -10,6 +10,8 @@ maven-debian-helper (1.6.7) UNRELEASED; urgency=medium
     plugins
   * Depend on maven-repo-helper >= 1.8.6
   * Improved the package description (Closes: #704091)
+  * Fixed the mvn-debian script when more than one binary package is defined
+    (Closes: #673525)
 
  -- Emmanuel Bourg <ebourg@apache.org>  Wed, 05 Feb 2014 12:18:48 +0100
 

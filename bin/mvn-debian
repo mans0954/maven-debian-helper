@@ -19,7 +19,7 @@ JAVA_OPTS="$JAVA_OPTS -Dproperties.file.auto=$AUTO_PROPS"
 MAVEN_OPTS="$MAVEN_OPTS -Ddebian.dir=$PWD/debian"
 
 if [ -r debian/control ]; then
-  JAR_PACKAGE=$(dh_listpackages | awk '{ print $1 }')
+  JAR_PACKAGE=$(dh_listpackages | head -1)
   MAVEN_OPTS="$MAVEN_OPTS -Ddebian.package=$JAR_PACKAGE"
 fi
 
