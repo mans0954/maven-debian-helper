@@ -32,10 +32,8 @@ Package: ${binPackage}
 Architecture: all
 ## libraries should not depend on runtime - default-jre-headless | java2-runtime-headless,
 Depends: ${dollar}{misc:Depends}, ${dollar}{maven:Depends}
-Recommends: ${dollar}{maven:OptionalDepends}
-#if ($generateJavadoc)
-Suggests: ${binPackage}-doc
-#end
+Suggests: ${dollar}{maven:OptionalDepends}#if ($generateJavadoc), ${binPackage}-doc#end
+
 Description: ${project.Name}
 #if ($description.isEmpty()) TODO - fill the description
 #else
