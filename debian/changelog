@@ -1,3 +1,10 @@
+maven-debian-helper (1.6.8) UNRELEASED; urgency=medium
+
+  * Use the --download-current-version uscan option in the generated
+    debian/rules files
+
+ -- Emmanuel Bourg <ebourg@apache.org>  Fri, 14 Mar 2014 13:57:53 +0100
+
 maven-debian-helper (1.6.7) unstable; urgency=medium
 
   * The optional Maven dependencies are now suggested and not recommended
