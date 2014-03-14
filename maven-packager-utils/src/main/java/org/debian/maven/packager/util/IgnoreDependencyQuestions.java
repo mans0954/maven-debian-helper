@@ -75,6 +75,7 @@ public class IgnoreDependencyQuestions {
         {"org.codehaus.mojo", "failsafe-maven-plugin"},
         {"org.codehaus.mojo", "shitty-maven-plugin"},
         {"com.mycila.maven-license-plugin", "maven-license-plugin"},
+        {"com.google.code.maven-license-plugin", "maven-license-plugin"},
     };
 
     private static final String[][] DOC_PLUGINS = {

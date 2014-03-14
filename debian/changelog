@@ -1,5 +1,7 @@
 maven-debian-helper (1.6.8) UNRELEASED; urgency=medium
 
+  * Added com.google.code.maven-license-plugin:maven-license-plugin
+    to the ignored plugins
   * Use the --download-current-version uscan option in the generated
     debian/rules files
 
