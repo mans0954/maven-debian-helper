@@ -207,7 +207,7 @@ if [ $? != 0 ]; then
 fi
 
 if [ ! -f debian/changelog ]; then
-    debianVersion=$(echo ${maven_UpstreamPackageVersion} | sed -re's/-(alpha|beta)-?/~\1/')
+    debianVersion=$(echo ${maven_UpstreamPackageVersion} | sed -re's/-(alpha|beta|rc)-?/~\1/')
     dch --create --newversion=${debianVersion}-1 --package=$PACKAGE "Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>"
 fi
 

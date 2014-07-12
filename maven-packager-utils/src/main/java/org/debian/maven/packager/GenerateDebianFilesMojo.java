@@ -416,6 +416,7 @@ public class GenerateDebianFilesMojo extends AbstractMojo {
 
             String debianVersion = projectVersion.replace("-alpha-", "~alpha");
             debianVersion = debianVersion.replace("-beta-", "~beta");
+            debianVersion = debianVersion.replace("-rc-", "~rc");
             debianVersion += "-1";
             context.put("version.vm", debianVersion);
 
