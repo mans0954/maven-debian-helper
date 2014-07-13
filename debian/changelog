@@ -1,4 +1,4 @@
-maven-debian-helper (1.6.8) UNRELEASED; urgency=medium
+maven-debian-helper (1.6.8) unstable; urgency=medium
 
   * The provided Maven dependencies are no longer added to the ${maven:Depends}
     substitution variable
@@ -9,7 +9,7 @@ maven-debian-helper (1.6.8) UNRELEASED; urgency=medium
   * Release candidate versions are now properly mangled (1.0-rc2 -> 1.0~rc2)
   * Updated the Maven dependencies
 
- -- Emmanuel Bourg <ebourg@apache.org>  Fri, 14 Mar 2014 13:57:53 +0100
+ -- Emmanuel Bourg <ebourg@apache.org>  Mon, 14 Jul 2014 00:51:14 +0200
 
 maven-debian-helper (1.6.7) unstable; urgency=medium
 
