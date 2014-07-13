@@ -802,7 +802,7 @@ public class DependenciesSolver {
                         debianDeps.add(TEST, libraryWithVersionConstraint);
                     } else if (dependency.isOptional()) {
                         debianDeps.add(OPTIONAL, libraryWithVersionConstraint);
-                    } else {
+                    } else if (!"provided".equals(dependency.getScope())) {
                         debianDeps.add(RUNTIME, libraryWithVersionConstraint);
                     }
                 }

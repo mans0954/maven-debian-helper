@@ -1,5 +1,7 @@
 maven-debian-helper (1.6.8) UNRELEASED; urgency=medium
 
+  * The provided Maven dependencies are no longer added to the ${maven:Depends}
+    substitution variable
   * Added com.google.code.maven-license-plugin:maven-license-plugin
     to the ignored plugins
   * Use the --download-current-version uscan option in the generated
