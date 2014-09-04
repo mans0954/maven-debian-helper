@@ -6,7 +6,7 @@
     <artifactId>maven-debian</artifactId>
     <version>1.6.8</version>
     <packaging>pom</packaging>
-    <name>helper tools for using Maven to build Debian packages</name>
+    <description>Helper tools for using Maven to build Debian packages</description>
 
     <modules>
         <module>maven-debian-helper</module>
