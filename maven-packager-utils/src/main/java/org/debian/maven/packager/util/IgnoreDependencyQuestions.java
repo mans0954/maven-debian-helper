@@ -106,6 +106,7 @@ public class IgnoreDependencyQuestions {
         {"org.codehaus.mojo", "sonar-maven-plugin"},
         {"org.codehaus.mojo", "surefire-report-maven-plugin"},
         {"org.jboss.maven.plugins", "maven-jdocbook-plugin"},
+        {"org.jacoco", "jacoco-maven-plugin"},
     };
 
     private static final String[][] TEST_PLUGINS = {

@@ -1,3 +1,9 @@
+maven-debian-helper (1.6.9) UNRELEASED; urgency=medium
+
+  * Marked jacoco-maven-plugin as a documentation plugin
+
+ -- Emmanuel Bourg <ebourg@apache.org>  Thu, 04 Sep 2014 09:51:27 +0200
+
 maven-debian-helper (1.6.8) unstable; urgency=medium
 
   * The provided Maven dependencies are no longer added to the ${maven:Depends}
