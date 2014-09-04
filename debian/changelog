@@ -3,6 +3,7 @@ maven-debian-helper (1.6.9) UNRELEASED; urgency=medium
   * Marked jacoco-maven-plugin as a documentation plugin
   * Use the uscan --no-symlink option instead of --rename in the generated
     debian/rule get-orig-source target to work around #748462
+  * Depend on maven-repo-helper >= 1.8.9
 
  -- Emmanuel Bourg <ebourg@apache.org>  Thu, 04 Sep 2014 09:51:27 +0200
 

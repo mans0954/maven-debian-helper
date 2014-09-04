@@ -13,7 +13,7 @@ Build-Depends-Indep: junit4,
                      libcommons-io-java,
                      libmaven-plugin-tools-java,
                      libplexus-velocity-java,
-                     maven-repo-helper (>= 1.8.6)
+                     maven-repo-helper (>= 1.8.9)
 Standards-Version: 3.9.5
 Vcs-Git: git://anonscm.debian.org/pkg-java/maven-debian-helper.git
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-java/maven-debian-helper.git
@@ -21,7 +21,7 @@ Homepage: http://wiki.debian.org/Java/MavenBuilder
 
 Package: maven-debian-helper
 Architecture: all
-Depends: ${misc:Depends}, default-jdk, maven-repo-helper (>= 1.8.6), maven2 (>= 2.2.1-5),
+Depends: ${misc:Depends}, default-jdk, maven-repo-helper (>= 1.8.9), maven2 (>= 2.2.1-5),
          libmaven-clean-plugin-java,
          libmaven-compiler-plugin-java,
          libmaven-jar-plugin-java,
