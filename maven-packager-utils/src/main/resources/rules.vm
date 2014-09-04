@@ -9,4 +9,4 @@ DEB_MAVEN_DOC_TARGET := javadoc:javadoc javadoc:aggregate
 #end
 
 get-orig-source:
-	uscan --download-current-version --force-download --rename
+	uscan --download-current-version --force-download --no-symlink
