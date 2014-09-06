@@ -8,6 +8,10 @@
     <packaging>pom</packaging>
     <description>Helper tools for using Maven to build Debian packages</description>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <modules>
         <module>maven-debian-helper</module>
         <module>debian-maven-plugin</module>
