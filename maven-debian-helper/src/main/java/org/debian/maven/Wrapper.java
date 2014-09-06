@@ -21,8 +21,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Properties;
 
-import org.apache.maven.cli.compat.CompatibleMain;
-import org.codehaus.classworlds.ClassWorld;
+import org.apache.maven.cli.MavenCli;
 import org.codehaus.plexus.util.IOUtil;
 
 /**
@@ -83,10 +82,11 @@ public class Wrapper {
     /**
      * Wraps maven's main function
      */
-    public static int main(String[] args, ClassWorld classWorld) throws IOException {
+    public static int main(String[] args) throws IOException {
         Properties extraArguments = readProperties(EXTRA_PROPERTIES_PROPERTY);
         String[] newArgs = updateCommandLine(extraArguments, args);
         
-        return CompatibleMain.main(newArgs, classWorld);
+        MavenCli.main(newArgs);
+        return 0;
     }
 }

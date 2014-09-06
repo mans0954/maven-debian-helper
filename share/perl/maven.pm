@@ -26,12 +26,12 @@ sub new {
 	my @packages = @{$dh{DOPACKAGES}};
 	$this->{package} = shift @packages;
 	$this->{doc_package} = (grep /-doc$/, @packages)[0];
-	my $classconf = '/etc/maven2/m2-debian.conf';
+	my $classconf = '/etc/maven/m2-debian.conf';
 	if (!$this->{doc_package}) {
-		$classconf = '/etc/maven2/m2-debian-nodocs.conf';
+		$classconf = '/etc/maven/m2-debian-nodocs.conf';
 	}
 
-	my @classpath = ('/usr/share/maven2/boot/classworlds.jar');
+	my @classpath = ('/usr/share/maven/boot/classworlds-2.x.jar');
 	if (-e "$java_home/lib/tools.jar") {
 		push(@classpath, "$java_home/lib/tools.jar");
 	}
@@ -45,7 +45,7 @@ sub new {
 	@{$this->{maven_cmd}} = ($java_home . '/bin/java',
 		@jvmopts,
 		"org.codehaus.classworlds.Launcher",
-		"-s/etc/maven2/settings-debian.xml",
+		"-s/etc/maven/settings-debian.xml",
 		"-Ddebian.dir=$this->{cwd}/debian",
 		"-Dmaven.repo.local=$this->{cwd}/debian/maven-repo");
 	return $this;

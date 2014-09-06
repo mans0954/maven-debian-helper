@@ -47,7 +47,7 @@ maven-sanity-check:
 		echo "You must specify a valid JAVA_HOME or JAVACMD!"; \
 		exit 1; \
 	fi
-	@if ! test -r "$(MAVEN_HOME)/boot/classworlds.jar"; then \
+	@if ! test -r "$(MAVEN_HOME)/boot/plexus-classworlds-2.x.jar"; then \
 		echo "You must specify a valid MAVEN_HOME directory!"; \
 		exit 1; \
 	fi
@@ -60,7 +60,7 @@ debian/maven.rules:
 
 ifeq (, $(DEB_DOC_PACKAGE))
 DEB_PATCHPOMS_ARGS += --build-no-docs
-debian/stamp-maven-build: override MAVEN_CLASSCONF = /etc/maven2/m2-debian-nodocs.conf
+debian/stamp-maven-build: override MAVEN_CLASSCONF = /etc/maven/m2-debian-nodocs.conf
 endif
 
 debian/stamp-poms-patched: debian/maven-repo

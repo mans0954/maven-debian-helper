@@ -33,10 +33,10 @@ CDBS_BUILD_DEPENDS := $(CDBS_BUILD_DEPENDS), maven-debian-helper (>= 1.4)
 
 # Maven home directory.  Doesn't need to be changed except when using
 # nonstandard Maven installations.
-MAVEN_HOME = /usr/share/maven2
+MAVEN_HOME = /usr/share/maven
 
 MAVEN_DEBIAN_VERSION = $(shell ls /usr/share/maven-repo/org/debian/maven/maven-packager-utils/ | sed 's|/||')
-MAVEN_CLASSCONF = /etc/maven2/m2-debian.conf
+MAVEN_CLASSCONF = /etc/maven/m2-debian.conf
 
 # The home directory of the Java Runtime Environment (JRE) or Java Development
 # Kit (JDK). You can either directly set JAVA_HOME in debian/rules or set
@@ -54,7 +54,7 @@ JAVACMD   = $(JAVA_HOME)/bin/java
 # end of the class path if it exists in the JDK's lib directory.
 # You can override the complete class path using DEB_CLASSPATH.
 DEB_JARS_BASE = /usr/share/java
-DEB_CLASSPATH = $(MAVEN_HOME)/boot/classworlds.jar:$(shell for jar in $(DEB_JARS); do \
+DEB_CLASSPATH = $(MAVEN_HOME)/boot/plexus-classworlds-2.x.jar:$(shell for jar in $(DEB_JARS); do \
 		if [ -f "$$jar" ]; then echo -n "$${jar}:"; fi; \
 		if [ -f "$$jar".jar ]; then echo -n "$${jar}.jar:"; fi; \
 		if [ -f $(DEB_JARS_BASE)/"$$jar" ]; then echo -n "$(DEB_JARS_BASE)/$${jar}:"; fi; \
@@ -94,7 +94,7 @@ DEB_MAVEN_PROPERTYFILE = $(shell test -f $(CURDIR)/debian/maven.properties && ec
 DEB_MAVEN_INVOKE = cd $(DEB_BUILDDIR) && $(JAVACMD) -noverify -cp $(DEB_CLASSPATH) \
 		 $(JAVA_OPTS) -Dclassworlds.conf=$(MAVEN_CLASSCONF) \
 		 org.codehaus.classworlds.Launcher \
-		 -s/etc/maven2/settings-debian.xml \
+		 -s/etc/maven/settings-debian.xml \
 		 -Dmaven.repo.local=$(DEB_MAVEN_REPO) \
 		 $(if $(DEB_MAVEN_ARGS_$(cdbs_curpkg)),$(DEB_MAVEN_ARGS_$(cdbs_curpkg)),$(DEB_MAVEN_ARGS))
 

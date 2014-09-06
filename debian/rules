@@ -6,8 +6,8 @@ include /usr/share/cdbs/1/class/ant.mk
 PACKAGE              := $(DEB_SOURCE_PACKAGE)
 VERSION              := $(shell echo ${DEB_UPSTREAM_VERSION} | sed -r 's/([0-9\.]+).*/\1/')
 JAVA_HOME            := /usr/lib/jvm/default-java
-DEB_JARS             := ant-junit junit commons-io classworlds maven-core maven-artifact maven-artifact-manager maven-model \
- maven-compat maven-plugin-api maven-project maven-scm-api velocity file-management plexus-utils \
+DEB_JARS             := ant-junit junit commons-io plexus-classworlds maven-core maven-artifact maven-artifact-manager maven-model \
+ maven-embedder maven-plugin-api maven-scm-api velocity file-management plexus-utils \
  plexus-container-default-alpha maven-repo-helper
 DEB_ANT_BUILD_TARGET := package #javadoc
 DEB_ANT_BUILDFILE    := debian/build.xml

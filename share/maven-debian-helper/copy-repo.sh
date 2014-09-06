@@ -25,7 +25,7 @@ find_src_poms() {
 
 list_fakes()
 {
-  CONFFILES="/etc/maven2/fake-poms.conf"
+  CONFFILES="/etc/maven/fake-poms.conf"
   if [ -r debian/fake-poms.conf ]
   then
     CONFFILES="$CONFFILES debian/fake-poms.conf"
