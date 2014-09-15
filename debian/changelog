@@ -2,6 +2,7 @@ maven-debian-helper (2.0.0) UNRELEASED; urgency=medium
 
   * Update Maven to version 3.0.5
   * Build deb package using itself rather than maven-ant-helper
+  * Update mojos to use annotations
 
  -- Andrew Schurman <arcticwaters@gmail.com>  Mon, 16 Mar 2015 18:48:32 -0700
 
