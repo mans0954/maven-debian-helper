@@ -27,9 +27,6 @@ sub new {
 	$this->{package} = shift @packages;
 	$this->{doc_package} = (grep /-doc$/, @packages)[0];
 	my $classconf = '/etc/maven/m2-debian.conf';
-	if (!$this->{doc_package}) {
-		$classconf = '/etc/maven/m2-debian-nodocs.conf';
-	}
 
 	my @classpath = ('/usr/share/maven/boot/classworlds-2.x.jar');
 	if (-e "$java_home/lib/tools.jar") {
@@ -54,9 +51,6 @@ sub new {
 sub configure {
 	my $this=shift;
 	my @patch_args;
-	if (! $this->{doc_package}) {
-		push(@patch_args, "--build-no-docs");
-	}
 
 	doit("/usr/share/maven-debian-helper/copy-repo.sh", "$this->{cwd}/debian");
 	$this->doit_in_sourcedir("mh_patchpoms", "-p$this->{package}",

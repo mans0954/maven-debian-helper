@@ -61,7 +61,6 @@ debian/maven.rules:
 
 ifeq (, $(DEB_DOC_PACKAGE))
 DEB_PATCHPOMS_ARGS += --build-no-docs
-debian/stamp-maven-build: override MAVEN_CLASSCONF = /etc/maven/m2-debian-nodocs.conf
 endif
 
 debian/stamp-poms-patched: debian/maven-repo
