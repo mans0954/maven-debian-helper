@@ -5,8 +5,10 @@ maven-debian-helper (1.6.9) UNRELEASED; urgency=medium
     plugins
   * Use the uscan --no-symlink option instead of --rename in the generated
     debian/rule get-orig-source target to work around #748462
-  * Depend on maven-repo-helper >= 1.8.9
   * The generated control file now specifies Standards-Version: 3.9.6
+  * debian/control:
+    - Depend on maven-repo-helper >= 1.8.9
+    - Standards-Version updated to 3.9.6 (no changes)
 
  -- Emmanuel Bourg <ebourg@apache.org>  Thu, 04 Sep 2014 09:51:27 +0200
 
