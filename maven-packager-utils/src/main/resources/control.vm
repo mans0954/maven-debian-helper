@@ -22,7 +22,7 @@ Build-Depends: debhelper (>= 9), cdbs, default-jdk, maven-debian-helper (>= 1.5)
 #if(!$buildDependencies.isEmpty())
 Build-Depends-Indep:#printDependencies($buildDependencies)$space
 #end
-Standards-Version: 3.9.5
+Standards-Version: 3.9.6
 Vcs-Git: git://anonscm.debian.org/pkg-java/${package}.git
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-java/${package}.git
 Homepage:#if(${project.Url}) ${project.Url}#else TODO #end
