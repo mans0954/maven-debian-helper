@@ -24,7 +24,7 @@ Build-Depends-Indep:#printDependencies($buildDependencies)$space
 #end
 Standards-Version: 3.9.6
 Vcs-Git: git://anonscm.debian.org/pkg-java/${package}.git
-Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-java/${package}.git
+Vcs-Browser: https://anonscm.debian.org/cgit/pkg-java/${package}.git
 Homepage:#if(${project.Url}) ${project.Url}#else TODO #end
 
 
