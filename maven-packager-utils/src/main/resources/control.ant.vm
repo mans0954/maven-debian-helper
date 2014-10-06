@@ -54,10 +54,8 @@ Description: ${project.Name}
 Package: ${binPackage}-doc
 Architecture: all
 Section: doc
-Depends: ${dollar}{misc:Depends}, #printDependencies($javadocDependencies)$space
-#if(!$javadocOptionalDependencies.isEmpty())
-Recommends: #printDependencies($javadocOptionalDependencies)$space
-#end
+Depends: ${dollar}{misc:Depends}
+Recommends: #printDependencies($javadocDependencies)$space#if(!$javadocOptionalDependencies.isEmpty()) ,#printDependencies($javadocOptionalDependencies)$space#end
 Suggests: ${binPackage}
 Description: Documentation for ${project.Name}
 #if ($description.isEmpty()) TODO - fill the description

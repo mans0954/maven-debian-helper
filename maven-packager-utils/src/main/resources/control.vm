@@ -50,8 +50,8 @@ Description: ${project.Name}
 Package: ${binPackage}-doc
 Architecture: all
 Section: doc
-Depends: ${dollar}{misc:Depends}, ${dollar}{maven:DocDepends}
-Recommends: ${dollar}{maven:DocOptionalDepends}
+Depends: ${dollar}{misc:Depends}
+Recommends: ${dollar}{maven:DocDepends}, ${dollar}{maven:DocOptionalDepends}
 Suggests: ${binPackage}
 Description: Documentation for ${project.Name}
 #if ($description.isEmpty()) TODO - fill the description

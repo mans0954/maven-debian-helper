@@ -7,6 +7,8 @@ maven-debian-helper (1.6.9) UNRELEASED; urgency=medium
     debian/rule get-orig-source target to work around #748462
   * The generated control file now specifies Standards-Version: 3.9.6
   * Shortened the Vcs-Browser URL in the generated control file
+  * The dependencies of the *-java-doc packages are now recommended to comply
+    with the Java policy
   * debian/control:
     - Depend on maven-repo-helper >= 1.8.9
     - Standards-Version updated to 3.9.6 (no changes)
