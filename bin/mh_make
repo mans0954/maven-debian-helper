@@ -59,7 +59,7 @@ fi
 
 if [ -z "$DEBLICENSE" ]; then
     echo "Environment variable DEBLICENSE not set, using GPL-3+ by default"
-    DEBLICENSE="GPL-3+"
+    DEBLICENSE="Apache-2.0"
 fi
 
 PACKAGE=$(getarg p package)
