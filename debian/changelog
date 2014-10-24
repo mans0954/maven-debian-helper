@@ -5,6 +5,7 @@ maven-debian-helper (1.6.9) UNRELEASED; urgency=medium
     plugins
   * Use the uscan --no-symlink option instead of --rename in the generated
     debian/rule get-orig-source target to work around #748462
+  * mh_make: Fixed the error displayed when DEBFULLNAME/DEBEMAIL is not defined
   * The generated control file now specifies Standards-Version: 3.9.6
   * Shortened the Vcs-Browser URL in the generated control file
   * The dependencies of the *-java-doc packages are now recommended to comply

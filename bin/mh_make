@@ -43,7 +43,7 @@ ARGS="p package b bin-package t run-tests d javadoc a ant v verbose s from-svn" 
 if [ -z "$DEBFULLNAME" ]; then
   echo "Please define the environment variable DEBFULLNAME, e.g."
   echo "export DEBFULLNAME=\"John Doe\""
-  return;
+  exit 1
 fi
 
 if [ -z "$DEBEMAIL" ]; then
@@ -54,7 +54,7 @@ fi
 if [ -z "$DEBEMAIL" ]; then
   echo "Please define the environment variable DEBEMAIL, e.g."
   echo "export DEBEMAIL=\"john.doe@where.no\""
-  return;
+  exit 1
 fi
 
 if [ -z "$DEBLICENSE" ]; then
