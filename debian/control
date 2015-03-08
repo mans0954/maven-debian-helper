@@ -23,7 +23,7 @@ Package: maven-debian-helper
 Architecture: all
 Depends: ${misc:Depends}, default-jdk, maven-repo-helper (>= 1.8.9), maven2 (>= 2.2.1-5),
          libmaven-clean-plugin-java,
-         libmaven-compiler-plugin-java,
+         libmaven-compiler-plugin-2.5-java,
          libmaven-jar-plugin-java,
          libmaven-resources-plugin-java,
          libmaven-site-plugin-java,

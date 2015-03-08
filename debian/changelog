@@ -1,3 +1,11 @@
+maven-debian-helper (1.6.10) experimental; urgency=medium
+
+  * Team upload.
+  * Replace dependency on libmaven-compiler-plugin-java with
+    libmaven-compiler-plugin-2.5-java.
+
+ -- Miguel Landaeta <nomadium@debian.org>  Sat, 07 Mar 2015 21:10:26 -0300
+
 maven-debian-helper (1.6.9) unstable; urgency=medium
 
   * Marked jacoco-maven-plugin as a documentation plugin
