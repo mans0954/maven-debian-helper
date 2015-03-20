@@ -534,17 +534,19 @@ public class SysInstallMojo extends AbstractMojo {
      * command for creating the relative symlink
      */
     private void link(String target, String linkName) throws IOException {
+        Process process;
         if (System.getProperty("os.name").contains("Windows")) {
             File linkNameFile = new File(linkName).getAbsoluteFile();
             linkNameFile.getParentFile().mkdirs();
-            Process process = new ProcessBuilder().command("cmd", "/C", "mklink", linkNameFile.getAbsolutePath(), target.replace('/', '\\')).start();
-            try {
-                process.waitFor();
-            } catch (InterruptedException e) {
-                throw new IOException(e);
-            }
+            process = new ProcessBuilder().command("cmd", "/C", "mklink", linkNameFile.getAbsolutePath(), target.replace('/', '\\')).start();
         } else {
-            Runtime.getRuntime().exec(new String[]{"ln", "-s", target, linkName}, null);
+            process = new ProcessBuilder().command("ln", "-s", target, linkName).start();
+        }
+
+        try {
+            process.waitFor();
+        } catch (InterruptedException e) {
+            throw new IOException(e);
         }
     }
 
