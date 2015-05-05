@@ -36,6 +36,12 @@ DEB_MAVEN_REPO := $(CURDIR)/debian/maven-repo
 JAVA_OPTS = \
   $(shell test -n "$(DEB_MAVEN_PROPERTYFILE)" && echo -Dproperties.file.manual=$(DEB_MAVEN_PROPERTYFILE))
 
+# Export the date of the latest entry in debian/changelog (used by maven-archiver to make reproducible builds)
+ifneq ("$(wildcard debian/changelog)","")
+    export DEB_CHANGELOG_DATETIME=$(shell dpkg-parsechangelog --show-field Date)
+    export DEB_CHANGELOG_TIMESTAMP=$(shell date '--date=$(DEB_CHANGELOG_DATETIME)' +%s)
+endif
+
 DEB_PHONY_RULES += maven-sanity-check before-mvn-build mvn-build after-mvn-build patch-poms unpatch-poms
 
 cdbs_use_maven_substvars := $(shell grep -q "{maven:\w*Depends}" debian/control && echo yes)

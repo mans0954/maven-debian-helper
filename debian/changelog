@@ -1,6 +1,8 @@
 maven-debian-helper (1.6.11) UNRELEASED; urgency=medium
 
   * Removed the timestamp from the javadoc files to make the builds reproducible
+  * Export the DEB_CHANGELOG_DATETIME variable with the date of the latest entry
+    in debian/changelog
 
  -- Emmanuel Bourg <ebourg@apache.org>  Mon, 04 May 2015 17:39:56 +0200
 
