@@ -134,7 +134,7 @@ endif
 
 ifneq (,$(DEB_DOC_PACKAGE))
 # extra arguments for the installation step
-PLUGIN_DOC_ARGS = -Ddebian.dir=$(CURDIR)/debian -Ddebian.package=$(DEB_DOC_PACKAGE) -Dnotimestamp=true
+PLUGIN_DOC_ARGS = -Ddebian.dir=$(CURDIR)/debian -Ddebian.package=$(DEB_DOC_PACKAGE) -Dnotimestamp=true -Dlocale=en_US
 
 common-build-arch common-build-indep:: debian/stamp-maven-doc
 debian/stamp-maven-doc: debian/stamp-maven-build

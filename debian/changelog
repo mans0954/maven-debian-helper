@@ -1,3 +1,10 @@
+maven-debian-helper (1.6.12) unstable; urgency=medium
+
+  * Set the locale to en_US when generating the javadoc
+    to make the builds reproducible
+
+ -- Emmanuel Bourg <ebourg@apache.org>  Fri, 19 Jun 2015 23:59:50 +0200
+
 maven-debian-helper (1.6.11) unstable; urgency=medium
 
   * Upload to unstable
