@@ -101,9 +101,6 @@ sub install {
 	$this->doit_in_builddir("mh_resolve_dependencies", "--non-interactive",
 		"--offline", "-p$this->{package}", @resolvedep_args);
 	if ($this->{doc_package}) {
-		$this->doit_in_builddir(@{$this->{maven_cmd}},
-			"-Ddebian.package=$this->{doc_package}",
-			"org.debian.maven:debian-maven-plugin:$maven_debian_version:install-doc");
 		doit("cp","debian/$this->{package}.substvars",
 			"debian/$this->{doc_package}.substvars");
 		# clean up generated docs
