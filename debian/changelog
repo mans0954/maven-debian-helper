@@ -1,8 +1,8 @@
-maven-debian-helper (1.6.13) UNRELEASED; urgency=medium
+maven-debian-helper (1.6.13) unstable; urgency=medium
 
   * Don't install the documentation jar by default (Closes: #711852)
 
- -- Emmanuel Bourg <ebourg@apache.org>  Tue, 29 Sep 2015 16:59:55 +0200
+ -- Emmanuel Bourg <ebourg@apache.org>  Tue, 29 Sep 2015 17:35:10 +0200
 
 maven-debian-helper (1.6.12) unstable; urgency=medium
 
