@@ -30,8 +30,7 @@ Depends: ${misc:Depends}, default-jdk, maven-repo-helper (>= 1.8.9), maven2 (>= 
          libplexus-velocity-java,
          libsurefire-java,
          velocity
-Recommends: apt-file, devscripts
-Suggests: libmaven-javadoc-plugin-java, subversion
+Suggests: libmaven-javadoc-plugin-java, apt-file, devscripts, subversion
 Description: Helper tools for building Debian packages with Maven
  maven-debian-helper is a set of tools used to generate Debian packages from
  Maven projects and build them in a manner that complies with the Debian
