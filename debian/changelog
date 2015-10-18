@@ -1,3 +1,11 @@
+maven-debian-helper (1.6.14) UNRELEASED; urgency=medium
+
+  * Team upload.
+  * Recommend apt-file and devscripts instead of Suggeting them.
+    (Closes: #802165) 
+
+ -- tony mancill <tmancill@debian.org>  Sun, 18 Oct 2015 11:45:25 -0700
+
 maven-debian-helper (1.6.13) unstable; urgency=medium
 
   * Don't install the documentation jar by default (Closes: #711852)
