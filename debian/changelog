@@ -1,4 +1,4 @@
-maven-debian-helper (1.6.14) UNRELEASED; urgency=medium
+maven-debian-helper (1.7) UNRELEASED; urgency=medium
 
   * Ignore the 'maven clean' errors when building with debhelper
   * Do not run the tests when DEB_BUILD_OPTIONS=nocheck is specified
