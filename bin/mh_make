@@ -21,6 +21,7 @@ syntax()
    echo -e "\t-t<true|false> --run-tests=<true|false>: include or not the tests"
    echo -e "\t-d<true|false> --javadoc=<true|false>: include or not the javadoc"
    echo -e "\t  during the build"
+   echo -e "\t--cdbs: use CDBS as the build helper instead of DH"
    echo -e "\t-a --ant: use Ant for the packaging instead of Maven"
    echo -e "\t-v --verbose: show more information while running"
    echo -e ""
@@ -38,7 +39,7 @@ syntax()
    exit 1
 }
 
-ARGS="p package b bin-package t run-tests d javadoc a ant v verbose s from-svn" parseargs "$@"
+ARGS="p package b bin-package t run-tests d javadoc a ant v verbose s from-svn cdbs" parseargs "$@"
 
 if [ -z "$DEBFULLNAME" ]; then
   echo "Please define the environment variable DEBFULLNAME, e.g."
@@ -67,6 +68,7 @@ BIN_PACKAGE=$(getarg b bin-package)
 RUN_TESTS=$(getarg t run-tests)
 GEN_JAVADOC=$(getarg d javadoc)
 ANT=$(getarg a ant)
+CDBS=$(getarg cdbs)
 FROM_SVN=$(getarg s from-svn)
 VERBOSE=$(getarg v verbose)
 
@@ -194,7 +196,7 @@ eval $(cat debian/$BIN_PACKAGE.substvars | sed -e 's/maven\./maven_/' | grep mav
 
 mh_patchpoms ${VERBOSE:+--verbose} -p$BIN_PACKAGE -rdebian/maven.rules -idebian/maven.ignoreRules --keep-pom-version
 
-mvn org.debian.maven:maven-packager-utils:$MH_VERSION:generate -Demail="$DEBEMAIL" -Dpackager="$DEBFULLNAME" -DpackagerLicense="$DEBLICENSE" -Dpackage="$PACKAGE" -Dbin.package="$BIN_PACKAGE" -DrunTests="$RUN_TESTS" -DgenerateJavadoc="$GEN_JAVADOC" -Dmaven.repo.local=/usr/share/maven-repo ${ANT:+-DpackageType=ant} ${FROM_SVN:+-DdownloadUrl=scm:svn:$FROM_SVN} --offline
+mvn org.debian.maven:maven-packager-utils:$MH_VERSION:generate -Demail="$DEBEMAIL" -Dpackager="$DEBFULLNAME" -DpackagerLicense="$DEBLICENSE" -Dpackage="$PACKAGE" -Dbin.package="$BIN_PACKAGE" -DrunTests="$RUN_TESTS" -DgenerateJavadoc="$GEN_JAVADOC" -Dmaven.repo.local=/usr/share/maven-repo ${ANT:+-DpackageType=ant} ${CDBS:+-Dhelper=cdbs} ${FROM_SVN:+-DdownloadUrl=scm:svn:$FROM_SVN} --offline
 
 if [ $? != 0 ]; then
     if [ -f debian/$BIN_PACKAGE.poms ]; then

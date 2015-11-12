@@ -156,6 +156,13 @@ public class GenerateDebianFilesMojo extends AbstractMojo {
      */
     protected boolean generateJavadoc;
 
+    /**
+     * The packaging helper used to build the package (CDBS or DH).
+     *
+     * @parameter expression="${helper}" default-value="dh"
+     */
+    protected String helper;
+
     private PackageScanner scanner = new PackageScanner(false);
     private LicensesScanner licensesScanner = new LicensesScanner();
 
@@ -167,6 +174,9 @@ public class GenerateDebianFilesMojo extends AbstractMojo {
 
         String controlTemplate = "control.vm";
         String rulesTemplate = "rules.vm";
+        if ("cdbs".equals(helper)) {
+            rulesTemplate = "rules.cdbs.vm";
+        }
         if ("ant".equals(packageType)) {
             controlTemplate = "control.ant.vm";
             rulesTemplate = "rules.ant.vm";
@@ -185,6 +195,7 @@ public class GenerateDebianFilesMojo extends AbstractMojo {
             context.put("package", packageName);
             context.put("packageType", packageType);
             context.put("binPackage", binPackageName);
+            context.put("helper", helper);
             context.put("packager", packager);
             context.put("packagerEmail", email);
             context.put("project", project);
