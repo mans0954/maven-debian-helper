@@ -1,4 +1,4 @@
-maven-debian-helper (1.7) UNRELEASED; urgency=medium
+maven-debian-helper (1.7) unstable; urgency=medium
 
   * Ignore the 'maven clean' errors when building with debhelper
   * Do not run the tests when DEB_BUILD_OPTIONS=nocheck is specified
@@ -9,7 +9,7 @@ maven-debian-helper (1.7) UNRELEASED; urgency=medium
   * Generate debian/watch for GitHub projects
   * Added animal-sniffer-maven-plugin to the ignored plugins
 
- -- Emmanuel Bourg <ebourg@apache.org>  Thu, 12 Nov 2015 10:10:31 +0100
+ -- Emmanuel Bourg <ebourg@apache.org>  Thu, 12 Nov 2015 19:18:51 +0100
 
 maven-debian-helper (1.6.13) unstable; urgency=medium
 
