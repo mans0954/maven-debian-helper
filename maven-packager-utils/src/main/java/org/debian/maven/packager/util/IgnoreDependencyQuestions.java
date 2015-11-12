@@ -49,6 +49,7 @@ public class IgnoreDependencyQuestions {
         {"org.apache.maven.plugins", "maven-eclipse-plugin"},
         {"org.apache.maven.plugins", "maven-idea-plugin"},
         {"org.apache.maven.plugins", "maven-source-plugin"},
+        {"org.codehaus.mojo", "animal-sniffer-maven-plugin"},
         {"org.codehaus.mojo", "changelog-maven-plugin"},
         {"org.codehaus.mojo", "netbeans-freeform-maven-plugin"},
         {"org.codehaus.mojo", "nbm-maven-plugin"},
