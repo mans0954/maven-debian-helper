@@ -116,7 +116,7 @@ sub clean {
 	# don't populate the directory just to run a clean target.
 	if (-e "$this->{cwd}/debian/maven-repo")
 	{
-		$this->doit_in_builddir(@{$this->{maven_cmd}}, "clean");
+		$this->doit_in_builddir_noerror(@{$this->{maven_cmd}}, "clean");
 		doit("rm", "-r", "$this->{cwd}/debian/maven-repo");
 	}
 	$this->doit_in_sourcedir("mh_unpatchpoms", "-p$this->{package}");
