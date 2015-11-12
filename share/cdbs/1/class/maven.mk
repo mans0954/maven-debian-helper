@@ -95,7 +95,7 @@ mvn-build:
 	if [ ! -f pom.xml.save ]; then \
 		$(MAKE) -f debian/rules patch-poms; \
 	fi
-	$(DEB_MAVEN_INVOKE) $(DEB_MAVEN_BUILD_TARGET)
+	$(DEB_MAVEN_INVOKE) $(DEB_MAVEN_BUILD_TARGET) -DskipTests
 # Placeholders to insert custom processing before and after a Maven build
 before-mvn-build::
 after-mvn-build::

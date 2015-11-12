@@ -75,6 +75,18 @@ sub build {
 		}
 	}
 
+	push(@_, "-DskipTests");
+
+	$this->doit_in_builddir(@{$this->{maven_cmd}}, @_);
+}
+
+sub test {
+	my $this=shift;
+
+	if (!@_) {
+		push(@_, "test");
+	}
+
 	$this->doit_in_builddir(@{$this->{maven_cmd}}, @_);
 }
 

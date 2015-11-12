@@ -104,7 +104,7 @@ DEB_MAVEN_INVOKE = cd $(DEB_BUILDDIR) && $(JAVACMD) -noverify -cp $(DEB_CLASSPAT
 # multiple targets for each step.
 DEB_MAVEN_BUILD_TARGET = package
 DEB_MAVEN_INSTALL_TARGET = org.debian.maven:debian-maven-plugin:$(MAVEN_DEBIAN_VERSION):install
-DEB_MAVEN_CHECK_TARGET =
+DEB_MAVEN_CHECK_TARGET = test
 DEB_MAVEN_CLEAN_TARGET = clean
 DEB_MAVEN_DOC_TARGET = javadoc:jar
 DEB_MAVEN_INSTALL_DOC_TARGET =
