@@ -28,6 +28,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Developer;
@@ -413,6 +415,20 @@ public class GenerateDebianFilesMojo extends AbstractMojo {
                 }
             }
 
+            if (downloadUrl != null && downloadUrl.startsWith("scm:git:") && downloadUrl.contains("github")) {
+                Pattern pattern = Pattern.compile("github\\.com/([^/]+)/([^/\\.]+)");
+                Matcher matcher = pattern.matcher(downloadUrl);
+                if (matcher.find()) {
+                    downloadType = DownloadType.GITHUB;
+                    downloadUrl = downloadUrl.substring("scm:git:".length());
+
+                    context.put("userId", matcher.group(1));
+                    context.put("repository", matcher.group(2));
+
+                    generateFile(context, "watch.github.vm", outputDirectory, "watch");
+                }
+            }
+
             if (downloadType == DownloadType.UNKNOWN) {
                 System.err.println("Cannot recognize the download url (" +
                         downloadUrl + ").");
@@ -613,6 +629,7 @@ public class GenerateDebianFilesMojo extends AbstractMojo {
         int SVN = 1;
         int CVS = 2;
         int TARBALL = 3;
+        int GITHUB = 4;
     }
 }
 
