@@ -28,12 +28,14 @@ sub new {
 	$this->{doc_package} = (grep /-doc$/, @packages)[0];
 	my $classconf = '/etc/maven/m2-debian.conf';
 
-	my @classpath = ('/usr/share/maven/boot/classworlds-2.x.jar');
+	my @classpath = ('/usr/share/maven/boot/plexus-classworlds-2.x.jar');
 	if (-e "$java_home/lib/tools.jar") {
 		push(@classpath, "$java_home/lib/tools.jar");
 	}
 
 	my @jvmopts = ('-noverify', '-cp', join(':',@classpath),
+		"-Dmaven.home=/usr/share/maven",
+		"-Dmaven.multiModuleProjectDirectory=$this->{cwd}",
 		"-Dclassworlds.conf=$classconf");
 	if (-e "$this->{cwd}/debian/maven.properties") {
 		push (@jvmopts, "-Dproperties.file.manual=$this->{cwd}/debian/maven.properties");
@@ -41,7 +43,7 @@ sub new {
 
 	@{$this->{maven_cmd}} = ($java_home . '/bin/java',
 		@jvmopts,
-		"org.codehaus.classworlds.Launcher",
+		"org.codehaus.plexus.classworlds.launcher.Launcher",
 		"-s/etc/maven/settings-debian.xml",
 		"-Ddebian.dir=$this->{cwd}/debian",
 		"-Dmaven.repo.local=$this->{cwd}/debian/maven-repo");

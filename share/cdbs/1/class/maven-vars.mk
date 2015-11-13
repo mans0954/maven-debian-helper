@@ -93,7 +93,9 @@ DEB_MAVEN_PROPERTYFILE = $(shell test -f $(CURDIR)/debian/maven.properties && ec
 # MAVEN_ARGS_<package> for each individual package.
 DEB_MAVEN_INVOKE = cd $(DEB_BUILDDIR) && $(JAVACMD) -noverify -cp $(DEB_CLASSPATH) \
 		 $(JAVA_OPTS) -Dclassworlds.conf=$(MAVEN_CLASSCONF) \
-		 org.codehaus.classworlds.Launcher \
+		 -Dmaven.home=/usr/share/maven \
+		 -Dmaven.multiModuleProjectDirectory=$(CURDIR) \
+		 org.codehaus.plexus.classworlds.launcher.Launcher \
 		 -s/etc/maven/settings-debian.xml \
 		 -Dmaven.repo.local=$(DEB_MAVEN_REPO) \
 		 $(if $(DEB_MAVEN_ARGS_$(cdbs_curpkg)),$(DEB_MAVEN_ARGS_$(cdbs_curpkg)),$(DEB_MAVEN_ARGS))
