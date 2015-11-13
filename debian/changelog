@@ -1,9 +1,12 @@
-maven-debian-helper (2.0) UNRELEASED; urgency=medium
+maven-debian-helper (2.0~exp1) experimental; urgency=medium
 
+  * Team upload.
   * Update Maven to version 3.3
-  * Remove nodocs build due to Maven 3 update
+    - Remove nodocs build due to Maven 3 update
+    - Generate maven metadata when copying maven repo for building
+  * Update SysInstallMojo to wait for symlinks to finish
 
- -- Andrew Schurman <arcticwaters@gmail.com>  Mon, 16 Mar 2015 18:48:32 -0700
+ -- Andrew Schurman <arcticwaters@gmail.com>  Fri, 13 Nov 2015 16:06:38 +0100
 
 maven-debian-helper (1.7) unstable; urgency=medium
 
