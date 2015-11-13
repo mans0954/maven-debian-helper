@@ -29,9 +29,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import junit.framework.TestCase;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
+
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
 import org.debian.maven.packager.util.PackageScanner;
 import org.debian.maven.repo.DependencyRule;
 
@@ -343,7 +345,7 @@ public class DependenciesSolverTest extends TestCase {
     protected void useFile(String resource, File file) throws IOException {
         final FileWriter out = new FileWriter(file);
         final Reader in = read(resource);
-        IOUtils.copy(in,out);
+        IOUtil.copy(in,out);
         in.close();
         out.close();
     }

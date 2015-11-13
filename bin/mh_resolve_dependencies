@@ -3,7 +3,7 @@
 MH_VERSION=$(ls /usr/share/maven-repo/org/debian/maven/maven-packager-utils/ | sed 's|/||')
 . /usr/share/maven-repo-helper/mh_lib.sh
 
-CLASSPATH="/usr/share/java/maven-project.jar:/usr/share/java/maven-repo-helper.jar:/usr/share/java/maven-packager-utils.jar"
+CLASSPATH="/usr/share/java/maven-repo-helper.jar:/usr/share/java/maven-packager-utils.jar"
 
 syntax()
 {

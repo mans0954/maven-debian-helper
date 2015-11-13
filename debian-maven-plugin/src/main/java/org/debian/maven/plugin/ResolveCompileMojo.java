@@ -16,13 +16,13 @@
 
 package org.debian.maven.plugin;
 
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.ResolutionScope;
+
 /**
  * Resolves compile dependencies
- *
- * @goal resolve-compile
- * @requiresDependencyResolution compile
- * @aggregator true
  */
+@Mojo(name = "resolve-compile", aggregator = true, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class ResolveCompileMojo extends ResolveNoneMojo
 {
 }

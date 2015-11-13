@@ -18,13 +18,13 @@ package org.debian.maven.plugin;
 
 import java.io.IOException;
 
+import org.apache.maven.plugins.annotations.Mojo;
 import org.codehaus.plexus.util.FileUtils;
 
 /**
  * Remove installed files and symlinks from the /usr/share hierarchy
- *
- * @goal sysuninstall
  */
+@Mojo(name = "sysuninstall")
 public class SysUninstallMojo extends SysInstallMojo {
     // ----------------------------------------------------------------------
     // Mojo parameters

@@ -32,6 +32,7 @@ include $(_cdbs_rules_path)/buildcore.mk$(_cdbs_makefile_suffix)
 include $(_cdbs_class_path)/maven-vars.mk$(_cdbs_makefile_suffix)
 
 DEB_MAVEN_REPO := $(CURDIR)/debian/maven-repo
+DEB_MAVEN_SCRIPT_DIR := /usr/share/maven-debian-helper/
 
 JAVA_OPTS = \
   $(shell test -n "$(DEB_MAVEN_PROPERTYFILE)" && echo -Dproperties.file.manual=$(DEB_MAVEN_PROPERTYFILE))
@@ -53,7 +54,7 @@ maven-sanity-check:
 		echo "You must specify a valid JAVA_HOME or JAVACMD!"; \
 		exit 1; \
 	fi
-	@if ! test -r "$(MAVEN_HOME)/boot/classworlds.jar"; then \
+	@if ! test -r "$(MAVEN_HOME)/boot/plexus-classworlds-2.x.jar"; then \
 		echo "You must specify a valid MAVEN_HOME directory!"; \
 		exit 1; \
 	fi
@@ -66,7 +67,6 @@ debian/maven.rules:
 
 ifeq (, $(DEB_DOC_PACKAGE))
 DEB_PATCHPOMS_ARGS += --build-no-docs
-debian/stamp-maven-build: override MAVEN_CLASSCONF = /etc/maven2/m2-debian-nodocs.conf
 endif
 
 debian/stamp-poms-patched: debian/maven-repo
@@ -80,7 +80,7 @@ unpatch-poms: debian/$(DEB_JAR_PACKAGE).poms
 	$(RM) -f debian/stamp-poms-patched
 
 debian/maven-repo:
-	/usr/share/maven-debian-helper/copy-repo.sh $(CURDIR)/debian
+	$(DEB_MAVEN_SCRIPT_DIR)/copy-repo.sh $(CURDIR)/debian
 
 post-patches:: patch-poms
 

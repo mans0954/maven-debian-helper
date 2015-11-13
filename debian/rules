@@ -1,18 +1,36 @@
 #!/usr/bin/make -f
 
+ROOT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))/..
+# ensure that maven.mk is able to include necessary files
+_cdbs_class_path = $(ROOT_DIR)/share/cdbs/1/class
+
 include /usr/share/cdbs/1/rules/debhelper.mk
-include /usr/share/cdbs/1/class/ant.mk
+include $(ROOT_DIR)/share/cdbs/1/class/maven.mk
 
 PACKAGE              := $(DEB_SOURCE_PACKAGE)
 VERSION              := $(shell echo ${DEB_UPSTREAM_VERSION} | sed -r 's/([0-9\.]+).*/\1/')
 JAVA_HOME            := /usr/lib/jvm/default-java
-DEB_JARS             := ant-junit junit commons-io classworlds maven-core maven-artifact maven-artifact-manager maven-model \
- maven-compat maven-plugin-api maven-project maven-scm-api velocity file-management plexus-utils \
- plexus-container-default-alpha maven-repo-helper
-DEB_ANT_BUILD_TARGET := package #javadoc
-DEB_ANT_BUILDFILE    := debian/build.xml
-DEB_ANT_ARGS         := -Dpackage=$(PACKAGE) -Dbin.package=$(PACKAGE)
-API_DOCS             := target/api
+MAVEN_CLASSCONF_ORIG := $(ROOT_DIR)/etc/m2-debian.conf
+MAVEN_CLASSCONF_REAL := $(ROOT_DIR)/debian/.mh/etc/m2-debian.conf
+MAVEN_CLASSCONF      := $(MAVEN_CLASSCONF_REAL)
+MAVEN_SETTINGS       := $(ROOT_DIR)/etc/settings-debian.xml
+DEB_MAVEN_PROPERTYFILE:= $(ROOT_DIR)/debian/build.properties
+DEB_MAVEN_SCRIPT_DIR := $(ROOT_DIR)/share/maven-debian-helper/
+
+
+# clean happens before we get a chance to bootstrap (and we don't need sugar yet)
+clean:: override MAVEN_CLASSCONF=/etc/maven/m2.conf
+clean:: override JAVA_OPTS+="-Dmaven.home=$(MAVEN_HOME)"
+
+# bootstrap the build process
+before-mvn-build:: override MAVEN_CLASSCONF=/etc/maven/m2.conf
+before-mvn-build:: override JAVA_OPTS+="-Dmaven.home=$(MAVEN_HOME)"
+before-mvn-build::
+	$(DEB_MAVEN_INVOKE) -Dmaven.test.skip -Djar.finalName=maven-debian-helper install
+	cp maven-debian-helper/target/maven-debian-helper.jar debian/.mh/
+	sed 's|load .*/maven-debian-helper.jar|load $(ROOT_DIR)/debian/.mh/maven-debian-helper.jar|g' $(MAVEN_CLASSCONF_ORIG) > $(MAVEN_CLASSCONF_REAL)
+	$(DEB_MAVEN_INVOKE) clean
+
 
 debian/.mh:
 	mkdir -p debian/.mh
@@ -59,7 +77,7 @@ clean::
 # Helper target, to use when updating the version of this package
 update-package-version:
 	perl -p -i -e "s/^    <version>([0-9\.]+<)/    <version>${VERSION}</" pom.xml
-	perl -p -i -e "s/^        <version>([0-9\.]+<)/        <version>${VERSION}</" maven-build-nodocs/pom.xml maven-debian-helper/pom.xml debian-maven-plugin/pom.xml
+	perl -p -i -e "s/^        <version>([0-9\.]+<)/        <version>${VERSION}</" maven-debian-helper/pom.xml debian-maven-plugin/pom.xml
 	perl -p -i -e "s/maven-debian-helper \(>= ([0-9\.]+)\)/maven-debian-helper \(>= ${VERSION})/" share/cdbs/1/class/maven-vars.mk maven-packager-utils/src/main/resources/control.vm
 
 

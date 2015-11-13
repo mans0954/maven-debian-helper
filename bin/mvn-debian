@@ -4,10 +4,10 @@
 # line in a similar way as our cdbs snippets work. Production use is
 # not supported by the maintainer of maven-debian-helper.
 
-DEB_CLASSPATH=/usr/share/java/classworlds.jar
-JAVA_OPTS=-Dclassworlds.conf=/etc/maven2/m2-debian.conf
+DEB_CLASSPATH=/usr/share/java/plexus-classworlds2.jar
+JAVA_OPTS=-Dclassworlds.conf=/etc/maven/m2-debian.conf
 MAIN_CLASS=org.codehaus.classworlds.Launcher
-MAVEN_OPTS=-s/etc/maven2/settings-debian.xml
+MAVEN_OPTS=-s/etc/maven/settings-debian.xml
 
 TMP_DIR=$(mktemp -d ${TMP:-/tmp}/mvn-deb.XXXXXXXXXX)
 /usr/share/maven-debian-helper/copy-repo.sh $TMP_DIR

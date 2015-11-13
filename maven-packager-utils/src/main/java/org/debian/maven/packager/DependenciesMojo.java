@@ -16,12 +16,16 @@
 
 package org.debian.maven.packager;
 
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.debian.maven.packager.util.PackageScanner;
 import org.debian.maven.repo.DependencyRuleSetFiles.RulesType;
@@ -30,96 +34,76 @@ import org.debian.maven.repo.DependencyRuleSetFiles.RulesType;
  * Analyze the Maven dependencies and extract the list of dependent packages,
  * reusable as subvars in the Debian control file and the list of POM files
  * to use and the rules if they did not exist already.
- *
- * @goal dependencies
- * @aggregator
- * @requiresDependencyResolution
- * @phase process-sources
  * 
  * @author Ludovic Claude
  */
+@Mojo(name = "dependencies", aggregator = true, requiresDependencyResolution = ResolutionScope.RUNTIME, defaultPhase = LifecyclePhase.PROCESS_SOURCES)
 public class DependenciesMojo extends AbstractMojo {
 
     /**
      * The Maven Project Object
-     *
-     * @parameter expression="${project}"
-     * @readonly
-     * @required
      */
+    @Parameter(property = "project", readonly = true, required = true)
     protected MavenProject project;
     
     /**
      * A list of every project in this reactor; provided by Maven
-     * 
-     * @parameter expression="${project.collectedProjects}"
      */
+    @Parameter(property = "project.collectedProjects")
     protected List<MavenProject> collectedProjects;
     
     /**
      * Location of the file.
-     * 
-     * @parameter expression="${debian.directory}"
-     *   default-value="debian"
      */
+    @Parameter(property = "debian.directory", defaultValue = "debian")
     protected File outputDirectory;
     
     /**
      * Name of the package (e.g. 'commons-lang')
-     * 
-     * @parameter expression="${package}"
-     * @required
      */
+    @Parameter(property = "package", required = true)
     protected String packageName;
     
     /**
      * Type of the package (e.g. 'maven' or 'ant')
-     * 
-     * @parameter expression="${packageType}" default-value="maven"
      */
+    @Parameter(property = "packageType", defaultValue = "maven")
     protected String packageType;
     
     /**
      * Should we also resolve Javadoc dependencies
-     * 
-     * @parameter expression="${resolveJavadoc}" default-value="false"
      */
+    @Parameter(property = "resolveJavadoc", defaultValue = "false")
     protected boolean resolveJavadoc;
     
     /**
      * Location for the list of POMs file.
-     * 
-     * @required
-     * @parameter expression="debian/${package}.poms"
      */
+    @Parameter(defaultValue = "debian/${package}.poms", required = true)
     protected File listOfPoms;
     
     /**
      * Location of the Maven repository
-     *
-     * @parameter expression="${maven.repo.local}" default-value="/usr/share/maven-repo"
      */
+    @Parameter(property = "maven.repo.local", defaultValue = "/usr/share/maven-repo")
     protected File mavenRepo;
     
     /**
      * Interactive execution will ask questions to the user
-     * 
-     * @parameter expression="${interactive}" default-value="true"
      */
+    @Parameter(property = "interactive", defaultValue = "true")
     protected boolean interactive;
     
     /**
      * Offline prevents any download from Internet
-     * 
-     * @parameter expression="${offline}" default-value="false"
      */
+    @Parameter(property = "offline", defaultValue = "false")
     protected boolean offline;
     
     /**
      * Try to be verbose
-     * 
-     * @parameter expression="${verbose}" default-value="false"
      */
+    @Parameter(property = "verbose", defaultValue = "false")
     protected boolean verbose;
 
     public void execute() throws MojoExecutionException {
