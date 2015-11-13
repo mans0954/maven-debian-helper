@@ -1,7 +1,6 @@
 maven-debian-helper (2.0) UNRELEASED; urgency=medium
 
   * Update Maven to version 3.0.5
-  * Build deb package using itself rather than maven-ant-helper
   * Update mojos to use annotations
   * Remove nodocs build due to Maven 3 update
 

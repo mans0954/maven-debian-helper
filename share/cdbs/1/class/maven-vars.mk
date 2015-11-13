@@ -37,7 +37,6 @@ MAVEN_HOME = /usr/share/maven
 
 MAVEN_DEBIAN_VERSION = $(shell ls /usr/share/maven-repo/org/debian/maven/maven-packager-utils/ | sed 's|/||')
 MAVEN_CLASSCONF = /etc/maven/m2-debian.conf
-MAVEN_SETTINGS = /etc/maven/settings-debian.xml
 
 # The home directory of the Java Runtime Environment (JRE) or Java Development
 # Kit (JDK). You can either directly set JAVA_HOME in debian/rules or set
@@ -95,7 +94,7 @@ DEB_MAVEN_PROPERTYFILE = $(shell test -f $(CURDIR)/debian/maven.properties && ec
 DEB_MAVEN_INVOKE = cd $(DEB_BUILDDIR) && $(JAVACMD) -noverify -cp $(DEB_CLASSPATH) \
 		 $(JAVA_OPTS) -Dclassworlds.conf=$(MAVEN_CLASSCONF) \
 		 org.codehaus.classworlds.Launcher \
-		 -s$(MAVEN_SETTINGS) \
+		 -s/etc/maven/settings-debian.xml \
 		 -Dmaven.repo.local=$(DEB_MAVEN_REPO) \
 		 $(if $(DEB_MAVEN_ARGS_$(cdbs_curpkg)),$(DEB_MAVEN_ARGS_$(cdbs_curpkg)),$(DEB_MAVEN_ARGS))
 

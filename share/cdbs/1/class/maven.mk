@@ -32,7 +32,6 @@ include $(_cdbs_rules_path)/buildcore.mk$(_cdbs_makefile_suffix)
 include $(_cdbs_class_path)/maven-vars.mk$(_cdbs_makefile_suffix)
 
 DEB_MAVEN_REPO := $(CURDIR)/debian/maven-repo
-DEB_MAVEN_SCRIPT_DIR := /usr/share/maven-debian-helper/
 
 JAVA_OPTS = \
   $(shell test -n "$(DEB_MAVEN_PROPERTYFILE)" && echo -Dproperties.file.manual=$(DEB_MAVEN_PROPERTYFILE))
@@ -80,7 +79,7 @@ unpatch-poms: debian/$(DEB_JAR_PACKAGE).poms
 	$(RM) -f debian/stamp-poms-patched
 
 debian/maven-repo:
-	$(DEB_MAVEN_SCRIPT_DIR)/copy-repo.sh $(CURDIR)/debian
+	/usr/share/maven-debian-helper/copy-repo.sh $(CURDIR)/debian
 
 post-patches:: patch-poms
 

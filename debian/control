@@ -8,10 +8,10 @@ Uploaders: Torsten Werner <twerner@debian.org>,
            Thomas Koch <thomas@koch.ro>,
            Emmanuel Bourg <ebourg@apache.org>,
            Wolodja Wentland <debian@babilen5.org>
-Build-Depends: cdbs, debhelper (>= 9), default-jdk, help2man
+Build-Depends: cdbs, debhelper (>= 9), default-jdk, maven-ant-helper (>= 7.0), ant-optional, help2man
 Build-Depends-Indep: junit4,
                      libcommons-io-java,
-                     libmaven-install-plugin-java,
+                     libmaven3-core-java,
                      libmaven-plugin-tools-java,
                      libplexus-velocity-java,
                      maven-repo-helper (>= 1.8.9)
