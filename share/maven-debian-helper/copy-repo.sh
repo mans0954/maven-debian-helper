@@ -30,7 +30,7 @@ find_group_artifact_ids() {
 }
 
 read_maven_plugin_xpath() {
-  unzip -q -c "$1" META-INF/maven/plugin.xml 2>/dev/null | xmllint --xpath "$2" - 2>/dev/null
+  unzip -q -c "$1" META-INF/maven/plugin.xml 2>/dev/null | xmllint --xpath "$2" - 2>/dev/null || true
 }
 
 list_fakes()
