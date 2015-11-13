@@ -18,14 +18,12 @@ package org.debian.maven.plugin;
 
 import java.io.IOException;
 
-import org.apache.maven.plugins.annotations.Mojo;
-
 /**
  * Install the javadoc jar.
  *
  * @author Ludovic Claude
+ * @goal sysinstall-doc
  */
-@Mojo(name = "sysinstall-doc")
 public class SysInstallDocMojo extends SysInstallMojo {
 
     {

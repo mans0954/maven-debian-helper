@@ -16,13 +16,13 @@
 
 package org.debian.maven.plugin;
 
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.ResolutionScope;
-
 /**
  * Resolves runtime dependencies
+ *
+ * @goal resolve-runtime
+ * @requiresDependencyResolution runtime
+ * @aggregator true
  */
-@Mojo(name = "resolve-runtime", aggregator = true, requiresDependencyResolution = ResolutionScope.RUNTIME)
 public class ResolveRuntimeMojo extends ResolveNoneMojo
 {
 }

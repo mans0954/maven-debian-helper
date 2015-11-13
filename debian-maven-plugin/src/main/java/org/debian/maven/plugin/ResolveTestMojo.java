@@ -16,13 +16,13 @@
 
 package org.debian.maven.plugin;
 
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.ResolutionScope;
-
 /**
  * Resolves test dependencies
+ *
+ * @goal resolve-test
+ * @requiresDependencyResolution test
+ * @aggregator true
  */
-@Mojo(name = "resolve-test", aggregator = true, requiresDependencyResolution = ResolutionScope.TEST)
 public class ResolveTestMojo extends ResolveNoneMojo
 {
 }

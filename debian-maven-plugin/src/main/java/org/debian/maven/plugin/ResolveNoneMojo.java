@@ -18,12 +18,13 @@ package org.debian.maven.plugin;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Mojo;
 
 /**
  * Dummy goal that just reads the pom.xml files including parents
+ *
+ * @goal resolve-none
+ * @aggregator true
  */
-@Mojo(name = "resolve-none", aggregator = true)
 public class ResolveNoneMojo extends AbstractMojo {
     
     public void execute() throws MojoExecutionException {

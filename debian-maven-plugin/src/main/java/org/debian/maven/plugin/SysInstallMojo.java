@@ -26,8 +26,6 @@ import java.util.regex.Pattern;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.plexus.util.FileUtils;
 import org.debian.maven.repo.ListOfPOMs;
 import org.debian.maven.repo.POMCleaner;
@@ -35,8 +33,9 @@ import org.debian.maven.repo.POMOptions;
 
 /**
  * Install pom and jar files into the /usr/share/hierarchy
+ *
+ * @goal sysinstall
  */
-@Mojo(name = "sysinstall")
 public class SysInstallMojo extends AbstractMojo {
 
     /** Regex for detecting that package is a libXXX-java package */
@@ -51,96 +50,134 @@ public class SysInstallMojo extends AbstractMojo {
 
     /**
      * groupId
+     *
+     * @parameter expression="${project.groupId}"
+     * @required
+     * @readonly
      */
-    @Parameter(property = "project.groupId", required = true, readonly = true)
     private String groupId;
 
     /**
      * artifactId
+     *
+     * @parameter expression="${project.artifactId}"
+     * @required
+     * @readonly
      */
-    @Parameter(property = "project.artifactId", required = true, readonly = true)
     private String artifactId;
 
     /**
      * destGroupId
+     *
+     * @parameter expression="${project.groupId}"
+     * @required
      */
-    @Parameter(property = "project.groupId", required = true)
     private String destGroupId;
 
     /**
      * destArtifactId
+     *
+     * @parameter expression="${project.artifactId}"
+     * @required
      */
-    @Parameter(property = "project.artifactId", required = true)
     private String destArtifactId;
 
     /**
      * version
+     *
+     * @parameter expression="${project.version}"
+     * @required
+     * @readonly
      */
-    @Parameter(property = "project.version", required = true, readonly = true)
     private String version;
 
     /**
      * debianVersion
+     *
+     * @parameter
      */
-    @Parameter
     private String debianVersion;
 
     /**
      * directory where the current pom.xml can be found
+     *
+     * @parameter expression="${basedir}"
+     * @required
+     * @readonly
      */
-    @Parameter(property = "basedir", required = true, readonly = true)
     private File basedir;
 
     /**
      * directory of the jar file
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     * @readonly
      */
-    @Parameter(property = "project.build.directory", required = true, readonly = true)
     private String jarDir;
 
     /**
      * finalname of the artifact
+     *
+     * @parameter expression="${project.build.finalName}"
+     * @required
+     * @readonly
      */
-    @Parameter(property = "project.build.finalName", required = true, readonly = true)
     private String finalName;
 
     /**
      * Debian directory
+     *
+     * @parameter expression="${debian.dir}"
      */
-    @Parameter(property = "debian.dir")
     private File debianDir;
 
     /**
      * Debian package (send from command line)
+     *
+     * @parameter expression="${debian.package}"
      */
-    @Parameter(property = "debian.package")
     private String debianPackage;
 
     /**
      * Debian package destination (set by xxx.poms file).
      * By default, equals to <code>debianPackage</code> attribute.
+     *
+     * @parameter expression="${debian.package}"
      */
-    @Parameter(property = "debian.package")
     private String destPackage;
 
-    @Parameter(property = "maven.rules", defaultValue = "maven.rules", required = true)
+    /**
+     * @parameter expression="${maven.rules}" default-value="maven.rules"
+     * @required
+     */
     private String mavenRules;
 
-    @Parameter(property = "maven.ignoreRules", defaultValue = "maven.ignoreRules", required = true)
+    /**
+     * @parameter expression="${maven.ignoreRules}" default-value="maven.ignoreRules"
+     * @required
+     */
     private String mavenIgnoreRules;
 
-    @Parameter(property = "maven.publishedRules", defaultValue = "maven.publishedRules", required = true)
+    /**
+     * @parameter expression="${maven.publishedRules}" default-value="maven.publishedRules"
+     * @required
+     */
     private String mavenPublishedRules;
 
     /**
      * root directory of the Maven repository
+     *
+     * @parameter expression="${basedir}"
+     * @readonly
      */
-    @Parameter(defaultValue = "${basedir}", readonly = true)
     private File repoDir;
 
     /**
      * Install the jar to /usr/share/java if true. Default is true
+     *
+     * @parameter expression="${install.to.usj}" default-value="true"
      */
-    @Parameter(property = "install.to.usj", defaultValue = "true")
     private boolean installToUsj = true;
 
     /**

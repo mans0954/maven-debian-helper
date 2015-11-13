@@ -18,25 +18,25 @@ package org.debian.maven.plugin;
 
 import java.io.File;
 
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-
 /**
  * Install pom and jar files into the debian/ directory
+ *
+ * @goal install
  */
-@Mojo(name = "install")
 public class InstallMojo extends SysInstallMojo {
 
     /**
      * Maven repository root
+     *
+     * @parameter expression="${maven.repo.local}"
      */
-    @Parameter(property = "maven.repo.local")
     private File mavenRepoLocal;
 
     /**
      * If true, use local Maven repository for installation
+     *
+     * @parameter expression="${use.maven.repo.local}"
      */
-    @Parameter(property = "use.maven.repo.local")
     private boolean useMavenRepoLocal;
 
     // ----------------------------------------------------------------------

@@ -35,10 +35,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Developer;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -52,87 +48,114 @@ import org.debian.maven.repo.POMOptions;
 /**
  * Generate the Debian files for packaging the current Maven project.
  *
+ * @goal generate
+ * @aggregator
+ * @requiresDependencyResolution
+ * @phase process-sources
+ * 
  * @author Ludovic Claude
  */
-@Mojo(name = "generate", defaultPhase = LifecyclePhase.PROCESS_SOURCES, requiresDependencyResolution = ResolutionScope.RUNTIME, aggregator = true)
 public class GenerateDebianFilesMojo extends AbstractMojo {
 
     /**
      * The Maven Project Object
+     *
+     * @parameter expression="${project}"
+     * @readonly
+     * @required
      */
-    @Parameter(property = "project", required = true, readonly = true)
     protected MavenProject project;
     
     /**
      * A list of every project in this reactor; provided by Maven
+     * 
+     * @parameter expression="${project.collectedProjects}"
      */
-    @Parameter(property = "project.collectedProjects")
     protected List<MavenProject> collectedProjects;
     
-    @Parameter(property = "localRepository", required = true, readonly = true)
+    /**
+     * @parameter expression="${localRepository}"
+     * @required
+     * @readonly
+     */
     protected ArtifactRepository localRepository;
     
     /**
      * Location of the file.
+     * 
+     * @parameter expression="${debian.directory}"
+     *   default-value="debian"
      */
-    @Parameter(defaultValue = "debian", property = "debian.directory")
     protected File outputDirectory;
     
     /**
      * Name of the packager (e.g. 'Ludovic Claude')
+     * 
+     * @parameter expression="${packager}"
+     * @required
      */
-    @Parameter(required = true, property = "packager")
     protected String packager;
     
     /**
      * Email of the packager (e.g. 'ludovic.claude@laposte.net')
+     * 
+     * @parameter expression="${email}"
+     * @required
      */
-    @Parameter(required = true, property = "email")
     protected String email;
     
     /**
      * License used by the packager (e.g. 'GPL-3' or 'Apache-2.0')
      * See http://dep.debian.net/deps/dep5/ for the list of licenses.
+     * 
+     * @parameter expression="${packagerLicense}" default-value="GPL-3"
+     * @required
      */
-    @Parameter(required = true, property = "packagerLicense", defaultValue = "GPL-3")
     protected String packagerLicense;
     
     /**
      * Name of the source package (e.g. 'commons-lang')
+     * 
+     * @parameter expression="${package}"
+     * @required
      */
-    @Parameter(required = true, property = "package")
     protected String packageName;
     
     /**
      * Name of the binary package (e.g. 'libcommons-lang-java')
+     * 
+     * @parameter expression="${bin.package}"
+     * @required
      */
-    @Parameter(required = true, property = "bin.package")
     protected String binPackageName;
     
     /**
      * Type of the package (e.g. 'maven' or 'ant')
+     * 
+     * @parameter expression="${packageType}" default-value="maven"
      */
-    @Parameter(property = "packageType", defaultValue = "maven")
     protected String packageType;
     
     /**
      * URL for downloading the source code, in the form scm:[svn|cvs]:http://xxx/
      * for downloads using a source code repository,
      * or http://xxx.[tar|zip|gz|tgz] for downloads using source tarballs.
+     * 
+     * @parameter expression="${downloadUrl}"
      */
-    @Parameter(property = "downloadUrl")
     protected String downloadUrl;
     
     /**
      * If true, include running the tests during the build.
+     * 
+     * @parameter expression="${runTests}" default-value="false"
      */
-    @Parameter(property = "runTests", defaultValue = "false")
     protected boolean runTests;
     
     /**
      * If true, generate the Javadoc packaged in a separate package.
+     * @parameter expression="${generateJavadoc}" default-value="false"
      */
-    @Parameter(property = "generateJavadoc", defaultValue = "false")
     protected boolean generateJavadoc;
 
     /**
