@@ -25,6 +25,7 @@ Architecture: all
 Depends: ${misc:Depends}, default-jdk, maven-repo-helper (>= 1.8.9), maven (>= 3.3),
          libmaven-clean-plugin-java,
          libmaven-compiler-plugin-java,
+         libmaven-deploy-plugin-java,
          libmaven-jar-plugin-java,
          libmaven-resources-plugin-java,
          libmaven-site-plugin-java,
