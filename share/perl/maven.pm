@@ -127,19 +127,10 @@ sub clean {
 		$this->doit_in_builddir_noerror(@{$this->{maven_cmd}}, "clean");
 		doit("rm", "-r", "$this->{cwd}/debian/maven-repo");
 	}
+	$this->doit_in_builddir('for dir in $(find . -name target -type d); do if [ -f $(echo $dir | sed -e s/target$/pom.xml/) ]; then rm -Rf $dir; fi done');
 	$this->doit_in_sourcedir("mh_unpatchpoms", "-p$this->{package}");
 	doit("rm", "-f", "debian/stamp-poms-patched");
 	doit("mh_clean");
 }
-
-# FIXME: no standard check target to use here?
-#sub test {
-#	my $this=shift;
-#	$this->doit_in_builddir(@{$this->{maven_cmd}},
-#		"-Ddebian.dir=$this->{cwd}/debian",
-#		"-Ddebian.package=$this->{package}",
-#		"-Dinstall.to.usj=true",
-#		??);
-#}
 
 1
