@@ -71,7 +71,7 @@ sub build {
 		}
 	}
 
-	push(@_, "-DskipTests");
+	push(@_, "-DskipTests", "-Dnotimestamp=true", "-Dlocale=en_US");
 
 	$this->doit_in_builddir(@{$this->{maven_cmd}}, @_);
 }

@@ -1,3 +1,11 @@
+maven-debian-helper (2.0~exp3) UNRELEASED; urgency=medium
+
+  * Team upload.
+  * Disable the timestamps and set the locale to en_US when generating
+    the javadoc in the builds using DH (improves the reproducibility).
+
+ -- Emmanuel Bourg <ebourg@apache.org>  Fri, 27 Nov 2015 09:24:11 +0100
+
 maven-debian-helper (2.0~exp2) experimental; urgency=medium
 
   * Team upload.
