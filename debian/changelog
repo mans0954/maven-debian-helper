@@ -4,6 +4,7 @@ maven-debian-helper (2.0~exp3) UNRELEASED; urgency=medium
   * Disable the timestamps and set the locale to en_US when generating
     the javadoc in the builds using DH (improves the reproducibility).
   * Added a dependency on libmaven-install-plugin-java to fix build failures
+  * Fixed the mvn-debian script to work with Maven 3.3.9
 
  -- Emmanuel Bourg <ebourg@apache.org>  Fri, 27 Nov 2015 09:24:11 +0100
 

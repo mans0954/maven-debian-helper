@@ -23,7 +23,7 @@ if [ -r debian/control ]; then
   MAVEN_OPTS="$MAVEN_OPTS -Ddebian.package=$JAR_PACKAGE"
 fi
 
-java -noverify -cp $DEB_CLASSPATH $JAVA_OPTS $MAIN_CLASS "$@" $MAVEN_OPTS
+java -noverify -Dmaven.multiModuleProjectDirectory=$PWD -cp $DEB_CLASSPATH $JAVA_OPTS $MAIN_CLASS "$@" $MAVEN_OPTS
 
 rm -rf $TMP_DIR
 
