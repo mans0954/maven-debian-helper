@@ -1,4 +1,4 @@
-maven-debian-helper (2.0~exp3) UNRELEASED; urgency=medium
+maven-debian-helper (2.0~exp3) experimental; urgency=medium
 
   * Team upload.
   * Disable the timestamps and set the locale to en_US when generating
@@ -8,7 +8,7 @@ maven-debian-helper (2.0~exp3) UNRELEASED; urgency=medium
   * Use the maven-plugin-api jar from libmaven3-core-java instead of
     libmaven2-core-java
 
- -- Emmanuel Bourg <ebourg@apache.org>  Fri, 27 Nov 2015 09:24:11 +0100
+ -- Emmanuel Bourg <ebourg@apache.org>  Mon, 07 Dec 2015 13:20:26 +0100
 
 maven-debian-helper (2.0~exp2) experimental; urgency=medium
 
