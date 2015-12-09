@@ -1,3 +1,10 @@
+maven-debian-helper (2.0) unstable; urgency=medium
+
+  * Team upload.
+  * Upload to unstable
+
+ -- Emmanuel Bourg <ebourg@apache.org>  Wed, 09 Dec 2015 09:52:13 +0100
+
 maven-debian-helper (2.0~exp3) experimental; urgency=medium
 
   * Team upload.
