@@ -89,6 +89,8 @@ sub test {
 sub install {
 	my $this=shift;
 	my @resolvedep_args;
+	my @install_args = @_;
+	shift @install_args;
 
 	opendir(my $dirhandle, "/usr/share/maven-repo/org/debian/maven/maven-packager-utils/")
 		|| die "maven debian helper not found";
@@ -100,7 +102,7 @@ sub install {
 	}
 	push(@resolvedep_args, "--base-directory=$this->{cwd}", "--non-explore");
 
-	$this->doit_in_builddir(@{$this->{maven_cmd}},
+	$this->doit_in_builddir(@{$this->{maven_cmd}}, @install_args,
 		"-Ddebian.dir=$this->{cwd}/debian",
 		"-Ddebian.package=$this->{package}",
 		"-Dmaven.repo.local=$this->{cwd}/debian/maven-repo",
