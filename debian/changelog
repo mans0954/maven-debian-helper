@@ -1,11 +1,11 @@
-maven-debian-helper (2.0.1) UNRELEASED; urgency=medium
+maven-debian-helper (2.0.1) unstable; urgency=medium
 
   * Team upload.
   * The dh_auto_install arguments are now passed to Maven
     (for example to specify the location of the build file with
     dh_auto_install -- -f foo/pom.xml)
 
- -- Emmanuel Bourg <ebourg@apache.org>  Fri, 11 Dec 2015 10:48:06 +0100
+ -- Emmanuel Bourg <ebourg@apache.org>  Fri, 11 Dec 2015 14:46:22 +0100
 
 maven-debian-helper (2.0) unstable; urgency=medium
 
