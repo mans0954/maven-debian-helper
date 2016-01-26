@@ -3,6 +3,10 @@ maven-debian-helper (2.0.3) UNRELEASED; urgency=medium
   * Team upload.
   * Build the plugin metadata for the org.codehaus.plexus group
     when copying the Maven repository.
+  * Fixed the test failure with testSolvePlexusActiveCollectionsDependencies
+    in DependenciesSolverTest. It should have been updated with
+    maven-debian-helper 1.6.8 when the provided dependencies stopped
+    from being included in the package dependencies.
 
  -- Emmanuel Bourg <ebourg@apache.org>  Wed, 27 Jan 2016 00:03:54 +0100
 
