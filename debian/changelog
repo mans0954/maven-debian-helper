@@ -1,6 +1,7 @@
 maven-debian-helper (2.0.3) UNRELEASED; urgency=medium
 
   * Team upload.
+  * Fixed the --no-usj-versionless option (Closes: #766392)
   * Build the plugin metadata for the org.codehaus.plexus group
     when copying the Maven repository.
   * Fixed the test failure with testSolvePlexusActiveCollectionsDependencies

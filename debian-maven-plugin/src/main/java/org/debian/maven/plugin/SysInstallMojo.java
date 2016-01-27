@@ -620,10 +620,10 @@ public class SysInstallMojo extends AbstractMojo {
         if (jarFile.exists()) {
             System.out.println("Install jar for " + artifactId + " into /usr/share/java");
             mkdir(compatSharePath());
-            FileUtils.copyFile(jarFile, new File(fullCompatPath()));
             if (noUsjVersionless) {
-                link(destUsjJarName(), versionedFullCompatPath());
+                FileUtils.copyFile(jarFile, new File(versionedFullCompatPath()));
             } else {
+                FileUtils.copyFile(jarFile, new File(fullCompatPath()));
                 link(destUsjJarName(), fullCompatPath());
                 link(destUsjJarName(), versionedFullCompatPath());
             }
