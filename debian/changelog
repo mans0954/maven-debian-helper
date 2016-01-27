@@ -1,4 +1,4 @@
-maven-debian-helper (2.0.3) UNRELEASED; urgency=medium
+maven-debian-helper (2.0.3) unstable; urgency=medium
 
   * Team upload.
   * Fixed the --no-usj-versionless option (Closes: #766392)
@@ -12,7 +12,7 @@ maven-debian-helper (2.0.3) UNRELEASED; urgency=medium
     maven-debian-helper 1.6.8 when the provided dependencies stopped
     from being included in the package dependencies.
 
- -- Emmanuel Bourg <ebourg@apache.org>  Wed, 27 Jan 2016 00:03:54 +0100
+ -- Emmanuel Bourg <ebourg@apache.org>  Wed, 27 Jan 2016 09:51:30 +0100
 
 maven-debian-helper (2.0.2) unstable; urgency=medium
 
