@@ -1,3 +1,11 @@
+maven-debian-helper (2.0.4) unstable; urgency=medium
+
+  * Team upload.
+  * Build the plugin metadata for the org.sonatype.plugins group
+    when copying the Maven repository.
+
+ -- Emmanuel Bourg <ebourg@apache.org>  Thu, 28 Jan 2016 15:37:35 +0100
+
 maven-debian-helper (2.0.3) unstable; urgency=medium
 
   * Team upload.
