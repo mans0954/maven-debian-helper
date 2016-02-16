@@ -17,7 +17,7 @@ Build-Depends-Indep: junit4,
                      maven-repo-helper (>= 1.8.9)
 Standards-Version: 3.9.7
 Vcs-Git: git://anonscm.debian.org/pkg-java/maven-debian-helper.git
-Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-java/maven-debian-helper.git
+Vcs-Browser: https://anonscm.debian.org/cgit/pkg-java/maven-debian-helper.git
 Homepage: http://wiki.debian.org/Java/MavenBuilder
 
 Package: maven-debian-helper
