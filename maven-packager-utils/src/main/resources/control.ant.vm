@@ -22,7 +22,7 @@ Build-Depends: debhelper (>= 9), default-jdk, maven-repo-helper (>= 1.7.1)#if ($
 #if(!$buildDependencies.isEmpty())
 Build-Depends-Indep:#printDependencies($buildDependencies)$space
 #end
-Standards-Version: 3.9.6
+Standards-Version: 3.9.7
 Vcs-Git: git://anonscm.debian.org/pkg-java/${package}.git
 Vcs-Browser: http://anonscm.debian.org/cgit/pkg-java/${package}.git
 Homepage:#if(${project.Url}) ${project.Url}#else TODO #end
