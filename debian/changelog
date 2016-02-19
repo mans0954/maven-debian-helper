@@ -4,6 +4,7 @@ maven-debian-helper (2.0.5) UNRELEASED; urgency=medium
   * Standards-Version updated to 3.9.7 (no changes)
   * The generated control file now specifies Standards-Version: 3.9.7
   * Use a secure Vcs-Git URL in the generated control file
+  * Updated debian/copyright
 
  -- Emmanuel Bourg <ebourg@apache.org>  Tue, 16 Feb 2016 12:55:41 +0100
 
