@@ -3,6 +3,8 @@ maven-debian-helper (2.0.6) UNRELEASED; urgency=medium
   * Team upload.
   * Inject plexus-utils 2.x instead of 1.1 in the dependency graph
     of the plugins not defining a dependency on it already (Closes: #813287)
+  * Build the plugin metadata for the com.thoughtworks.paranamer group
+    when copying the Maven repository.
 
  -- Emmanuel Bourg <ebourg@apache.org>  Mon, 29 Feb 2016 09:13:41 +0100
 

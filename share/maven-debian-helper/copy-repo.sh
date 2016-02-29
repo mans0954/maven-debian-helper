@@ -18,7 +18,7 @@ set -e
 
 SRC_REPO="/usr/share/maven-repo"
 DEST_REPO="$1/maven-repo"
-PLUGIN_GROUPS="org.apache.maven.plugins org.codehaus.mojo org.codehaus.plexus org.apache.felix org.sonatype.plugins"
+PLUGIN_GROUPS="org.apache.maven.plugins org.codehaus.mojo org.codehaus.plexus org.apache.felix org.sonatype.plugins com.thoughtworks.paranamer"
 METADATA_NAME="maven-metadata-local.xml"
 
 find_src_poms() {
