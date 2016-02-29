@@ -72,7 +72,7 @@ public class LicensesScanner {
 
     private String getAvailableLicenses() {
         return "Apache-2.0 Artistic BSD FreeBSD ISC CC-BY CC-BY-SA CC-BY-ND CC-BY-NC CC-BY-NC-SA\n"
-         + "CC-BY-NC-ND CC0 CDDL CPL Eiffel Expat GPL-2 GPL-3 LGPL-2 LGPL-2.1 LGPL-3"
+         + "CC-BY-NC-ND CC0 CDDL CPL Eiffel EPL-1.0 Expat GPL-2 GPL-3 LGPL-2 LGPL-2.1 LGPL-3"
          + "GFDL-1.2 GFDL-1.3 GFDL-NIV LPPL MPL Perl PSF QPL W3C-Software ZLIB Zope";
     }
 
@@ -98,6 +98,11 @@ public class LicensesScanner {
                 recognized = true;
             } else if (licenseName.contains("1.1") || licenseUrl.contains("1.1")) {
                 licenses.add("Apache-1.1");
+                recognized = true;
+            }
+        } else if (licenseName.contains("epl") || licenseUrl.contains("epl")) {
+            if (licenseName.contains("1.0") || licenseUrl.contains("v10")) {
+                licenses.add("EPL-1.0");
                 recognized = true;
             }
         } else if (licenseName.contains("lgpl ") || licenseUrl.contains("lgpl")) {

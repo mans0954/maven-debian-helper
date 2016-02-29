@@ -5,6 +5,7 @@ maven-debian-helper (2.0.6) UNRELEASED; urgency=medium
     of the plugins not defining a dependency on it already (Closes: #813287)
   * Build the plugin metadata for the com.thoughtworks.paranamer group
     when copying the Maven repository.
+  * mh_make now recognizes the EPL-1.0 license (Closes: #814632)
 
  -- Emmanuel Bourg <ebourg@apache.org>  Mon, 29 Feb 2016 09:13:41 +0100
 
