@@ -74,6 +74,6 @@ if [ ! -e .debianVersion -a ! -e debian/stamp-poms-patched ]; then
     fi
 fi
 
-java $JAVA_OPTS -cp $CLASSPATH org.debian.maven.packager.DependenciesSolver ${NON_INTERACTIVE:+--non-interactive} ${NON_EXPLORE:+--non-explore} ${OFFLINE:+--offline} ${ANT:+--ant} ${GEN_JAVADOC:+--generate-javadoc} ${BASE_DIR:+--base-directory=$BASE_DIR} --package=$PACKAGE --maven-repo=/usr/share/maven-repo
+java $JAVA_OPTS -cp $CLASSPATH org.debian.maven.packager.DependenciesSolver ${NON_INTERACTIVE:+--non-interactive} ${NON_EXPLORE:+--non-explore} ${OFFLINE:+--offline} ${ANT:+--ant} ${GEN_JAVADOC:+--generate-javadoc} ${BASE_DIR:+--base-directory=$BASE_DIR} ${VERBOSE:+--verbose} --package=$PACKAGE --maven-repo=/usr/share/maven-repo
 
 perl -p -i -e 's/maven\./maven:/' debian/${PACKAGE}.substvars
