@@ -163,8 +163,11 @@ public class IgnoreDependencyQuestions {
     }
 
     private boolean askIgnoreDependency(String sourcePomLoc, Dependency dependency, String message, boolean defaultToIgnore) {
-        if (!interactive || notIgnoredDependencies.contains(dependency)) {
+        if (notIgnoredDependencies.contains(dependency)) {
             return false;
+        }
+        if (!interactive) {
+            return defaultToIgnore;
         }
         String question = "\n" + "In " + sourcePomLoc + ": " + message + "  " + dependency;
         boolean ignore = new YesNoQuestion(question, defaultToIgnore).ask();
