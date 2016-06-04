@@ -20,6 +20,7 @@ syntax()
    echo -e "\t-V --version: show the version"
    echo -e "\t-p<package> --package=<package>: name of the package"
    echo -e "\t-a --ant: use Ant for the packaging instead of Maven"
+   echo -e "\t-t --run-tests: include or not the tests"
    echo -e "\t-j --javadoc: resolve the Javadoc dependencies"
    echo -e "\t-n --non-interactive: non interactive mode, don't ask questions"
    echo -e "\t-o --offline: don't ever connect to the internet, for Debian build"
@@ -42,10 +43,11 @@ syntax()
    exit 1
 }
 
-ARGS="p package a ant d javadoc v verbose n non-interactive o offline b base-directory non-explore" parseargs "$@"
+ARGS="p package a ant d javadoc v verbose n non-interactive o offline b base-directory non-explore t run-tests" parseargs "$@"
 
 PACKAGE=$(getarg p package)
 ANT=$(getarg a ant)
+RUN_TESTS=$(getarg t run-tests)
 GEN_JAVADOC=$(getarg j javadoc)
 NON_INTERACTIVE=$(getarg n non-interactive)
 OFFLINE=$(getarg o offline)
@@ -74,6 +76,6 @@ if [ ! -e .debianVersion -a ! -e debian/stamp-poms-patched ]; then
     fi
 fi
 
-java $JAVA_OPTS -cp $CLASSPATH org.debian.maven.packager.DependenciesSolver ${NON_INTERACTIVE:+--non-interactive} ${NON_EXPLORE:+--non-explore} ${OFFLINE:+--offline} ${ANT:+--ant} ${GEN_JAVADOC:+--generate-javadoc} ${BASE_DIR:+--base-directory=$BASE_DIR} ${VERBOSE:+--verbose} --package=$PACKAGE --maven-repo=/usr/share/maven-repo
+java $JAVA_OPTS -cp $CLASSPATH org.debian.maven.packager.DependenciesSolver ${NON_INTERACTIVE:+--non-interactive} ${NON_EXPLORE:+--non-explore} ${OFFLINE:+--offline} ${ANT:+--ant} ${GEN_JAVADOC:+--generate-javadoc} ${RUN_TESTS:+--run-tests} ${BASE_DIR:+--base-directory=$BASE_DIR} ${VERBOSE:+--verbose} --package=$PACKAGE --maven-repo=/usr/share/maven-repo
 
 perl -p -i -e 's/maven\./maven:/' debian/${PACKAGE}.substvars

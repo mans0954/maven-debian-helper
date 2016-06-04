@@ -7,6 +7,7 @@ maven-debian-helper (2.1.1) unstable; urgency=medium
  -- Emmanuel Bourg <ebourg@apache.org>  Thu, 30 Jun 2016 16:58:44 +0200
 
   * Add non-interactive option to mh_make
+  * Add test option to mh_resolve_dependencies
 
  -- Christopher Hoskin <christopher.hoskin@gmail.com>  Wed, 29 Jun 2016 07:28:49 +0100
 
