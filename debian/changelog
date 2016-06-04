@@ -6,6 +6,11 @@ maven-debian-helper (2.1.1) unstable; urgency=medium
 
  -- Emmanuel Bourg <ebourg@apache.org>  Thu, 30 Jun 2016 16:58:44 +0200
 
+  * Add non-interactive option to mh_make
+
+ -- Christopher Hoskin <christopher.hoskin@gmail.com>  Wed, 29 Jun 2016 07:28:49 +0100
+
+
 maven-debian-helper (2.1) unstable; urgency=medium
 
   * Team upload.
@@ -19,6 +24,7 @@ maven-debian-helper (2.1) unstable; urgency=medium
 maven-debian-helper (2.0.7) unstable; urgency=medium
 
   * Team upload.
+  * Fix "mh_resolve_dependencies fails to honour --verbose option" (Closes: #820161)
 
   [ Emmanuel Bourg ]
   * Added maven-doap-plugin and coveralls-maven-plugin to the ignored plugins

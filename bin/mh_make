@@ -21,6 +21,7 @@ syntax()
    echo -e "\t-t<true|false> --run-tests=<true|false>: include or not the tests"
    echo -e "\t-d<true|false> --javadoc=<true|false>: include or not the javadoc"
    echo -e "\t  during the build"
+   echo -e "\t-n --non-interactive: non interactive mode, don't ask questions"
    echo -e "\t--cdbs: use CDBS as the build helper instead of DH"
    echo -e "\t-a --ant: use Ant for the packaging instead of Maven"
    echo -e "\t-v --verbose: show more information while running"
@@ -39,7 +40,7 @@ syntax()
    exit 1
 }
 
-ARGS="p package b bin-package t run-tests d javadoc a ant v verbose s from-svn cdbs" parseargs "$@"
+ARGS="p package b bin-package t run-tests d javadoc a ant v verbose n non-interactive s from-svn cdbs" parseargs "$@"
 
 if [ -z "$DEBFULLNAME" ]; then
   echo "Please define the environment variable DEBFULLNAME, e.g."
@@ -71,6 +72,7 @@ ANT=$(getarg a ant)
 CDBS=$(getarg cdbs)
 FROM_SVN=$(getarg s from-svn)
 VERBOSE=$(getarg v verbose)
+NON_INTERACTIVE=$(getarg n non-interactive)
 
 if [ "$FROM_SVN" == "true" ]; then
 	echo "The syntax for the --from-svn option is --from-svn=<url>, please try again"
@@ -83,11 +85,15 @@ if [ -z "$PACKAGE" ]; then
 	PACKAGE=$(echo "$FROM_SVN" | sed 's/-[0-9].*//')
         PACKAGE=$(echo "$PACKAGE" | sed 's|.*/||' )
     fi
-    echo
-    echo "Enter the name of the new Debian source package:"
-    read -p "[$PACKAGE] > " USER_PACKAGE
-    if [ -n "$USER_PACKAGE" ]; then
-        PACKAGE=$USER_PACKAGE
+    if [ "$NON_INTERACTIVE" != true ]; then
+        echo
+        echo "Enter the name of the new Debian source package:"
+        read -p "[$PACKAGE] > " USER_PACKAGE
+        if [ -n "$USER_PACKAGE" ]; then
+            PACKAGE=$USER_PACKAGE
+        fi
+    else
+        echo "Using source package name $PACKAGE, override with option --package=<package>."
     fi
 fi
 
@@ -98,21 +104,29 @@ if [ -z "$BIN_PACKAGE" ]; then
     else
         BIN_PACKAGE="lib${PACKAGE}-java"
     fi
+    if [ "$NON_INTERACTIVE" != true ]; then
 	echo
-    echo "Enter the name of the binary package:"
-    read -p "[$BIN_PACKAGE] > " USER_PACKAGE
-    if [ -n "$USER_PACKAGE" ]; then
-        BIN_PACKAGE=$USER_PACKAGE
+        echo "Enter the name of the binary package:"
+        read -p "[$BIN_PACKAGE] > " USER_PACKAGE
+        if [ -n "$USER_PACKAGE" ]; then
+            BIN_PACKAGE=$USER_PACKAGE
+        fi
+    else
+        echo "Using binary package name $PACKAGE, override with option --bin-package=<package>."
     fi
 fi
 
 if [ -z "$RUN_TESTS" ]; then
-	echo
-    echo "Run tests while building the package?"
-    read -p "[Y/n] > " RUN
     RUN_TESTS="true"
-    if [ "$RUN" == "n" ]; then
-        RUN_TESTS=
+    if [ "$NON_INTERACTIVE" != true ]; then
+        echo
+        echo "Run tests while building the package?"
+        read -p "[Y/n] > " RUN
+        if [ "$RUN" == "n" ]; then
+            RUN_TESTS=
+        fi
+    else
+	echo "Tests will be run whilst building the package, override with option --run-tests=false."
     fi
 elif [ "$RUN_TESTS"="false" ]; then
     RUN_TESTS=
@@ -120,12 +134,16 @@ fi
 
 
 if [ -z "$GEN_JAVADOC" ]; then
-	echo
-    echo "Generate the Javadoc while building the package?"
-    read -p "[Y/n] > " GEN
     GEN_JAVADOC="true"
-    if [ "$GEN" == "n" ]; then
-        GEN_JAVADOC=
+    if [ "$NON_INTERACTIVE" != true ]; then
+	echo
+        echo "Generate the Javadoc while building the package?"
+        read -p "[Y/n] > " GEN
+        if [ "$GEN" == "n" ]; then
+            GEN_JAVADOC=
+        fi
+    else
+        echo "Javadoc will be generated whilst building the package, override with option --javadoc=false."
     fi
 elif [ "$GEN_JAVADOC"="false" ]; then
     GEN_JAVADOC=
@@ -188,7 +206,7 @@ if [ -f debian/patches/series ]; then
 fi
 
 echo
-java -cp /usr/share/java/maven-project.jar:/usr/share/java/maven-repo-helper.jar:/usr/share/java/maven-packager-utils.jar:/usr/share/maven2/lib/maven-debian-uber.jar org.debian.maven.packager.DependenciesSolver --verbose --package="$BIN_PACKAGE" ${ANT:+--ant} ${GEN_JAVADOC:+--generate-javadoc} ${RUN_TESTS:+--run-tests} ${VERBOSE:+--verbose} --maven-repo=/usr/share/maven-repo
+java -cp /usr/share/java/maven-project.jar:/usr/share/java/maven-repo-helper.jar:/usr/share/java/maven-packager-utils.jar:/usr/share/maven2/lib/maven-debian-uber.jar org.debian.maven.packager.DependenciesSolver --verbose --package="$BIN_PACKAGE" ${ANT:+--ant} ${GEN_JAVADOC:+--generate-javadoc} ${RUN_TESTS:+--run-tests} ${VERBOSE:+--verbose} ${NON_INTERACTIVE:+--non-interactive} --maven-repo=/usr/share/maven-repo
 
 if [ $? != 0 ]; then
     if [ -f debian/patches/series ]; then
