@@ -16,6 +16,8 @@ maven-debian-helper (2.0.7) UNRELEASED; urgency=medium
   * Fix "Using wrong path to mvnDebug when checking if apt-file"
     Updated path for mvnDebug in mh_make (Closes: #726609)
   * DependancySolver displays the relative path to poms (Closes: #826433)
+  * Fix mh_make so that the dependency resolution is properly affected by
+    --run-tests=false and --javadoc=false work (Closes: #827732)
 
   [ Luca Vercelli ]
   * Fixed an error when copy-repo.sh encounters artifacts with ".pom"

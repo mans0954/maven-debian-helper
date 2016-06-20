@@ -114,7 +114,10 @@ if [ -z "$RUN_TESTS" ]; then
     if [ "$RUN" == "n" ]; then
         RUN_TESTS=
     fi
+elif [ "$RUN_TESTS"="false" ]; then
+    RUN_TESTS=
 fi
+
 
 if [ -z "$GEN_JAVADOC" ]; then
 	echo
@@ -124,6 +127,8 @@ if [ -z "$GEN_JAVADOC" ]; then
     if [ "$GEN" == "n" ]; then
         GEN_JAVADOC=
     fi
+elif [ "$GEN_JAVADOC"="false" ]; then
+    GEN_JAVADOC=
 fi
 
 echo
