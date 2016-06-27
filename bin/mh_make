@@ -59,7 +59,7 @@ if [ -z "$DEBEMAIL" ]; then
 fi
 
 if [ -z "$DEBLICENSE" ]; then
-    echo "Environment variable DEBLICENSE not set, using GPL-3+ by default"
+    echo "Environment variable DEBLICENSE not set, using Apache-2.0 by default"
     DEBLICENSE="Apache-2.0"
 fi
 
