@@ -22,7 +22,7 @@ PLUGIN_GROUPS="org.apache.maven.plugins org.codehaus.mojo org.codehaus.plexus or
 METADATA_NAME="maven-metadata-local.xml"
 
 find_src_poms() {
-  find -L $SRC_REPO -name '*.pom' -printf '%P\n'
+  find -L $SRC_REPO -type f -name '*.pom' -printf '%P\n'
 }
 
 find_group_artifact_ids() {
