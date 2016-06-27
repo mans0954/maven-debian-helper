@@ -1,4 +1,4 @@
-maven-debian-helper (2.0.7) UNRELEASED; urgency=medium
+maven-debian-helper (2.0.7) unstable; urgency=medium
 
   * Team upload.
 
@@ -23,7 +23,7 @@ maven-debian-helper (2.0.7) UNRELEASED; urgency=medium
   * Fixed an error when copy-repo.sh encounters artifacts with ".pom"
     in the artifactId
 
- -- Christopher Hoskin <christopher.hoskin@gmail.com>  Sat, 09 Apr 2016 21:47:26 +0100
+ -- Emmanuel Bourg <ebourg@apache.org>  Tue, 28 Jun 2016 00:31:21 +0200
 
 maven-debian-helper (2.0.6) unstable; urgency=medium
 
