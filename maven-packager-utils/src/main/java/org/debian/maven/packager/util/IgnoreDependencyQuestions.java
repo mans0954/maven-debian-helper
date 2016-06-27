@@ -41,6 +41,7 @@ public class IgnoreDependencyQuestions {
         {"org.apache.maven.plugins", "maven-archetype-plugin"},
         {"org.apache.maven.plugins", "changelog-maven-plugin"},
         {"org.apache.maven.plugins", "maven-deploy-plugin"},
+        {"org.apache.maven.plugins", "maven-doap-plugin"},
         {"org.apache.maven.plugins", "maven-release-plugin"},
         {"org.apache.maven.plugins", "maven-repository-plugin"},
         {"org.apache.maven.plugins", "maven-scm-plugin"},
