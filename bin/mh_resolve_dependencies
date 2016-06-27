@@ -26,7 +26,7 @@ syntax()
    echo -e "\t  compatibility."
    echo -e "\t-v --verbose: show more information while running"
    echo -e "\t-b --base-directory: path to root directory of package"
-   echo -e "\t-n --non-explore: doesn't explore directories for pom.xml"
+   echo -e "\t   --non-explore: doesn't explore directories for pom.xml"
    echo -e ""
    echo -e "Description:"
    echo -e "This tool reads the POM files defined in debian/$package.poms"
@@ -42,7 +42,7 @@ syntax()
    exit 1
 }
 
-ARGS="p package a ant d javadoc v verbose n non-interactive o offline b base-directory n non-explore" parseargs "$@"
+ARGS="p package a ant d javadoc v verbose n non-interactive o offline b base-directory non-explore" parseargs "$@"
 
 PACKAGE=$(getarg p package)
 ANT=$(getarg a ant)
@@ -51,7 +51,7 @@ NON_INTERACTIVE=$(getarg n non-interactive)
 OFFLINE=$(getarg o offline)
 VERBOSE=$(getarg v verbose)
 BASE_DIR=$(getarg b base-directory)
-NON_EXPLORE=$(getarg n non-explore)
+NON_EXPLORE=$(getarg non-explore)
 
 if [ -z "$PACKAGE" ]; then
     if [ "$ARGC" -gt "0" ]; then
