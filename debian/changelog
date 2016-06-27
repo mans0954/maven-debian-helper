@@ -5,6 +5,7 @@ maven-debian-helper (2.0.7) UNRELEASED; urgency=medium
   [ Emmanuel Bourg ]
   * Added org.eluder.coveralls:coveralls-maven-plugin to the ignored plugins
   * Standards-Version updated to 3.9.8
+  * The generated control file now specifies Standards-Version: 3.9.8
 
   [ Christopher Hoskin ]
   * Fix "mh_resolve_dependencies fails to honour --verbose option" 
