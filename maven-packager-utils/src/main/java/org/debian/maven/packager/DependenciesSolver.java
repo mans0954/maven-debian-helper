@@ -544,7 +544,9 @@ public class DependenciesSolver {
             return dependency;
         }
 
-        String sourcePomLoc = sourcePom.getName();
+        String sourcePomLoc = sourcePom.getAbsolutePath();
+        String baseDirPath = baseDir.getAbsolutePath();
+        sourcePomLoc = sourcePomLoc.substring(baseDirPath.length() + 1, sourcePomLoc.length());
         if (verbose) {
              System.out.println("Resolving " + dependency + (dependency.getScope() == null ? "" : " of scope " + dependency.getScope()) + "...");
         }
