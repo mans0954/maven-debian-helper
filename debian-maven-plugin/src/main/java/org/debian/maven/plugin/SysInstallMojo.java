@@ -394,21 +394,28 @@ public class SysInstallMojo extends AbstractMojo {
      * returns e.g. /org/debian/maven/debian-maven-plugin/0.1/
      */
     protected final String repoPath() {
-        return "/" + groupId.replace('.', '/') + "/" + artifactId + "/" + version + "/";
+        return artifactPath(groupId, artifactId, version);
     }
 
     /**
      * returns e.g. /org/debian/maven/debian-maven-plugin/0.1/
      */
     protected final String destRepoPath() {
-        return "/" + destGroupId.replace('.', '/') + "/" + destArtifactId + "/" + version + "/";
+        return artifactPath(destGroupId, destArtifactId, version);
     }
 
     /**
      * returns e.g. /org/debian/maven/debian-maven-plugin/debian/
      */
     protected final String debianRepoPath() {
-        return "/" + destGroupId.replace('.', '/') + "/" + destArtifactId + "/" + debianVersion + "/";
+        return artifactPath(destGroupId, destArtifactId, debianVersion);
+    }
+
+    /**
+     * Path to the files of an artifact relatively to the root of the repository.
+     */
+    private String artifactPath(String groupId, String artifactId, String version) {
+        return "/" + groupId.replace('.', '/') + "/" + artifactId + "/" + version + "/";
     }
 
     /**
