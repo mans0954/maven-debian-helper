@@ -432,16 +432,11 @@ public class SysInstallMojo extends AbstractMojo {
         return packagePath() + "/usr/share/maven-repo" + debianRepoPath();
     }
 
-    protected String pomName() {
+    /**
+     * Name of the pom file in the repository.
+     */
+    protected String pomName(String artifactId, String version) {
         return artifactId + "-" + version + ".pom";
-    }
-
-    protected String destPomName() {
-        return destArtifactId + "-" + version + ".pom";
-    }
-
-    protected String debianPomName() {
-        return destArtifactId + "-" + debianVersion + ".pom";
     }
 
     private String pomSrcPath() {
@@ -465,11 +460,11 @@ public class SysInstallMojo extends AbstractMojo {
     }
 
     private String pomDestPath() {
-        return fullRepoPath() + destPomName();
+        return fullRepoPath() + pomName(destArtifactId, version);
     }
 
     private String debianPomDestPath() {
-        return debianFullRepoPath() + debianPomName();
+        return debianFullRepoPath() + pomName(destArtifactId, debianVersion);
     }
 
     protected String jarName() {
