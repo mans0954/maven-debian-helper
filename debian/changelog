@@ -1,6 +1,7 @@
 maven-debian-helper (2.2) UNRELEASED; urgency=medium
 
   * Team upload.
+  * Added the debian.package property in the relocated poms
   * Fixed a NPE when no relocation is specified
 
  -- Emmanuel Bourg <ebourg@apache.org>  Thu, 30 Jun 2016 16:20:45 +0200

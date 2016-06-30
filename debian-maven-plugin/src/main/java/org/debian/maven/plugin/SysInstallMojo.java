@@ -817,6 +817,9 @@ public class SysInstallMojo extends AbstractMojo {
                 "  <groupId>" + relocateArtifact.getGroupId() + "</groupId>\n" +
                 "  <artifactId>" + relocateArtifact.getArtifactId() + "</artifactId>\n" +
                 "  <version>" + relocateArtifact.getVersion() + "</version>\n" +
+                "  <properties>\n" +
+                "    <debian.package>" + destPackage + "</debian.package>\n" +
+                "  </properties>\n" +
                 "  <distributionManagement>\n" +
                 "    <relocation>\n" +
                 "      <groupId>" + destGroupId + "</groupId>\n" +
