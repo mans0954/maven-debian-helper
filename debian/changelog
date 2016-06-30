@@ -1,4 +1,4 @@
-maven-debian-helper (2.1) UNRELEASED; urgency=medium
+maven-debian-helper (2.1) unstable; urgency=medium
 
   * Team upload.
   * Added pom relocation support
@@ -6,7 +6,7 @@ maven-debian-helper (2.1) UNRELEASED; urgency=medium
   * Bumped the required version of maven-debian-helper to 2.1
     in the generated control files
 
- -- Emmanuel Bourg <ebourg@apache.org>  Thu, 30 Jun 2016 10:30:52 +0200
+ -- Emmanuel Bourg <ebourg@apache.org>  Thu, 30 Jun 2016 12:55:06 +0200
 
 maven-debian-helper (2.0.7) unstable; urgency=medium
 
