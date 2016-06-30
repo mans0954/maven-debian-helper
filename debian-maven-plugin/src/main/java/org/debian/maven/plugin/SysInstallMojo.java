@@ -610,7 +610,7 @@ public class SysInstallMojo extends AbstractMojo {
     protected void copyJar() throws IOException {
         File jarFile = new File(fullJarName());
         if (jarFile.exists()) {
-            System.out.println("Install jar file into Maven repo: " + jarFile.getAbsolutePath());
+            getLog().info("Install jar file into Maven repo: " + jarFile.getAbsolutePath());
             FileUtils.copyFile(jarFile, new File(jarDestPath()));
             if (debianVersion != null && !debianVersion.equals(version)) {
                 mkdir(debianFullRepoPath());
@@ -625,7 +625,7 @@ public class SysInstallMojo extends AbstractMojo {
     private void copyJarToUsj() throws IOException {
         File jarFile = new File(fullJarName());
         if (jarFile.exists()) {
-            System.out.println("Install jar for " + artifactId + " into /usr/share/java");
+            getLog().info("Install jar for " + artifactId + " into /usr/share/java");
             mkdir(compatSharePath());
             if (noUsjVersionless) {
                 FileUtils.copyFile(jarFile, new File(versionedFullCompatPath()));
@@ -735,22 +735,22 @@ public class SysInstallMojo extends AbstractMojo {
         String mavenPublishedRulesPath = new File(debianDir, mavenPublishedRules).getAbsolutePath();
         params.add("--published-rules=" + mavenPublishedRulesPath);
 
-        System.out.println("Cleaning pom file: " + pomFile + " with options:");
-        System.out.println("\t--keep-pom-version --package=" + destPackage);
-        System.out.println("\t--rules=" + mavenRulesPath);
-        System.out.println("\t--ignore-rules=" + mavenIgnoreRulesPath);
-        System.out.println("\t--published-rules=" + mavenPublishedRulesPath);
+        getLog().info("Cleaning pom file: " + pomFile + " with options:");
+        getLog().info("\t--keep-pom-version --package=" + destPackage);
+        getLog().info("\t--rules=" + mavenRulesPath);
+        getLog().info("\t--ignore-rules=" + mavenIgnoreRulesPath);
+        getLog().info("\t--published-rules=" + mavenPublishedRulesPath);
 
         // add optional --no-parent option
         if (pomOption != null && pomOption.isNoParent()) {
             params.add("--no-parent");
-            System.out.println("\t--no-parent");
+            getLog().info("\t--no-parent");
         }
 
         // add options --keep-elements option
         if (pomOption != null && pomOption.getKeepElements() != null) {
             params.add("--keep-elements=" + pomOption.getKeepElements());
-            System.out.println("\t--keep-elements=" + pomOption.getKeepElements());
+            getLog().info("\t--keep-elements=" + pomOption.getKeepElements());
         }
 
         params.add(pomFile.getAbsolutePath());
