@@ -3,6 +3,8 @@ maven-debian-helper (2.1) UNRELEASED; urgency=medium
   * Team upload.
   * Added pom relocation support
   * Depend on maven-repo-helper >= 1.9
+  * Bumped the required version of maven-debian-helper to 2.1
+    in the generated control files
 
  -- Emmanuel Bourg <ebourg@apache.org>  Thu, 30 Jun 2016 10:30:52 +0200
 
