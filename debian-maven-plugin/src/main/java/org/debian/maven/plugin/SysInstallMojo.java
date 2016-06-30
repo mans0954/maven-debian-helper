@@ -16,6 +16,7 @@
 
 package org.debian.maven.plugin;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -27,6 +28,8 @@ import java.util.regex.Pattern;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.io.RawInputStreamFacade;
+import org.debian.maven.repo.Dependency;
 import org.debian.maven.repo.ListOfPOMs;
 import org.debian.maven.repo.POMCleaner;
 import org.debian.maven.repo.POMOptions;
@@ -197,6 +200,10 @@ public class SysInstallMojo extends AbstractMojo {
 
     private String classifier;
 
+    /**
+     * The Maven artifacts relocated to this artifact.
+     */
+    private List<Dependency> relocatedArtifacts;
 
     // ----------------------------------------------------------------------
     // Public methods
@@ -717,6 +724,8 @@ public class SysInstallMojo extends AbstractMojo {
             // creation
             installToUsj = pomOption.isJavaLib() ||
                            (packageIsJavaLib && installToUsj);
+
+            relocatedArtifacts = pomOption.getRelocatedArtifacts();
         }
 
         List<String> params = new ArrayList<String>();
@@ -786,6 +795,37 @@ public class SysInstallMojo extends AbstractMojo {
     }
 
     /**
+     * Install the relocated poms
+     */
+    protected void relocatePoms() throws IOException {
+        for (Dependency relocated : relocatedArtifacts) {
+            getLog().info("Relocating " + relocated.formatCompactNotation());
+
+            File relocatedPath = new File(packagePath() + "/usr/share/maven-repo" + artifactPath(relocated.getGroupId(), relocated.getArtifactId(), relocated.getVersion()));
+            File relocatedPom = new File(relocatedPath, pomName(relocated.getArtifactId(), relocated.getVersion()));
+            String pom = createRelocationPom(relocated);
+
+            FileUtils.copyStreamToFile(new RawInputStreamFacade(new ByteArrayInputStream(pom.getBytes("UTF-8"))), relocatedPom);
+        }
+    }
+
+    private String createRelocationPom(Dependency relocateArtifact) {
+        return "<project>\n" +
+                "  <modelVersion>4.0.0</modelVersion>\n" +
+                "  <groupId>" + relocateArtifact.getGroupId() + "</groupId>\n" +
+                "  <artifactId>" + relocateArtifact.getArtifactId() + "</artifactId>\n" +
+                "  <version>" + relocateArtifact.getVersion() + "</version>\n" +
+                "  <distributionManagement>\n" +
+                "    <relocation>\n" +
+                "      <groupId>" + destGroupId + "</groupId>\n" +
+                "      <artifactId>" + destArtifactId + "</artifactId>\n" +
+                "      <version>" + debianVersion + "</version>\n" +
+                "    </relocation>\n" +
+                "  </distributionManagement>\n" +
+                "</project>";
+    }
+
+    /**
      * Prepare the destination  directories: remove the directory symlinks that were created
      * by copy-repo.sh if they exist as they point to a directory owned by root and that cannot
      * be modified.
@@ -803,6 +843,7 @@ public class SysInstallMojo extends AbstractMojo {
         cleanPom();
         prepareDestDirs();
         copyPom();
+        relocatePoms();
         if (installToUsj) {
             copyJarToUsj();
             symlinkJar();

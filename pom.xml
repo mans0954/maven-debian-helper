@@ -23,7 +23,7 @@
             <dependency>
                 <groupId>org.debian.maven</groupId>
                 <artifactId>maven-repo-helper</artifactId>
-                <version>[1.8,2.0)</version>
+                <version>[1.9,2.0)</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.maven</groupId>
