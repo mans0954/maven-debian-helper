@@ -798,14 +798,16 @@ public class SysInstallMojo extends AbstractMojo {
      * Install the relocated poms
      */
     protected void relocatePoms() throws IOException {
-        for (Dependency relocated : relocatedArtifacts) {
-            getLog().info("Relocating " + relocated.formatCompactNotation());
+        if (relocatedArtifacts != null) {
+            for (Dependency relocated : relocatedArtifacts) {
+                getLog().info("Relocating " + relocated.formatCompactNotation());
 
-            File relocatedPath = new File(packagePath() + "/usr/share/maven-repo" + artifactPath(relocated.getGroupId(), relocated.getArtifactId(), relocated.getVersion()));
-            File relocatedPom = new File(relocatedPath, pomName(relocated.getArtifactId(), relocated.getVersion()));
-            String pom = createRelocationPom(relocated);
+                File relocatedPath = new File(packagePath() + "/usr/share/maven-repo" + artifactPath(relocated.getGroupId(), relocated.getArtifactId(), relocated.getVersion()));
+                File relocatedPom = new File(relocatedPath, pomName(relocated.getArtifactId(), relocated.getVersion()));
+                String pom = createRelocationPom(relocated);
 
-            FileUtils.copyStreamToFile(new RawInputStreamFacade(new ByteArrayInputStream(pom.getBytes("UTF-8"))), relocatedPom);
+                FileUtils.copyStreamToFile(new RawInputStreamFacade(new ByteArrayInputStream(pom.getBytes("UTF-8"))), relocatedPom);
+            }
         }
     }
 
