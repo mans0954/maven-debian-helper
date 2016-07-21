@@ -206,7 +206,7 @@ if [ -f debian/patches/series ]; then
 fi
 
 echo
-java -cp /usr/share/java/maven-project.jar:/usr/share/java/maven-repo-helper.jar:/usr/share/java/maven-packager-utils.jar:/usr/share/maven2/lib/maven-debian-uber.jar org.debian.maven.packager.DependenciesSolver --verbose --package="$BIN_PACKAGE" ${ANT:+--ant} ${GEN_JAVADOC:+--generate-javadoc} ${RUN_TESTS:+--run-tests} ${VERBOSE:+--verbose} ${NON_INTERACTIVE:+--non-interactive} --maven-repo=/usr/share/maven-repo
+java -cp /usr/share/java/maven-project.jar:/usr/share/java/maven-repo-helper.jar:/usr/share/java/maven-packager-utils.jar:/usr/share/maven2/lib/maven-debian-uber.jar org.debian.maven.packager.DependenciesSolver --package="$BIN_PACKAGE" ${ANT:+--ant} ${GEN_JAVADOC:+--generate-javadoc} ${RUN_TESTS:+--run-tests} ${VERBOSE:+--verbose} ${NON_INTERACTIVE:+--non-interactive} --maven-repo=/usr/share/maven-repo
 
 if [ $? != 0 ]; then
     if [ -f debian/patches/series ]; then
